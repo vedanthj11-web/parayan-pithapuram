@@ -7,510 +7,193 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Serif:wght@600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --saffron:#e2711d;
-    --saffron-dark:#c85a0e;
-    --maroon:#7a2e2e;
-    --cream:#fff8ee;
-    --gold:#c9a227;
-    --ink:#332218;
-    --border:#e8d9c0;
-    --success:#2f7d4f;
-  }
+  :root{--saffron:#e2711d;--saffron-dark:#c85a0e;--maroon:#7a2e2e;--cream:#fff8ee;--ink:#332218;--border:#e8d9c0;--success:#2f7d4f;}
   *{box-sizing:border-box;}
-  body{
-    margin:0;
-    font-family:'Poppins','Noto Sans Devanagari',sans-serif;
-    background:linear-gradient(180deg,#fff8ee 0%,#fbeed9 100%);
-    color:var(--ink);
-    min-height:100vh;
-    padding:0 0 60px 0;
-  }
-  header{
-    background:linear-gradient(120deg,var(--maroon),#5c2020);
-    color:#fdf1df;
-    padding:28px 20px 34px;
-    text-align:center;
-    box-shadow:0 4px 18px rgba(0,0,0,0.15);
-  }
-  header h1{
-    font-family:'Noto Serif','Noto Sans Devanagari',serif;
-    font-size:clamp(19px,4.3vw,30px);
-    margin:0 0 4px;
-    letter-spacing:.3px;
-  }
-  header h1 .eng{
-    display:block;
-    font-family:'Poppins',sans-serif;
-    font-size:clamp(12px,2.6vw,15px);
-    font-weight:400;
-    color:#f3d9b0;
-    margin-top:4px;
-    letter-spacing:.2px;
-  }
-  header p{
-    margin:10px 0 0;
-    font-size:clamp(13px,3vw,16px);
-    color:#f3d9b0;
-  }
-  .dates{
-    display:inline-block;
-    margin-top:10px;
-    background:rgba(255,255,255,0.12);
-    border:1px solid rgba(255,255,255,0.3);
-    padding:6px 16px;
-    border-radius:20px;
-    font-size:14px;
-    letter-spacing:.5px;
-  }
-  .container{
-    max-width:720px;
-    margin:-20px auto 0;
-    padding:0 16px;
-  }
-  form{
-    background:#fffefb;
-    border-radius:16px;
-    box-shadow:0 10px 30px rgba(122,46,46,0.12);
-    padding:clamp(18px,4vw,36px);
-    margin-top:20px;
-  }
-  .section{
-    margin-bottom:30px;
-  }
-  .section-title{
-    font-size:15px;
-    font-weight:600;
-    color:var(--saffron-dark);
-    letter-spacing:.3px;
-    margin-bottom:14px;
-    padding-bottom:8px;
-    border-bottom:2px solid var(--border);
-  }
-  .section-title .eng{
-    font-weight:400;
-    color:#a68a63;
-    font-size:12.5px;
-  }
-  .field{
-    margin-bottom:18px;
-  }
-  label{
-    display:block;
-    font-weight:500;
-    font-size:14.5px;
-    margin-bottom:6px;
-    color:var(--ink);
-  }
-  label .eng{
-    font-weight:400;
-    color:#8a7454;
-    font-size:12.5px;
-  }
-  label .req{
-    color:var(--saffron-dark);
-    margin-left:2px;
-  }
-  input[type="text"],
-  input[type="tel"],
-  input[type="number"],
-  select{
-    width:100%;
-    padding:12px 14px;
-    font-size:15px;
-    border:1.5px solid var(--border);
-    border-radius:10px;
-    background:#fffdf9;
-    font-family:inherit;
-    color:var(--ink);
-    transition:border-color .15s, box-shadow .15s;
-    -webkit-appearance:none;
-    appearance:none;
-  }
-  input:focus, select:focus{
-    outline:none;
-    border-color:var(--saffron);
-    box-shadow:0 0 0 3px rgba(226,113,29,0.15);
-  }
-  select{
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23c85a0e'><path d='M7 10l5 5 5-5z'/></svg>");
-    background-repeat:no-repeat;
-    background-position:right 12px center;
-    background-size:20px;
-    padding-right:38px;
-  }
-  .stepper{
-    display:flex;
-    align-items:center;
-    gap:14px;
-  }
-  .stepper button{
-    width:44px;
-    height:44px;
-    min-width:44px;
-    border-radius:10px;
-    border:1.5px solid var(--saffron);
-    background:#fff;
-    color:var(--saffron-dark);
-    font-size:20px;
-    font-weight:600;
-    cursor:pointer;
-    transition:background .15s;
-  }
-  .stepper button:active{
-    background:var(--saffron);
-    color:#fff;
-  }
-  .stepper .count{
-    min-width:44px;
-    text-align:center;
-    font-size:19px;
-    font-weight:600;
-  }
-  .person-blocks{
-    margin-top:16px;
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-  }
-  .person-card{
-    background:var(--cream);
-    border:1.5px solid var(--border);
-    border-radius:12px;
-    padding:14px;
-    animation:fadeIn .25s ease;
-  }
-  @keyframes fadeIn{
-    from{opacity:0; transform:translateY(-6px);}
-    to{opacity:1; transform:translateY(0);}
-  }
-  .person-card .p-title{
-    font-weight:600;
-    font-size:13.5px;
-    color:var(--maroon);
-    margin-bottom:10px;
-    letter-spacing:.3px;
-  }
-  .grid-3{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-  }
-  .grid-3 .full{
-    grid-column:1 / -1;
-  }
-  @media (min-width:600px){
-    .grid-3{
-      grid-template-columns:2fr 1fr 1.5fr;
-    }
-    .grid-3 .full{
-      grid-column:auto;
-    }
-  }
-  .radio-group{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-  }
-  .radio-option{
-    display:flex;
-    align-items:flex-start;
-    gap:10px;
-    border:1.5px solid var(--border);
-    border-radius:10px;
-    padding:12px 14px;
-    cursor:pointer;
-    transition:border-color .15s, background .15s;
-  }
-  .radio-option:hover{
-    border-color:var(--saffron);
-  }
-  .radio-option.selected{
-    border-color:var(--saffron);
-    background:#fff3e4;
-  }
-  .radio-option input{
-    margin-top:3px;
-    accent-color:var(--saffron-dark);
-    width:18px;
-    height:18px;
-    flex-shrink:0;
-  }
-  .radio-option .opt-text strong{
-    display:block;
-    font-size:14.5px;
-  }
-  .radio-option .opt-text span{
-    font-size:12.5px;
-    color:#7a6a55;
-  }
-  .submit-btn{
-    width:100%;
-    padding:16px;
-    font-size:16px;
-    font-weight:600;
-    color:#fff;
-    background:linear-gradient(120deg,var(--saffron),var(--saffron-dark));
-    border:none;
-    border-radius:12px;
-    cursor:pointer;
-    box-shadow:0 6px 16px rgba(226,113,29,0.35);
-    transition:transform .1s, box-shadow .1s;
-    letter-spacing:.3px;
-  }
-  .submit-btn:active{
-    transform:scale(0.98);
-  }
-  .submit-btn:disabled{
-    opacity:0.6;
-    cursor:not-allowed;
-  }
-  .error-text{
-    color:#c0392b;
-    font-size:12.5px;
-    margin-top:5px;
-    display:none;
-  }
-  .field.invalid input, .field.invalid select{
-    border-color:#c0392b;
-  }
-  .field.invalid .error-text{
-    display:block;
-  }
-  #statusBox{
-    display:none;
-    text-align:center;
-    padding:40px 20px;
-  }
-  #statusBox.show{
-    display:block;
-  }
+  body{margin:0;font-family:'Poppins','Noto Sans Devanagari',sans-serif;background:linear-gradient(180deg,#fff8ee 0%,#fbeed9 100%);color:var(--ink);min-height:100vh;padding:0 0 60px 0;}
+  header{background:linear-gradient(120deg,var(--maroon),#5c2020);color:#fdf1df;padding:28px 20px 34px;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,0.15);}
+  header h1{font-family:'Noto Serif','Noto Sans Devanagari',serif;font-size:clamp(19px,4.3vw,30px);margin:0 0 4px;letter-spacing:.3px;}
+  header h1 .eng{display:block;font-family:'Poppins',sans-serif;font-size:clamp(12px,2.6vw,15px);font-weight:400;color:#f3d9b0;margin-top:4px;letter-spacing:.2px;}
+  header p{margin:10px 0 0;font-size:clamp(13px,3vw,16px);color:#f3d9b0;}
+  .dates{display:inline-block;margin-top:10px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.3);padding:6px 16px;border-radius:20px;font-size:14px;letter-spacing:.5px;}
+  .container{max-width:720px;margin:-20px auto 0;padding:0 16px;}
+  form{background:#fffefb;border-radius:16px;box-shadow:0 10px 30px rgba(122,46,46,0.12);padding:clamp(18px,4vw,36px);margin-top:20px;}
+  .section{margin-bottom:30px;}
+  .section-title{font-size:15px;font-weight:600;color:var(--saffron-dark);letter-spacing:.3px;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--border);}
+  .section-title .eng{font-weight:400;color:#a68a63;font-size:12.5px;}
+  .field{margin-bottom:18px;}
+  label{display:block;font-weight:500;font-size:14.5px;margin-bottom:6px;color:var(--ink);}
+  label .eng{font-weight:400;color:#8a7454;font-size:12.5px;}
+  label .req{color:var(--saffron-dark);margin-left:2px;}
+  .hint{font-size:12px;color:#a3906f;margin-top:5px;}
+  input[type="text"],input[type="tel"],input[type="number"],select{width:100%;padding:12px 14px;font-size:15px;border:1.5px solid var(--border);border-radius:10px;background:#fffdf9;font-family:inherit;color:var(--ink);transition:border-color .15s, box-shadow .15s;-webkit-appearance:none;appearance:none;}
+  input:focus, select:focus{outline:none;border-color:var(--saffron);box-shadow:0 0 0 3px rgba(226,113,29,0.15);}
+  .count-pills{display:flex;flex-wrap:wrap;gap:8px;}
+  .count-pill{width:48px;height:48px;border-radius:10px;border:1.5px solid var(--border);background:#fffdf9;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;cursor:pointer;transition:all .15s;}
+  .count-pill.plus{width:auto;padding:0 14px;font-size:13px;}
+  .count-pill:hover{border-color:var(--saffron);}
+  .count-pill.selected{background:var(--saffron);border-color:var(--saffron);color:#fff;}
+  .overflow-input{margin-top:10px;display:none;}
+  .person-blocks{margin-top:16px;display:flex;flex-direction:column;gap:14px;}
+  .person-card{background:var(--cream);border:1.5px solid var(--border);border-radius:12px;padding:14px;animation:fadeIn .25s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(-6px);}to{opacity:1; transform:translateY(0);}}
+  .person-card .p-title{font-weight:600;font-size:13.5px;color:var(--maroon);margin-bottom:10px;letter-spacing:.3px;}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .grid-3 .full{grid-column:1 / -1;}
+  @media (min-width:600px){.grid-3{grid-template-columns:2fr 1fr 1.5fr;}.grid-3 .full{grid-column:auto;}}
+  .radio-group{display:flex;flex-direction:column;gap:10px;}
+  .radio-option{display:flex;align-items:flex-start;gap:10px;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .15s, background .15s;}
+  .radio-option:hover{border-color:var(--saffron);}
+  .radio-option.selected{border-color:var(--saffron);background:#fff3e4;}
+  .radio-option input{margin-top:3px;accent-color:var(--saffron-dark);width:18px;height:18px;flex-shrink:0;}
+  .radio-option .opt-text strong{display:block;font-size:14.5px;}
+  .radio-option .opt-text span{font-size:12.5px;color:#7a6a55;}
+  .submit-btn{width:100%;padding:16px;font-size:16px;font-weight:600;color:#fff;background:linear-gradient(120deg,var(--saffron),var(--saffron-dark));border:none;border-radius:12px;cursor:pointer;box-shadow:0 6px 16px rgba(226,113,29,0.35);transition:transform .1s, box-shadow .1s;letter-spacing:.3px;}
+  .submit-btn:active{transform:scale(0.98);}
+  .submit-btn:disabled{opacity:0.6;cursor:not-allowed;}
+  .error-text{color:#c0392b;font-size:12.5px;margin-top:5px;display:none;}
+  .field.invalid input, .field.invalid select{border-color:#c0392b;}
+  .field.invalid .error-text{display:block;}
+  #statusBox{display:none;text-align:center;padding:40px 20px;}
+  #statusBox.show{display:block;}
   #statusBox.error #statusIcon{color:#c0392b;}
-  #statusIcon{
-    font-size:52px;
-    margin-bottom:14px;
-    color:var(--success);
-  }
-  #statusBox h2{
-    font-family:'Noto Serif',serif;
-    margin-bottom:8px;
-  }
-  #statusBox p{
-    color:#6b5a45;
-    font-size:14.5px;
-  }
-  .spinner{
-    display:inline-block;
-    width:18px;
-    height:18px;
-    border:2.5px solid rgba(255,255,255,0.5);
-    border-top-color:#fff;
-    border-radius:50%;
-    animation:spin .7s linear infinite;
-    vertical-align:middle;
-    margin-right:8px;
-  }
+  #statusIcon{font-size:52px;margin-bottom:14px;color:var(--success);}
+  #statusBox h2{font-family:'Noto Serif',serif;margin-bottom:8px;}
+  #statusBox p{color:#6b5a45;font-size:14.5px;}
+  .spinner{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.5);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px;}
   @keyframes spin{to{transform:rotate(360deg);}}
-  footer{
-    text-align:center;
-    margin-top:24px;
-    font-size:12px;
-    color:#a3906f;
-  }
-  .city-wrap{
-    position:relative;
-  }
-  #cityOther{
-    margin-top:10px;
-    display:none;
-  }
+  footer{text-align:center;margin-top:24px;font-size:12px;color:#a3906f;}
 </style>
 </head>
 <body>
-
 <header>
-  <h1>श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण
-    <span class="eng">(Shripad Shrivallabh Charitamrut Samohik Parayan)</span>
-  </h1>
+  <h1>श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण <span class="eng">(Shripad Shrivallabh Charitamrut Samohik Parayan)</span></h1>
   <p>पिठापुरम · नोंदणी फॉर्म (Pithapuram · Registration Form)</p>
   <div class="dates">21 – 22 – 23 नोव्हेंबर (November)</div>
 </header>
-
 <div class="container">
   <form id="regForm" novalidate>
-
     <div id="formBody">
-
-      <!-- Location -->
       <div class="section">
         <div class="section-title">ठिकाण <span class="eng">(Location)</span></div>
-        <div class="field" id="field-city">
-          <label>शहर / गाव <span class="eng">(City / Village)</span><span class="req">*</span></label>
-          <div class="city-wrap">
-            <select id="citySelect" required>
-              <option value="">— निवडा (Select) —</option>
-            </select>
-          </div>
-          <input type="text" id="cityOther" placeholder="गावाचे नाव लिहा (Type your village name)">
-          <div class="error-text">कृपया शहर/गाव निवडा (Please select your city/village).</div>
+        <div class="field" id="field-pincode">
+          <label>तुमचा पिनकोड काय आहे? <span class="eng">(What is your PIN code?)</span><span class="req">*</span></label>
+          <input type="text" id="pincode" inputmode="numeric" maxlength="6" placeholder="उदा. 533450 (e.g. 533450)" required>
+          <div class="hint">6 अंकी पिनकोड टाका (Enter your 6-digit postal PIN code)</div>
+          <div class="error-text">कृपया वैध 6 अंकी पिनकोड टाका (Please enter a valid 6-digit PIN code).</div>
         </div>
       </div>
-
-      <!-- Gents -->
       <div class="section">
         <div class="section-title">पुरुष <span class="eng">(Gents Travelling)</span></div>
         <div class="field">
-          <label>पुरुषांची संख्या <span class="eng">(Number of Gents)</span><span class="req">*</span></label>
-          <div class="stepper">
-            <button type="button" onclick="changeCount('gents',-1)">−</button>
-            <div class="count" id="gentsCount">0</div>
-            <button type="button" onclick="changeCount('gents',1)">+</button>
+          <label>किती पुरुष प्रवास करत आहेत? <span class="eng">(How many gents are travelling?)</span><span class="req">*</span></label>
+          <div class="count-pills" id="gentsPills">
+            <div class="count-pill selected" data-val="0">0</div>
+            <div class="count-pill" data-val="1">1</div>
+            <div class="count-pill" data-val="2">2</div>
+            <div class="count-pill" data-val="3">3</div>
+            <div class="count-pill" data-val="4">4</div>
+            <div class="count-pill" data-val="5">5</div>
+            <div class="count-pill plus" data-val="6+">6+</div>
           </div>
+          <input type="number" class="overflow-input" id="gentsOverflow" min="6" max="30" placeholder="नक्की संख्या टाका (Enter exact number)">
         </div>
         <div class="person-blocks" id="gentsBlocks"></div>
       </div>
-
-      <!-- Ladies -->
       <div class="section">
         <div class="section-title">स्त्रिया <span class="eng">(Ladies Travelling)</span></div>
         <div class="field">
-          <label>स्त्रियांची संख्या <span class="eng">(Number of Ladies)</span><span class="req">*</span></label>
-          <div class="stepper">
-            <button type="button" onclick="changeCount('ladies',-1)">−</button>
-            <div class="count" id="ladiesCount">0</div>
-            <button type="button" onclick="changeCount('ladies',1)">+</button>
+          <label>किती स्त्रिया प्रवास करत आहेत? <span class="eng">(How many ladies are travelling?)</span><span class="req">*</span></label>
+          <div class="count-pills" id="ladiesPills">
+            <div class="count-pill selected" data-val="0">0</div>
+            <div class="count-pill" data-val="1">1</div>
+            <div class="count-pill" data-val="2">2</div>
+            <div class="count-pill" data-val="3">3</div>
+            <div class="count-pill" data-val="4">4</div>
+            <div class="count-pill" data-val="5">5</div>
+            <div class="count-pill plus" data-val="6+">6+</div>
           </div>
+          <input type="number" class="overflow-input" id="ladiesOverflow" min="6" max="30" placeholder="नक्की संख्या टाका (Enter exact number)">
         </div>
         <div class="person-blocks" id="ladiesBlocks"></div>
       </div>
-
-      <!-- Accommodation -->
       <div class="section">
         <div class="section-title">निवास <span class="eng">(Accommodation)</span></div>
         <div class="field" id="field-accom">
           <div class="radio-group" id="accomGroup">
             <label class="radio-option" data-value="free">
               <input type="radio" name="accom" value="free">
-              <span class="opt-text">
-                <strong>होय — मोफत, देवस्थान <span class="eng" style="font-weight:400;">(Yes — Free, Devasthanam)</span></strong>
-                <span>मर्यादित जागा (Limited availability)</span>
-              </span>
+              <span class="opt-text"><strong>होय — मोफत, देवस्थान <span class="eng" style="font-weight:400;">(Yes — Free, Devasthanam)</span></strong><span>मर्यादित जागा (Limited availability)</span></span>
             </label>
             <label class="radio-option" data-value="own">
               <input type="radio" name="accom" value="own">
-              <span class="opt-text">
-                <strong>नाही — स्वतःची व्यवस्था <span class="eng" style="font-weight:400;">(No — Own Arrangement)</span></strong>
-                <span>तुम्ही स्वतः व्यवस्था कराल (You will arrange your own stay)</span>
-              </span>
+              <span class="opt-text"><strong>नाही — स्वतःची व्यवस्था <span class="eng" style="font-weight:400;">(No — Own Arrangement)</span></strong><span>तुम्ही स्वतः व्यवस्था कराल (You will arrange your own stay)</span></span>
             </label>
           </div>
           <div class="error-text">कृपया निवास पर्याय निवडा (Please select an accommodation option).</div>
         </div>
       </div>
-
     </div>
-
     <button type="submit" class="submit-btn" id="submitBtn">नोंदणी सबमिट करा (Submit Registration)</button>
   </form>
-
   <div id="statusBox">
     <div id="statusIcon">✓</div>
     <h2 id="statusTitle">नोंदणी यशस्वी (Registration Successful)</h2>
-    <p id="statusMsg">धन्यवाद! आम्ही तुमची वाट पाहत आहोत. (Thank you for registering. We look forward to your participation.)</p>
+    <p id="statusMsg">धन्यवाद! आम्ही तुमची वाट पाहत आहोत.</p>
   </div>
-
   <footer>श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण · Pithapuram, 2026</footer>
 </div>
-
 <script>
-// ====== CONFIG ======
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx1ZfRr54Ki9XOH76phFeg7AC5FQGmfVaP5bnUpzM79w-wiRCwLEGzOuYKTIf4auUmo/exec";
-
-// Standardized city/town list — keeps data clean instead of free-text
-// (Hyderabad / Hyd / हैदराबाद all becoming different values in the sheet)
-const CITY_LIST = [
-  "Hyderabad","Secunderabad","Warangal","Nizamabad","Karimnagar","Khammam",
-  "Rangareddy","Medchal","Sangareddy",
-  "Vijayawada","Visakhapatnam","Guntur","Rajahmundry","Kakinada","Nellore",
-  "Tirupati","Kurnool","Anantapur","Kadapa","Chittoor","Eluru","Ongole",
-  "Machilipatnam","Srikakulam","Vizianagaram",
-  "Pithapuram","Samalkot","Peddapuram","Anaparthi","Prathipadu",
-  "Mumbai","Pune","Nagpur","Nashik","Bangalore","Chennai","Delhi","Kolkata","Ahmedabad",
-  "Other / इतर"
-];
-
-// ====== INIT CITY DROPDOWN ======
-const citySelect = document.getElementById('citySelect');
-CITY_LIST.forEach(c=>{
-  const opt = document.createElement('option');
-  opt.value = c;
-  opt.textContent = c;
-  citySelect.appendChild(opt);
-});
-citySelect.addEventListener('change', ()=>{
-  const otherBox = document.getElementById('cityOther');
-  if(citySelect.value.startsWith('Other')){
-    otherBox.style.display = 'block';
-    otherBox.required = true;
-  } else {
-    otherBox.style.display = 'none';
-    otherBox.required = false;
-    otherBox.value = '';
-  }
-  document.getElementById('field-city').classList.remove('invalid');
-});
-
-// ====== STATE ======
 let counts = { gents: 0, ladies: 0 };
-
-function changeCount(type, delta){
-  let next = counts[type] + delta;
-  if(next < 0) next = 0;
-  if(next > 30) next = 30; // sane upper bound
-  counts[type] = next;
-  document.getElementById(type + 'Count').textContent = next;
-  renderBlocks(type);
+function setupPills(type){
+  const container = document.getElementById(type + 'Pills');
+  const overflow = document.getElementById(type + 'Overflow');
+  container.querySelectorAll('.count-pill').forEach(pill=>{
+    pill.addEventListener('click', ()=>{
+      container.querySelectorAll('.count-pill').forEach(p=>p.classList.remove('selected'));
+      pill.classList.add('selected');
+      const val = pill.dataset.val;
+      if(val === '6+'){
+        overflow.style.display = 'block';
+        overflow.required = true;
+        overflow.focus();
+        counts[type] = parseInt(overflow.value) || 6;
+      } else {
+        overflow.style.display = 'none';
+        overflow.required = false;
+        overflow.value = '';
+        counts[type] = parseInt(val);
+      }
+      renderBlocks(type);
+    });
+  });
+  overflow.addEventListener('input', ()=>{
+    let v = parseInt(overflow.value) || 0;
+    if(v < 6) v = 6;
+    if(v > 30) v = 30;
+    counts[type] = v;
+    renderBlocks(type);
+  });
 }
-
+setupPills('gents');
+setupPills('ladies');
 function renderBlocks(type){
   const container = document.getElementById(type + 'Blocks');
   const n = counts[type];
   const label = type === 'gents' ? 'पुरुष / Gent' : 'स्त्री / Lady';
-
-  // preserve existing values when re-rendering
   const existing = [];
   container.querySelectorAll('.person-card').forEach(card=>{
-    existing.push({
-      name: card.querySelector('.p-name').value,
-      age: card.querySelector('.p-age').value,
-      mobile: card.querySelector('.p-mobile').value
-    });
+    existing.push({name: card.querySelector('.p-name').value, age: card.querySelector('.p-age').value, mobile: card.querySelector('.p-mobile').value});
   });
-
   container.innerHTML = '';
   for(let i=0;i<n;i++){
     const vals = existing[i] || {name:'',age:'',mobile:''};
     const card = document.createElement('div');
     card.className = 'person-card';
-    card.innerHTML = `
-      <div class="p-title">${label} ${i+1}</div>
-      <div class="grid-3">
-        <div class="full">
-          <input type="text" class="p-name" placeholder="पूर्ण नाव (Full Name)" value="${vals.name.replace(/"/g,'&quot;')}" required>
-        </div>
-        <div>
-          <input type="number" class="p-age" placeholder="वय (Age)" min="0" max="120" value="${vals.age}" required>
-        </div>
-        <div>
-          <input type="tel" class="p-mobile" placeholder="मोबाईल (Mobile)" value="${vals.mobile}" required>
-        </div>
-      </div>
-    `;
+    card.innerHTML = `<div class="p-title">${label} ${i+1}</div><div class="grid-3"><div class="full"><input type="text" class="p-name" placeholder="पूर्ण नाव (Full Name)" value="${vals.name.replace(/"/g,'&quot;')}" required></div><div><input type="number" class="p-age" placeholder="वय (Age)" min="0" max="120" value="${vals.age}" required></div><div><input type="tel" class="p-mobile" placeholder="मोबाईल (Mobile)" value="${vals.mobile}" required></div></div>`;
     container.appendChild(card);
   }
 }
-
-// ====== ACCOMMODATION RADIO UX ======
 document.querySelectorAll('.radio-option').forEach(opt=>{
   opt.addEventListener('click', ()=>{
     document.querySelectorAll('.radio-option').forEach(o=>o.classList.remove('selected'));
@@ -519,117 +202,46 @@ document.querySelectorAll('.radio-option').forEach(opt=>{
     document.getElementById('field-accom').classList.remove('invalid');
   });
 });
-
-// ====== VALIDATION ======
 function validate(){
   let valid = true;
-
-  const cityField = document.getElementById('field-city');
-  const cityVal = citySelect.value;
-  const cityOtherVal = document.getElementById('cityOther').value.trim();
-  if(!cityVal || (cityVal.startsWith('Other') && !cityOtherVal)){
-    cityField.classList.add('invalid');
-    valid = false;
-  } else {
-    cityField.classList.remove('invalid');
-  }
-
-  if(counts.gents === 0 && counts.ladies === 0){
-    alert('किमान १ पुरुष किंवा स्त्री जोडा. (Please add at least 1 Gent or Lady travelling.)');
-    valid = false;
-  }
-
-  // validate each person card
+  const pinField = document.getElementById('field-pincode');
+  const pinVal = document.getElementById('pincode').value.trim();
+  if(!/^\d{6}$/.test(pinVal)){ pinField.classList.add('invalid'); valid = false; } else { pinField.classList.remove('invalid'); }
+  if(counts.gents === 0 && counts.ladies === 0){ alert('किमान १ पुरुष किंवा स्त्री जोडा.'); valid = false; }
   ['gents','ladies'].forEach(type=>{
     document.querySelectorAll(`#${type}Blocks .person-card`).forEach(card=>{
-      const name = card.querySelector('.p-name');
-      const age = card.querySelector('.p-age');
-      const mobile = card.querySelector('.p-mobile');
-      [name,age,mobile].forEach(inp=>{
-        if(!inp.value.trim()){
-          inp.style.borderColor = '#c0392b';
-          valid = false;
-        } else {
-          inp.style.borderColor = '';
-        }
-      });
+      const name = card.querySelector('.p-name'); const age = card.querySelector('.p-age'); const mobile = card.querySelector('.p-mobile');
+      [name,age,mobile].forEach(inp=>{ if(!inp.value.trim()){ inp.style.borderColor = '#c0392b'; valid = false; } else { inp.style.borderColor = ''; } });
     });
   });
-
   const accomField = document.getElementById('field-accom');
   const accomChecked = document.querySelector('input[name="accom"]:checked');
-  if(!accomChecked){
-    accomField.classList.add('invalid');
-    valid = false;
-  } else {
-    accomField.classList.remove('invalid');
-  }
-
+  if(!accomChecked){ accomField.classList.add('invalid'); valid = false; } else { accomField.classList.remove('invalid'); }
   return valid;
 }
-
-// ====== SUBMIT ======
 document.getElementById('regForm').addEventListener('submit', async function(e){
   e.preventDefault();
   if(!validate()) return;
-
   const submitBtn = document.getElementById('submitBtn');
   submitBtn.disabled = true;
-  submitBtn.innerHTML = '<span class="spinner"></span>सबमिट करत आहे... (Submitting...)';
-
+  submitBtn.innerHTML = '<span class="spinner"></span>सबमिट करत आहे...';
   const gents = [];
-  document.querySelectorAll('#gentsBlocks .person-card').forEach(card=>{
-    gents.push({
-      name: card.querySelector('.p-name').value.trim(),
-      age: card.querySelector('.p-age').value.trim(),
-      mobile: card.querySelector('.p-mobile').value.trim()
-    });
-  });
-
+  document.querySelectorAll('#gentsBlocks .person-card').forEach(card=>{ gents.push({name: card.querySelector('.p-name').value.trim(), age: card.querySelector('.p-age').value.trim(), mobile: card.querySelector('.p-mobile').value.trim()}); });
   const ladies = [];
-  document.querySelectorAll('#ladiesBlocks .person-card').forEach(card=>{
-    ladies.push({
-      name: card.querySelector('.p-name').value.trim(),
-      age: card.querySelector('.p-age').value.trim(),
-      mobile: card.querySelector('.p-mobile').value.trim()
-    });
-  });
-
-  const finalCity = citySelect.value.startsWith('Other')
-    ? document.getElementById('cityOther').value.trim()
-    : citySelect.value;
-
-  const payload = {
-    city: finalCity,
-    gentsCount: counts.gents,
-    ladiesCount: counts.ladies,
-    gents: gents,
-    ladies: ladies,
-    accommodation: document.querySelector('input[name="accom"]:checked').value,
-    timestamp: new Date().toISOString()
-  };
-
+  document.querySelectorAll('#ladiesBlocks .person-card').forEach(card=>{ ladies.push({name: card.querySelector('.p-name').value.trim(), age: card.querySelector('.p-age').value.trim(), mobile: card.querySelector('.p-mobile').value.trim()}); });
+  const payload = { pincode: document.getElementById('pincode').value.trim(), gentsCount: counts.gents, ladiesCount: counts.ladies, gents: gents, ladies: ladies, accommodation: document.querySelector('input[name="accom"]:checked').value, timestamp: new Date().toISOString() };
   try{
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: {'Content-Type':'text/plain;charset=utf-8'},
-      body: JSON.stringify(payload)
-    });
+    const res = await fetch(SCRIPT_URL, { method: 'POST', headers: {'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload) });
     const result = await res.json();
-
     if(result.status === 'success'){
       document.getElementById('formBody').parentElement.style.display = 'none';
       submitBtn.style.display = 'none';
       const statusBox = document.getElementById('statusBox');
-      statusBox.classList.add('show');
-      statusBox.classList.remove('error');
+      statusBox.classList.add('show'); statusBox.classList.remove('error');
       document.getElementById('statusIcon').textContent = '✓';
       document.getElementById('statusTitle').textContent = 'नोंदणी यशस्वी (Registration Successful)';
-      document.getElementById('statusMsg').textContent =
-        `धन्यवाद! ${counts.gents + counts.ladies} सदस्यांची नोंदणी झाली. (Thank you! ${counts.gents + counts.ladies} member(s) registered from ${payload.city}.)`;
-    } else {
-      throw new Error(result.message || 'Unknown error');
-    }
+      document.getElementById('statusMsg').textContent = `धन्यवाद! ${counts.gents + counts.ladies} सदस्यांची नोंदणी झाली.`;
+    } else { throw new Error(result.message || 'Unknown error'); }
   }catch(err){
     submitBtn.disabled = false;
     submitBtn.innerHTML = 'नोंदणी सबमिट करा (Submit Registration)';
@@ -637,12 +249,11 @@ document.getElementById('regForm').addEventListener('submit', async function(e){
     statusBox.classList.add('show','error');
     document.getElementById('statusIcon').textContent = '✕';
     document.getElementById('statusTitle').textContent = 'त्रुटी (Submission Failed)';
-    document.getElementById('statusMsg').textContent = 'काहीतरी चूक झाली. कृपया पुन्हा प्रयत्न करा. (Something went wrong. Please try again.)';
+    document.getElementById('statusMsg').textContent = 'काहीतरी चूक झाली. कृपया पुन्हा प्रयत्न करा.';
     document.querySelector('form').style.display='block';
     setTimeout(()=>{ statusBox.classList.remove('show','error'); }, 3500);
   }
 });
 </script>
-
 </body>
 </html>
