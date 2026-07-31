@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard — Parayan Registrations</title>
+<title>Admin Dashboard - Parayan Registrations</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -17,6 +17,8 @@
     --card:#ffffff;
     --blue:#2f6fa8;
     --pink:#b5457a;
+    --green:#2f7d4f;
+    --red:#b33a30;
   }
   *{box-sizing:border-box;}
   body{
@@ -27,7 +29,7 @@
     padding:20px;
   }
   h1{
-    font-size:clamp(18px,4vw,26px);
+    font-size:clamp(18px,4vw,28px);
     color:var(--maroon);
     margin:0 0 4px;
   }
@@ -53,43 +55,78 @@
     font-size:15px;
     margin:14px 0;
   }
-  #lockScreen button{
-    width:100%;
-    padding:12px;
+  #lockScreen button,.action-btn,.filter-btn,.tab-btn{
+    border:none;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  #lockScreen button,.action-btn{
     background:var(--saffron);
     color:#fff;
-    border:none;
-    border-radius:8px;
-    font-size:15px;
+    padding:12px 16px;
+    border-radius:10px;
+    font-size:14px;
     font-weight:600;
-    cursor:pointer;
   }
   #dashboard{
     display:none;
-    max-width:1000px;
+    max-width:1120px;
     margin:0 auto;
   }
-  .refresh-row{
+  .top-row{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:16px;
+    gap:12px;
     flex-wrap:wrap;
-    gap:8px;
+    margin-bottom:18px;
   }
-  .refresh-row button{
-    background:var(--saffron);
-    color:#fff;
-    border:none;
-    padding:9px 16px;
-    border-radius:8px;
-    font-size:13.5px;
-    cursor:pointer;
-    font-weight:500;
+  .actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .ghost-btn{
+    background:#fff2df;
+    color:var(--maroon);
   }
   #lastUpdated{
     font-size:12px;
     color:#8a7454;
+  }
+  .tabs,.filters{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .tab-btn,.filter-btn{
+    border:1.5px solid var(--border);
+    background:#fff8ee;
+    color:var(--maroon);
+    padding:10px 14px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:600;
+  }
+  .tab-btn.active,.filter-btn.active{
+    background:var(--saffron);
+    border-color:var(--saffron);
+    color:#fff;
+  }
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+  .panel{
+    background:var(--card);
+    border-radius:14px;
+    padding:20px;
+    box-shadow:0 4px 14px rgba(122,46,46,0.08);
+    border:1px solid var(--border);
+    margin-bottom:20px;
+  }
+  .panel h2{
+    font-size:15px;
+    color:var(--maroon);
+    margin:0 0 14px;
   }
   .stat-grid{
     display:grid;
@@ -97,8 +134,8 @@
     gap:12px;
     margin-bottom:24px;
   }
-  @media(min-width:700px){
-    .stat-grid{ grid-template-columns:repeat(4,1fr); }
+  @media(min-width:760px){
+    .stat-grid{grid-template-columns:repeat(4,1fr);}
   }
   .stat-card{
     background:var(--card);
@@ -117,38 +154,26 @@
     color:#8a7454;
     margin-top:4px;
   }
-  .stat-card.gents .num{ color:var(--blue); }
-  .stat-card.ladies .num{ color:var(--pink); }
-  .panel{
-    background:var(--card);
-    border-radius:14px;
-    padding:20px;
-    box-shadow:0 4px 14px rgba(122,46,46,0.08);
-    border:1px solid var(--border);
-    margin-bottom:20px;
+  .stat-card.gents .num{color:var(--blue);}
+  .stat-card.ladies .num{color:var(--pink);}
+  .accom-split{
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
   }
-  .panel h2{
-    font-size:15px;
-    color:var(--maroon);
-    margin:0 0 14px;
+  .accom-pill{
+    flex:1;
+    min-width:140px;
+    padding:16px;
+    border-radius:12px;
+    text-align:center;
   }
-  table{
-    width:100%;
-    border-collapse:collapse;
-    font-size:13.5px;
-  }
-  th, td{
-    text-align:left;
-    padding:8px 10px;
-    border-bottom:1px solid var(--border);
-  }
-  th{
-    color:#8a7454;
-    font-weight:600;
-    font-size:12px;
-    text-transform:uppercase;
-    letter-spacing:.3px;
-  }
+  .accom-pill.free{background:#fdecd8;}
+  .accom-pill.own{background:#e8f2ea;}
+  .accom-pill .num{font-size:24px;font-weight:700;}
+  .accom-pill.free .num{color:var(--saffron-dark);}
+  .accom-pill.own .num{color:var(--green);}
+  .accom-pill .lbl{font-size:12.5px;color:#6b5a45;margin-top:4px;}
   .bar-row{
     display:flex;
     align-items:center;
@@ -171,7 +196,6 @@
     height:100%;
     background:linear-gradient(90deg,var(--saffron),var(--saffron-dark));
     border-radius:6px;
-    transition:width .4s ease;
   }
   .bar-count{
     width:40px;
@@ -180,87 +204,124 @@
     font-weight:600;
     flex-shrink:0;
   }
-  .accom-split{
-    display:flex;
-    gap:16px;
-    flex-wrap:wrap;
-  }
-  .accom-pill{
-    flex:1;
-    min-width:140px;
-    padding:16px;
-    border-radius:12px;
-    text-align:center;
-  }
-  .accom-pill.free{
-    background:#fdecd8;
-  }
-  .accom-pill.own{
-    background:#e8f2ea;
-  }
-  .accom-pill .num{
-    font-size:24px;
-    font-weight:700;
-  }
-  .accom-pill.free .num{ color:var(--saffron-dark); }
-  .accom-pill.own .num{ color:#2f7d4f; }
-  .accom-pill .lbl{
-    font-size:12.5px;
-    color:#6b5a45;
-    margin-top:4px;
-  }
-  #loadingMsg, #errorMsg{
-    text-align:center;
-    padding:40px;
-    color:#8a7454;
-  }
-  #errorMsg{
-    display:none;
-    color:#c0392b;
-  }
-  .tabs{
-    display:flex;
-    gap:10px;
-    margin-bottom:18px;
-    flex-wrap:wrap;
-  }
-  .tab-btn{
-    border:1.5px solid var(--border);
-    background:#fff8ee;
-    color:var(--maroon);
-    padding:10px 14px;
-    border-radius:999px;
-    font-size:13px;
-    font-weight:600;
-    cursor:pointer;
-  }
-  .tab-btn.active{
-    background:var(--saffron);
-    border-color:var(--saffron);
-    color:#fff;
-  }
-  .tab-panel{
-    display:none;
-  }
-  .tab-panel.active{
-    display:block;
-  }
   .table-wrap{
     overflow:auto;
     border:1px solid var(--border);
     border-radius:12px;
   }
-  #dataTable{
-    min-width:1100px;
+  table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:720px;
     background:#fff;
   }
-  #dataTable tbody tr:nth-child(even){
-    background:#fcf7ef;
+  th,td{
+    text-align:left;
+    padding:10px 12px;
+    border-bottom:1px solid var(--border);
+    font-size:13.5px;
+  }
+  th{
+    color:#8a7454;
+    font-weight:600;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.3px;
+    background:#fffaf3;
+  }
+  tbody tr:nth-child(even){background:#fcf7ef;}
+  tbody tr{cursor:pointer;}
+  tbody tr:hover{background:#fff1df;}
+  .status-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:88px;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+  }
+  .status-pill.active{background:#e8f2ea;color:var(--green);}
+  .status-pill.inactive{background:#f9e6e3;color:var(--red);}
+  #loadingMsg,#errorMsg{
+    text-align:center;
+    padding:40px;
+    color:#8a7454;
+  }
+  #errorMsg{display:none;color:#c0392b;}
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    align-items:center;
+    flex-wrap:wrap;
+    margin-bottom:14px;
   }
   .empty-note{
     color:#8a7454;
     font-size:13px;
     margin:0;
+  }
+  .modal-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.35);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .modal-backdrop.show{display:flex;}
+  .modal-card{
+    width:min(100%,420px);
+    background:#fff;
+    border-radius:16px;
+    padding:20px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.25);
+  }
+  .modal-title{
+    font-size:18px;
+    font-weight:700;
+    color:var(--maroon);
+    margin:0 0 14px;
+  }
+  .detail-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:18px;
+  }
+  .detail-card{
+    background:#fff8ee;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:10px;
+  }
+  .detail-card.full{grid-column:1 / -1;}
+  .detail-label{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.4px;
+    color:#8a7454;
+    margin-bottom:4px;
+  }
+  .detail-value{
+    font-size:14px;
+    color:var(--ink);
+    word-break:break-word;
+  }
+  .modal-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .danger-btn{background:var(--red);}
+  .secondary-btn{background:#efe2cf;color:var(--maroon);}
+  @media(max-width:640px){
+    body{padding:14px;}
+    .panel{padding:16px;}
+    .detail-grid{grid-template-columns:1fr;}
   }
 </style>
 </head>
@@ -275,18 +336,21 @@
 
 <div id="dashboard">
   <h1>Registration Analytics</h1>
-  <div class="sub">श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण · Pithapuram · 21–23 Nov</div>
+  <div class="sub">Shripad Shrivallabh Charitamrut Samohik Parayan · Pithapuram · 21-23 Nov</div>
 
-  <div class="refresh-row">
+  <div class="top-row">
     <span id="lastUpdated"></span>
-    <button onclick="loadData()">↻ Refresh</button>
+    <div class="actions">
+      <button class="action-btn ghost-btn" onclick="downloadExcel()">Download Excel</button>
+      <button class="action-btn" onclick="loadData()">Refresh</button>
+    </div>
   </div>
 
   <div id="loadingMsg">Loading data...</div>
-  <div id="errorMsg">Could not load data. Check SCRIPT_URL and that the Apps Script is deployed.</div>
+  <div id="errorMsg">Could not load data. Check `SCRIPT_URL`, deployment access, and the latest Apps Script version.</div>
 
   <div id="content" style="display:none;">
-    <div class="tabs">
+    <div class="tabs" style="margin-bottom:18px;">
       <button type="button" class="tab-btn active" data-tab="analyticsTab">Analytics</button>
       <button type="button" class="tab-btn" data-tab="dataTab">All Submissions</button>
     </div>
@@ -295,19 +359,19 @@
       <div class="stat-grid">
         <div class="stat-card">
           <div class="num" id="statTotal">0</div>
-          <div class="lbl">Total People Registered</div>
+          <div class="lbl">Active People</div>
         </div>
         <div class="stat-card">
           <div class="num" id="statSubmissions">0</div>
-          <div class="lbl">Total Submissions</div>
+          <div class="lbl">Active Submissions</div>
         </div>
         <div class="stat-card gents">
           <div class="num" id="statGents">0</div>
-          <div class="lbl">Gents</div>
+          <div class="lbl">Active Gents</div>
         </div>
         <div class="stat-card ladies">
           <div class="num" id="statLadies">0</div>
-          <div class="lbl">Ladies</div>
+          <div class="lbl">Active Ladies</div>
         </div>
       </div>
 
@@ -316,7 +380,7 @@
         <div class="accom-split">
           <div class="accom-pill free">
             <div class="num" id="accomFree">0</div>
-            <div class="lbl">Free (Devasthanam) requested</div>
+            <div class="lbl">Free (Devasthanam)</div>
           </div>
           <div class="accom-pill own">
             <div class="num" id="accomOwn">0</div>
@@ -326,7 +390,7 @@
       </div>
 
       <div class="panel">
-        <h2>City / Village Breakdown</h2>
+        <h2>City Breakdown</h2>
         <div id="cityBars"></div>
       </div>
 
@@ -338,40 +402,61 @@
 
     <div id="dataTab" class="tab-panel">
       <div class="panel">
-        <h2>All Submitted Data</h2>
+        <div class="meta-row">
+          <h2 style="margin:0;">All Submitted Data</h2>
+          <div class="filters">
+            <button type="button" class="filter-btn active" data-filter="active">Active People</button>
+            <button type="button" class="filter-btn" data-filter="all">All People</button>
+            <button type="button" class="filter-btn" data-filter="inactive">Inactive People</button>
+          </div>
+        </div>
         <div class="table-wrap">
           <table id="dataTable">
             <thead>
               <tr>
-                <th>Timestamp</th>
-                <th>PIN Code</th>
-                <th>City</th>
-                <th>District</th>
-                <th>State</th>
-                <th>Gents Count</th>
-                <th>Ladies Count</th>
-                <th>Type</th>
-                <th>Person No.</th>
                 <th>Name</th>
+                <th>Gender</th>
                 <th>Age</th>
                 <th>Mobile Number</th>
+                <th>City</th>
                 <th>Accommodation</th>
-                <th>Submission ID</th>
               </tr>
             </thead>
             <tbody id="dataTableBody"></tbody>
           </table>
         </div>
-        <p id="dataEmpty" class="empty-note" style="display:none;">No submission rows found yet.</p>
+        <p id="dataEmpty" class="empty-note" style="display:none;">No rows available for the selected filter.</p>
       </div>
     </div>
   </div>
 </div>
 
+<div id="userModal" class="modal-backdrop" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <h3 class="modal-title" id="modalName">Person Details</h3>
+    <div class="detail-grid">
+      <div class="detail-card"><div class="detail-label">Gender</div><div class="detail-value" id="modalGender"></div></div>
+      <div class="detail-card"><div class="detail-label">Age</div><div class="detail-value" id="modalAge"></div></div>
+      <div class="detail-card"><div class="detail-label">Mobile</div><div class="detail-value" id="modalMobile"></div></div>
+      <div class="detail-card"><div class="detail-label">City</div><div class="detail-value" id="modalCity"></div></div>
+      <div class="detail-card"><div class="detail-label">Accommodation</div><div class="detail-value" id="modalAccommodation"></div></div>
+      <div class="detail-card"><div class="detail-label">Status</div><div class="detail-value" id="modalStatus"></div></div>
+      <div class="detail-card full"><div class="detail-label">Submission ID</div><div class="detail-value" id="modalSubmissionId"></div></div>
+    </div>
+    <div class="modal-actions">
+      <button class="action-btn" id="modalActivateBtn">Mark Active</button>
+      <button class="action-btn danger-btn" id="modalDeactivateBtn">Mark Inactive</button>
+      <button class="action-btn secondary-btn" onclick="closeUserModal()">Close</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ====== CONFIG ======
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTkXBHASxYiSdqjy1eyYQASuqgDY-qvABIwISYEyOaKg8Bvg8H1WsVAOT7CWo78dat/exec";
 const ADMIN_KEY = "Admin@1";
+let allRows = [];
+let currentFilter = "active";
+let selectedRow = null;
 
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
@@ -380,6 +465,21 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
     btn.classList.add('active');
     document.getElementById(btn.dataset.tab).classList.add('active');
   });
+});
+
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    currentFilter = btn.dataset.filter;
+    document.querySelectorAll('.filter-btn').forEach(el=>el.classList.remove('active'));
+    btn.classList.add('active');
+    renderTable();
+  });
+});
+
+document.getElementById('modalActivateBtn').addEventListener('click', ()=>updateSelectedStatus('active'));
+document.getElementById('modalDeactivateBtn').addEventListener('click', ()=>updateSelectedStatus('inactive'));
+document.getElementById('userModal').addEventListener('click', (event)=>{
+  if(event.target.id === 'userModal') closeUserModal();
 });
 
 function tryUnlock(){
@@ -411,13 +511,13 @@ async function loadData(){
     if(rowsPayload.status !== 'success'){
       throw new Error(rowsPayload.message || 'Data request failed');
     }
+    allRows = Array.isArray(rowsPayload.data) ? rowsPayload.data : [];
     renderAnalytics(analyticsPayload.data || {});
-    renderTable(rowsPayload.data || []);
-    document.getElementById('lastUpdated').textContent =
-      'Last updated: ' + new Date().toLocaleTimeString();
+    renderTable();
+    document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
     document.getElementById('loadingMsg').style.display = 'none';
     document.getElementById('content').style.display = 'block';
-  }catch(e){
+  }catch(err){
     document.getElementById('loadingMsg').style.display = 'none';
     document.getElementById('errorMsg').style.display = 'block';
   }
@@ -431,26 +531,18 @@ function renderAnalytics(data){
   document.getElementById('accomFree').textContent = data.accomFree || 0;
   document.getElementById('accomOwn').textContent = data.accomOwn || 0;
 
-  // City breakdown bars
   const cityBars = document.getElementById('cityBars');
   cityBars.innerHTML = '';
-  const cities = data.cityBreakdown || [];
+  const cities = (data.cityBreakdown || []).slice().sort((a,b)=>b.count - a.count);
   const maxCity = Math.max(1, ...cities.map(c=>c.count));
-  cities.sort((a,b)=>b.count - a.count).forEach(c=>{
+  cities.forEach(c=>{
     const row = document.createElement('div');
     row.className = 'bar-row';
-    row.innerHTML = `
-      <div class="bar-label">${c.city}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${(c.count/maxCity*100)}%"></div></div>
-      <div class="bar-count">${c.count}</div>
-    `;
+    row.innerHTML = `<div class="bar-label">${safeCell(c.city)}</div><div class="bar-track"><div class="bar-fill" style="width:${(c.count / maxCity) * 100}%"></div></div><div class="bar-count">${c.count}</div>`;
     cityBars.appendChild(row);
   });
-  if(cities.length === 0){
-    cityBars.innerHTML = '<p style="color:#a3906f;font-size:13px;">No data yet.</p>';
-  }
+  if(!cities.length) cityBars.innerHTML = '<p class="empty-note">No active data yet.</p>';
 
-  // Age breakdown bars
   const ageBars = document.getElementById('ageBars');
   ageBars.innerHTML = '';
   const ages = data.ageBreakdown || [];
@@ -458,47 +550,129 @@ function renderAnalytics(data){
   ages.forEach(a=>{
     const row = document.createElement('div');
     row.className = 'bar-row';
-    row.innerHTML = `
-      <div class="bar-label">${a.range}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${(a.count/maxAge*100)}%"></div></div>
-      <div class="bar-count">${a.count}</div>
-    `;
+    row.innerHTML = `<div class="bar-label">${safeCell(a.range)}</div><div class="bar-track"><div class="bar-fill" style="width:${(a.count / maxAge) * 100}%"></div></div><div class="bar-count">${a.count}</div>`;
     ageBars.appendChild(row);
   });
-  if(ages.length === 0){
-    ageBars.innerHTML = '<p style="color:#a3906f;font-size:13px;">No data yet.</p>';
-  }
+  if(!ages.length) ageBars.innerHTML = '<p class="empty-note">No active data yet.</p>';
 }
 
-function renderTable(rows){
+function renderTable(){
   const tbody = document.getElementById('dataTableBody');
   const empty = document.getElementById('dataEmpty');
   tbody.innerHTML = '';
+  const rows = getFilteredRows();
   if(!rows.length){
     empty.style.display = 'block';
     return;
   }
   empty.style.display = 'none';
-  rows.forEach(row=>{
+  rows.forEach((row, index)=>{
     const tr = document.createElement('tr');
+    tr.dataset.index = String(index);
     tr.innerHTML = `
-      <td>${safeCell(row['Timestamp'])}</td>
-      <td>${safeCell(row['PIN Code'])}</td>
-      <td>${safeCell(row['City (from PIN)'])}</td>
-      <td>${safeCell(row['District (from PIN)'])}</td>
-      <td>${safeCell(row['State (from PIN)'])}</td>
-      <td>${safeCell(row['Gents Count'])}</td>
-      <td>${safeCell(row['Ladies Count'])}</td>
-      <td>${safeCell(row['Type'])}</td>
-      <td>${safeCell(row['Person No.'])}</td>
       <td>${safeCell(row['Name'])}</td>
+      <td>${safeCell(row['Type'] === 'Gent' ? 'Male' : 'Female')}</td>
       <td>${safeCell(row['Age'])}</td>
       <td>${safeCell(row['Mobile Number'])}</td>
-      <td>${safeCell(row['Accommodation'])}</td>
-      <td>${safeCell(row['Submission ID'])}</td>
+      <td>${safeCell(row['City (from PIN)'])}</td>
+      <td>${safeCell(row['Accommodation'] === 'free' ? 'Free' : 'Own')}</td>
     `;
+    tr.addEventListener('click', ()=>openUserModal(row));
     tbody.appendChild(tr);
   });
+}
+
+function getFilteredRows(){
+  return allRows.filter(row=>{
+    const status = normalizeStatus(row['Status']);
+    if(currentFilter === 'all') return true;
+    return status === currentFilter;
+  });
+}
+
+function normalizeStatus(value){
+  return String(value || '').toLowerCase() === 'inactive' ? 'inactive' : 'active';
+}
+
+function openUserModal(row){
+  selectedRow = row;
+  document.getElementById('modalName').textContent = row['Name'] || 'Person Details';
+  document.getElementById('modalGender').textContent = row['Type'] === 'Gent' ? 'Male' : 'Female';
+  document.getElementById('modalAge').textContent = row['Age'] || '-';
+  document.getElementById('modalMobile').textContent = row['Mobile Number'] || '-';
+  document.getElementById('modalCity').textContent = row['City (from PIN)'] || '-';
+  document.getElementById('modalAccommodation').textContent = row['Accommodation'] === 'free' ? 'Free' : 'Own';
+  document.getElementById('modalStatus').textContent = capitalize(normalizeStatus(row['Status']));
+  document.getElementById('modalSubmissionId').textContent = row['Submission ID'] || '-';
+  document.getElementById('userModal').classList.add('show');
+}
+
+function closeUserModal(){
+  selectedRow = null;
+  document.getElementById('userModal').classList.remove('show');
+}
+
+async function updateSelectedStatus(nextStatus){
+  if(!selectedRow) return;
+  try{
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({
+        action: 'updateStatus',
+        rowNumber: selectedRow._rowNumber,
+        nextStatus: nextStatus
+      })
+    });
+    const payload = await response.json();
+    if(payload.status !== 'success'){
+      throw new Error(payload.message || 'Status update failed');
+    }
+    const updated = payload.data;
+    allRows = allRows.map(row=>row._rowNumber === updated._rowNumber ? updated : row);
+    renderTable();
+    closeUserModal();
+    loadData();
+  }catch(err){
+    alert('Could not update status. Please try again.');
+  }
+}
+
+function downloadExcel(){
+  const rows = getFilteredRows();
+  if(!rows.length){
+    alert('No data available for export.');
+    return;
+  }
+  const header = ['Name','Gender','Age','Mobile Number','City','Accommodation','Status'];
+  const tableRows = rows.map(row=>[
+    row['Name'],
+    row['Type'] === 'Gent' ? 'Male' : 'Female',
+    row['Age'],
+    row['Mobile Number'],
+    row['City (from PIN)'],
+    row['Accommodation'] === 'free' ? 'Free' : 'Own',
+    capitalize(normalizeStatus(row['Status']))
+  ]);
+  const html = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
+      <head><meta charset="UTF-8"></head>
+      <body>
+        <table border="1">
+          <tr>${header.map(cell=>`<th>${safeCell(cell)}</th>`).join('')}</tr>
+          ${tableRows.map(row=>`<tr>${row.map(cell=>`<td>${safeCell(cell)}</td>`).join('')}</tr>`).join('')}
+        </table>
+      </body>
+    </html>`;
+  const blob = new Blob([html], {type:'application/vnd.ms-excel'});
+  const link = document.createElement('a');
+  const statusSuffix = currentFilter === 'all' ? 'all' : currentFilter;
+  link.href = URL.createObjectURL(blob);
+  link.download = `parayan-submissions-${statusSuffix}.xls`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(link.href);
 }
 
 function safeCell(value){
@@ -509,6 +683,11 @@ function safeCell(value){
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+function capitalize(value){
+  const text = String(value || '');
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : '';
 }
 </script>
 
