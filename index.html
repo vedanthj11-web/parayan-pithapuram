@@ -9,13 +9,14 @@
 <style>
   :root{--saffron:#e2711d;--saffron-dark:#c85a0e;--maroon:#7a2e2e;--cream:#fff8ee;--ink:#332218;--border:#e8d9c0;--success:#2f7d4f;}
   *{box-sizing:border-box;}
+  html,body{max-width:100%;overflow-x:hidden;}
   body{margin:0;font-family:'Poppins','Noto Sans Devanagari',sans-serif;background:linear-gradient(180deg,#fff8ee 0%,#fbeed9 100%);color:var(--ink);min-height:100vh;padding:0 0 60px 0;}
   header{background:linear-gradient(120deg,var(--maroon),#5c2020);color:#fdf1df;padding:28px 20px 34px;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,0.15);}
   header h1{font-family:'Noto Serif','Noto Sans Devanagari',serif;font-size:clamp(19px,4.3vw,30px);margin:0 0 4px;letter-spacing:.3px;}
   header h1 .eng{display:block;font-family:'Poppins',sans-serif;font-size:clamp(12px,2.6vw,15px);font-weight:400;color:#f3d9b0;margin-top:4px;letter-spacing:.2px;}
   header p{margin:10px 0 0;font-size:clamp(13px,3vw,16px);color:#f3d9b0;}
   .dates{display:inline-block;margin-top:10px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.3);padding:6px 16px;border-radius:20px;font-size:14px;letter-spacing:.5px;}
-  .container{max-width:720px;margin:-20px auto 0;padding:0 16px;}
+  .container{width:min(100%,720px);max-width:720px;margin:-20px auto 0;padding:0 16px;}
   form{background:#fffefb;border-radius:16px;box-shadow:0 10px 30px rgba(122,46,46,0.12);padding:clamp(18px,4vw,36px);margin-top:20px;}
   .section{margin-bottom:30px;}
   .section-title{font-size:15px;font-weight:600;color:var(--saffron-dark);letter-spacing:.3px;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--border);}
@@ -27,9 +28,9 @@
   .hint{font-size:12px;color:#a3906f;margin-top:5px;}
   input[type="text"],input[type="tel"],input[type="number"],select{width:100%;padding:12px 14px;font-size:15px;border:1.5px solid var(--border);border-radius:10px;background:#fffdf9;font-family:inherit;color:var(--ink);transition:border-color .15s, box-shadow .15s;-webkit-appearance:none;appearance:none;}
   input:focus, select:focus{outline:none;border-color:var(--saffron);box-shadow:0 0 0 3px rgba(226,113,29,0.15);}
-  .count-pills{display:flex;flex-wrap:wrap;gap:8px;}
-  .count-pill{width:48px;height:48px;border-radius:10px;border:1.5px solid var(--border);background:#fffdf9;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;cursor:pointer;transition:all .15s;}
-  .count-pill.plus{width:auto;padding:0 14px;font-size:13px;}
+  .count-pills{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
+  .count-pill{width:100%;min-height:48px;border-radius:10px;border:1.5px solid var(--border);background:#fffdf9;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;cursor:pointer;transition:all .15s;}
+  .count-pill.plus{padding:0 14px;font-size:13px;grid-column:span 2;}
   .count-pill:hover{border-color:var(--saffron);}
   .count-pill.selected{background:var(--saffron);border-color:var(--saffron);color:#fff;}
   .overflow-input{margin-top:10px;display:none;}
@@ -39,7 +40,7 @@
   .person-card .p-title{font-weight:600;font-size:13.5px;color:var(--maroon);margin-bottom:10px;letter-spacing:.3px;}
   .grid-3{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .grid-3 .full{grid-column:1 / -1;}
-  @media (min-width:600px){.grid-3{grid-template-columns:2fr 1fr 1.5fr;}.grid-3 .full{grid-column:auto;}}
+  @media (min-width:600px){.grid-3{grid-template-columns:2fr 1fr 1.5fr;}.grid-3 .full{grid-column:auto;}.count-pills{grid-template-columns:repeat(7,minmax(0,1fr));}.count-pill.plus{grid-column:span 1;}}
   .radio-group{display:flex;flex-direction:column;gap:10px;}
   .radio-option{display:flex;align-items:flex-start;gap:10px;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .15s, background .15s;}
   .radio-option:hover{border-color:var(--saffron);}
@@ -62,6 +63,12 @@
   .spinner{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.5);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px;}
   @keyframes spin{to{transform:rotate(360deg);}}
   footer{text-align:center;margin-top:24px;font-size:12px;color:#a3906f;}
+  @media (max-width:480px){
+    header{padding:24px 14px 30px;}
+    form{padding:18px 14px;}
+    .radio-option{padding:12px;}
+    .submit-btn{padding:15px;font-size:15px;}
+  }
 </style>
 </head>
 <body>
@@ -144,6 +151,7 @@
 </div>
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTkXBHASxYiSdqjy1eyYQASuqgDY-qvABIwISYEyOaKg8Bvg8H1WsVAOT7CWo78dat/exec";
+const REQUEST_TIMEOUT_MS = 15000;
 let counts = { gents: 0, ladies: 0 };
 function setupPills(type){
   const container = document.getElementById(type + 'Pills');
@@ -229,31 +237,60 @@ document.getElementById('regForm').addEventListener('submit', async function(e){
   document.querySelectorAll('#gentsBlocks .person-card').forEach(card=>{ gents.push({name: card.querySelector('.p-name').value.trim(), age: card.querySelector('.p-age').value.trim(), mobile: card.querySelector('.p-mobile').value.trim()}); });
   const ladies = [];
   document.querySelectorAll('#ladiesBlocks .person-card').forEach(card=>{ ladies.push({name: card.querySelector('.p-name').value.trim(), age: card.querySelector('.p-age').value.trim(), mobile: card.querySelector('.p-mobile').value.trim()}); });
-  const payload = { pincode: document.getElementById('pincode').value.trim(), gentsCount: counts.gents, ladiesCount: counts.ladies, gents: gents, ladies: ladies, accommodation: document.querySelector('input[name="accom"]:checked').value, timestamp: new Date().toISOString() };
+  const submissionId = `sub_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+  const payload = { pincode: document.getElementById('pincode').value.trim(), gentsCount: counts.gents, ladiesCount: counts.ladies, gents: gents, ladies: ladies, accommodation: document.querySelector('input[name="accom"]:checked').value, timestamp: new Date().toISOString(), submissionId: submissionId };
   try{
-    const res = await fetch(SCRIPT_URL, { method: 'POST', headers: {'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload) });
-    const result = await res.json();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(()=>controller.abort(), REQUEST_TIMEOUT_MS);
+    const res = await fetch(SCRIPT_URL, { method: 'POST', headers: {'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload), signal: controller.signal });
+    clearTimeout(timeoutId);
+    const raw = await res.text();
+    const result = JSON.parse(raw);
     if(result.status === 'success'){
-      document.getElementById('formBody').parentElement.style.display = 'none';
-      submitBtn.style.display = 'none';
-      const statusBox = document.getElementById('statusBox');
-      statusBox.classList.add('show'); statusBox.classList.remove('error');
-      document.getElementById('statusIcon').textContent = '✓';
-      document.getElementById('statusTitle').textContent = 'नोंदणी यशस्वी (Registration Successful)';
-      document.getElementById('statusMsg').textContent = `धन्यवाद! ${counts.gents + counts.ladies} सदस्यांची नोंदणी झाली.`;
-    } else { throw new Error(result.message || 'Unknown error'); }
+      showSuccess(counts.gents + counts.ladies);
+    } else {
+      throw new Error(result.message || 'Unknown error');
+    }
   }catch(err){
+    const verified = await verifySubmission(submissionId);
+    if(verified){
+      showSuccess(counts.gents + counts.ladies, true);
+      return;
+    }
     submitBtn.disabled = false;
     submitBtn.innerHTML = 'नोंदणी सबमिट करा (Submit Registration)';
     const statusBox = document.getElementById('statusBox');
     statusBox.classList.add('show','error');
     document.getElementById('statusIcon').textContent = '✕';
     document.getElementById('statusTitle').textContent = 'त्रुटी (Submission Failed)';
-    document.getElementById('statusMsg').textContent = 'काहीतरी चूक झाली. कृपया पुन्हा प्रयत्न करा.';
+    document.getElementById('statusMsg').textContent = 'सबमिशन पूर्ण झाले नाही. कृपया पुन्हा प्रयत्न करा.';
     document.querySelector('form').style.display='block';
     setTimeout(()=>{ statusBox.classList.remove('show','error'); }, 3500);
   }
 });
+
+function showSuccess(totalPeople, verifiedAfterRetry = false){
+  document.getElementById('formBody').parentElement.style.display = 'none';
+  document.getElementById('submitBtn').style.display = 'none';
+  const statusBox = document.getElementById('statusBox');
+  statusBox.classList.add('show');
+  statusBox.classList.remove('error');
+  document.getElementById('statusIcon').textContent = '✓';
+  document.getElementById('statusTitle').textContent = 'नोंदणी यशस्वी (Registration Successful)';
+  document.getElementById('statusMsg').textContent = verifiedAfterRetry
+    ? `नोंदणी जतन झाली आहे. ${totalPeople} सदस्यांची नोंदणी झाली.`
+    : `धन्यवाद! ${totalPeople} सदस्यांची नोंदणी झाली.`;
+}
+
+async function verifySubmission(submissionId){
+  try{
+    const res = await fetch(`${SCRIPT_URL}?action=getSubmissionStatus&submissionId=${encodeURIComponent(submissionId)}`);
+    const payload = await res.json();
+    return Boolean(payload && payload.status === 'success' && payload.data && payload.data.exists);
+  }catch(err){
+    return false;
+  }
+}
 </script>
 </body>
 </html>
