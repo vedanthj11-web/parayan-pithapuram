@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shripad Shrivallabh Charitamrut Samohik Parayan — Registration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Serif:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --saffron:#e2711d;
+    --saffron-dark:#c85a0e;
+    --maroon:#7a2e2e;
+    --cream:#fff8ee;
+    --gold:#c9a227;
+    --ink:#332218;
+    --border:#e8d9c0;
+    --success:#2f7d4f;
+    --warn:#b3541e;
+    --warn-bg:#fdecd8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(180deg,#fff8ee 0%,#fbeed9 100%);
+    color:var(--ink);
+    min-height:100vh;
+    padding:0 0 60px 0;
+  }
+  header{
+    background:linear-gradient(120deg,var(--maroon),#5c2020);
+    color:#fdf1df;
+    padding:28px 20px 34px;
+    text-align:center;
+    box-shadow:0 4px 18px rgba(0,0,0,0.15);
+  }
+  header h1{
+    font-family:'Noto Serif',serif;
+    font-size:clamp(20px,4.5vw,32px);
+    margin:0 0 6px;
+    letter-spacing:.3px;
+  }
+  header p{
+    margin:4px 0;
+    font-size:clamp(13px,3vw,16px);
+    color:#f3d9b0;
+  }
+  .dates{
+    display:inline-block;
+    margin-top:10px;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.3);
+    padding:6px 16px;
+    border-radius:20px;
+    font-size:14px;
+    letter-spacing:.5px;
+  }
+  .container{
+    max-width:720px;
+    margin:-20px auto 0;
+    padding:0 16px;
+  }
+  form{
+    background:#fffefb;
+    border-radius:16px;
+    box-shadow:0 10px 30px rgba(122,46,46,0.12);
+    padding:clamp(18px,4vw,36px);
+    margin-top:20px;
+  }
+  .section{
+    margin-bottom:30px;
+  }
+  .section-title{
+    font-size:15px;
+    font-weight:600;
+    color:var(--saffron-dark);
+    text-transform:uppercase;
+    letter-spacing:.8px;
+    margin-bottom:14px;
+    padding-bottom:8px;
+    border-bottom:2px solid var(--border);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .field{
+    margin-bottom:18px;
+  }
+  label{
+    display:block;
+    font-weight:500;
+    font-size:14.5px;
+    margin-bottom:6px;
+    color:var(--ink);
+  }
+  label .req{
+    color:var(--saffron-dark);
+    margin-left:2px;
+  }
+  input[type="text"],
+  input[type="tel"],
+  input[type="number"],
+  select{
+    width:100%;
+    padding:12px 14px;
+    font-size:15px;
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    background:#fffdf9;
+    font-family:inherit;
+    color:var(--ink);
+    transition:border-color .15s, box-shadow .15s;
+    -webkit-appearance:none;
+    appearance:none;
+  }
+  input:focus, select:focus{
+    outline:none;
+    border-color:var(--saffron);
+    box-shadow:0 0 0 3px rgba(226,113,29,0.15);
+  }
+  select{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23c85a0e'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 12px center;
+    background-size:20px;
+    padding-right:38px;
+  }
+  .stepper{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .stepper button{
+    width:44px;
+    height:44px;
+    min-width:44px;
+    border-radius:10px;
+    border:1.5px solid var(--saffron);
+    background:#fff;
+    color:var(--saffron-dark);
+    font-size:20px;
+    font-weight:600;
+    cursor:pointer;
+    transition:background .15s;
+  }
+  .stepper button:active{
+    background:var(--saffron);
+    color:#fff;
+  }
+  .stepper .count{
+    min-width:44px;
+    text-align:center;
+    font-size:19px;
+    font-weight:600;
+  }
+  .person-blocks{
+    margin-top:16px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .person-card{
+    background:var(--cream);
+    border:1.5px solid var(--border);
+    border-radius:12px;
+    padding:14px;
+    animation:fadeIn .25s ease;
+  }
+  @keyframes fadeIn{
+    from{opacity:0; transform:translateY(-6px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .person-card .p-title{
+    font-weight:600;
+    font-size:13.5px;
+    color:var(--maroon);
+    margin-bottom:10px;
+    text-transform:uppercase;
+    letter-spacing:.4px;
+  }
+  .grid-3{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .grid-3 .full{
+    grid-column:1 / -1;
+  }
+  @media (min-width:600px){
+    .grid-3{
+      grid-template-columns:2fr 1fr 1.5fr;
+    }
+    .grid-3 .full{
+      grid-column:auto;
+    }
+  }
+  .radio-group{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .radio-option{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    padding:12px 14px;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .radio-option:hover{
+    border-color:var(--saffron);
+  }
+  .radio-option.selected{
+    border-color:var(--saffron);
+    background:#fff3e4;
+  }
+  .radio-option input{
+    margin-top:3px;
+    accent-color:var(--saffron-dark);
+    width:18px;
+    height:18px;
+    flex-shrink:0;
+  }
+  .radio-option .opt-text strong{
+    display:block;
+    font-size:14.5px;
+  }
+  .radio-option .opt-text span{
+    font-size:12.5px;
+    color:#7a6a55;
+  }
+  #capWarning{
+    display:none;
+    margin-top:10px;
+    background:var(--warn-bg);
+    border:1.5px solid #f0c48a;
+    color:var(--warn);
+    padding:10px 14px;
+    border-radius:10px;
+    font-size:13.5px;
+    line-height:1.4;
+  }
+  #capCounter{
+    font-size:12.5px;
+    color:#8a7454;
+    margin-top:8px;
+  }
+  .submit-btn{
+    width:100%;
+    padding:16px;
+    font-size:16px;
+    font-weight:600;
+    color:#fff;
+    background:linear-gradient(120deg,var(--saffron),var(--saffron-dark));
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    box-shadow:0 6px 16px rgba(226,113,29,0.35);
+    transition:transform .1s, box-shadow .1s;
+    letter-spacing:.3px;
+  }
+  .submit-btn:active{
+    transform:scale(0.98);
+  }
+  .submit-btn:disabled{
+    opacity:0.6;
+    cursor:not-allowed;
+  }
+  .error-text{
+    color:#c0392b;
+    font-size:12.5px;
+    margin-top:5px;
+    display:none;
+  }
+  .field.invalid input, .field.invalid select{
+    border-color:#c0392b;
+  }
+  .field.invalid .error-text{
+    display:block;
+  }
+  #statusBox{
+    display:none;
+    text-align:center;
+    padding:40px 20px;
+  }
+  #statusBox.show{
+    display:block;
+  }
+  #statusBox.error #statusIcon{color:#c0392b;}
+  #statusIcon{
+    font-size:52px;
+    margin-bottom:14px;
+    color:var(--success);
+  }
+  #statusBox h2{
+    font-family:'Noto Serif',serif;
+    margin-bottom:8px;
+  }
+  #statusBox p{
+    color:#6b5a45;
+    font-size:14.5px;
+  }
+  .spinner{
+    display:inline-block;
+    width:18px;
+    height:18px;
+    border:2.5px solid rgba(255,255,255,0.5);
+    border-top-color:#fff;
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+    vertical-align:middle;
+    margin-right:8px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  footer{
+    text-align:center;
+    margin-top:24px;
+    font-size:12px;
+    color:#a3906f;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण</h1>
+  <p>Pithapuram · Registration Form</p>
+  <div class="dates">21st – 22nd – 23rd November</div>
+</header>
+
+<div class="container">
+  <form id="regForm" novalidate>
+
+    <div id="formBody">
+
+      <!-- Location -->
+      <div class="section">
+        <div class="section-title">Participant Location</div>
+        <div class="field" id="field-city">
+          <label>City / Village<span class="req">*</span></label>
+          <input type="text" id="city" placeholder="Enter your city or village" required>
+          <div class="error-text">Please enter your city/village.</div>
+        </div>
+      </div>
+
+      <!-- Gents -->
+      <div class="section">
+        <div class="section-title">Gents Travelling</div>
+        <div class="field">
+          <label>Number of Gents<span class="req">*</span></label>
+          <div class="stepper">
+            <button type="button" onclick="changeCount('gents',-1)">−</button>
+            <div class="count" id="gentsCount">0</div>
+            <button type="button" onclick="changeCount('gents',1)">+</button>
+          </div>
+        </div>
+        <div class="person-blocks" id="gentsBlocks"></div>
+      </div>
+
+      <!-- Ladies -->
+      <div class="section">
+        <div class="section-title">Ladies Travelling</div>
+        <div class="field">
+          <label>Number of Ladies<span class="req">*</span></label>
+          <div class="stepper">
+            <button type="button" onclick="changeCount('ladies',-1)">−</button>
+            <div class="count" id="ladiesCount">0</div>
+            <button type="button" onclick="changeCount('ladies',1)">+</button>
+          </div>
+        </div>
+        <div class="person-blocks" id="ladiesBlocks"></div>
+      </div>
+
+      <!-- Accommodation -->
+      <div class="section">
+        <div class="section-title">Accommodation</div>
+        <div class="field" id="field-accom">
+          <div class="radio-group" id="accomGroup">
+            <label class="radio-option" data-value="free">
+              <input type="radio" name="accom" value="free">
+              <span class="opt-text">
+                <strong>Yes — Free (Devasthanam)</strong>
+                <span>Limited to first 600 people. Allocation on first-come basis.</span>
+              </span>
+            </label>
+            <label class="radio-option" data-value="own">
+              <input type="radio" name="accom" value="own">
+              <span class="opt-text">
+                <strong>No — Own Arrangement</strong>
+                <span>You will arrange your own stay.</span>
+              </span>
+            </label>
+          </div>
+          <div class="error-text">Please select an accommodation option.</div>
+          <div id="capWarning">⚠ Free accommodation has crossed 600 registered people. You may still select this option, but availability is not guaranteed — please arrange a backup if possible.</div>
+          <div id="capCounter"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <button type="submit" class="submit-btn" id="submitBtn">Submit Registration</button>
+  </form>
+
+  <div id="statusBox">
+    <div id="statusIcon">✓</div>
+    <h2 id="statusTitle">Registration Successful</h2>
+    <p id="statusMsg">Thank you for registering. We look forward to your participation.</p>
+  </div>
+
+  <footer>Shripad Shrivallabh Charitamrut Samohik Parayan · Pithapuram, 2026</footer>
+</div>
+
+<script>
+// ====== CONFIG ======
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx1ZfRr54Ki9XOH76phFeg7AC5FQGmfVaP5bnUpzM79w-wiRCwLEGzOuYKTIf4auUmo/exec";
+const FREE_ACCOM_CAP = 600;
+
+// ====== STATE ======
+let counts = { gents: 0, ladies: 0 };
+
+function changeCount(type, delta){
+  let next = counts[type] + delta;
+  if(next < 0) next = 0;
+  if(next > 30) next = 30; // sane upper bound
+  counts[type] = next;
+  document.getElementById(type + 'Count').textContent = next;
+  renderBlocks(type);
+}
+
+function renderBlocks(type){
+  const container = document.getElementById(type + 'Blocks');
+  const n = counts[type];
+  const label = type === 'gents' ? 'Gent' : 'Lady';
+
+  // preserve existing values when re-rendering
+  const existing = [];
+  container.querySelectorAll('.person-card').forEach(card=>{
+    existing.push({
+      name: card.querySelector('.p-name').value,
+      age: card.querySelector('.p-age').value,
+      mobile: card.querySelector('.p-mobile').value
+    });
+  });
+
+  container.innerHTML = '';
+  for(let i=0;i<n;i++){
+    const vals = existing[i] || {name:'',age:'',mobile:''};
+    const card = document.createElement('div');
+    card.className = 'person-card';
+    card.innerHTML = `
+      <div class="p-title">${label} ${i+1}</div>
+      <div class="grid-3">
+        <div class="full">
+          <input type="text" class="p-name" placeholder="Full Name" value="${vals.name.replace(/"/g,'&quot;')}" required>
+        </div>
+        <div>
+          <input type="number" class="p-age" placeholder="Age" min="0" max="120" value="${vals.age}" required>
+        </div>
+        <div>
+          <input type="tel" class="p-mobile" placeholder="Mobile Number" value="${vals.mobile}" required>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  }
+}
+
+// ====== ACCOMMODATION RADIO UX ======
+document.querySelectorAll('.radio-option').forEach(opt=>{
+  opt.addEventListener('click', ()=>{
+    document.querySelectorAll('.radio-option').forEach(o=>o.classList.remove('selected'));
+    opt.classList.add('selected');
+    opt.querySelector('input').checked = true;
+    document.getElementById('field-accom').classList.remove('invalid');
+  });
+});
+
+// ====== CAP COUNTER (fetched from sheet via Apps Script) ======
+async function loadCapCount(){
+  const counterEl = document.getElementById('capCounter');
+  try{
+    const res = await fetch(SCRIPT_URL + '?action=getFreeAccomCount');
+    const data = await res.json();
+    const used = data.count || 0;
+    counterEl.textContent = `Free accommodation: ${used} / ${FREE_ACCOM_CAP} registered`;
+    if(used >= FREE_ACCOM_CAP){
+      document.getElementById('capWarning').style.display = 'block';
+    }
+  }catch(e){
+    counterEl.textContent = '';
+  }
+}
+loadCapCount();
+
+// ====== VALIDATION ======
+function validate(){
+  let valid = true;
+
+  const cityField = document.getElementById('field-city');
+  const cityVal = document.getElementById('city').value.trim();
+  if(!cityVal){
+    cityField.classList.add('invalid');
+    valid = false;
+  } else {
+    cityField.classList.remove('invalid');
+  }
+
+  if(counts.gents === 0 && counts.ladies === 0){
+    alert('Please add at least 1 Gent or Lady travelling.');
+    valid = false;
+  }
+
+  // validate each person card
+  ['gents','ladies'].forEach(type=>{
+    document.querySelectorAll(`#${type}Blocks .person-card`).forEach(card=>{
+      const name = card.querySelector('.p-name');
+      const age = card.querySelector('.p-age');
+      const mobile = card.querySelector('.p-mobile');
+      [name,age,mobile].forEach(inp=>{
+        if(!inp.value.trim()){
+          inp.style.borderColor = '#c0392b';
+          valid = false;
+        } else {
+          inp.style.borderColor = '';
+        }
+      });
+    });
+  });
+
+  const accomField = document.getElementById('field-accom');
+  const accomChecked = document.querySelector('input[name="accom"]:checked');
+  if(!accomChecked){
+    accomField.classList.add('invalid');
+    valid = false;
+  } else {
+    accomField.classList.remove('invalid');
+  }
+
+  return valid;
+}
+
+// ====== SUBMIT ======
+document.getElementById('regForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  if(!validate()) return;
+
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner"></span>Submitting...';
+
+  const gents = [];
+  document.querySelectorAll('#gentsBlocks .person-card').forEach(card=>{
+    gents.push({
+      name: card.querySelector('.p-name').value.trim(),
+      age: card.querySelector('.p-age').value.trim(),
+      mobile: card.querySelector('.p-mobile').value.trim()
+    });
+  });
+
+  const ladies = [];
+  document.querySelectorAll('#ladiesBlocks .person-card').forEach(card=>{
+    ladies.push({
+      name: card.querySelector('.p-name').value.trim(),
+      age: card.querySelector('.p-age').value.trim(),
+      mobile: card.querySelector('.p-mobile').value.trim()
+    });
+  });
+
+  const payload = {
+    city: document.getElementById('city').value.trim(),
+    gentsCount: counts.gents,
+    ladiesCount: counts.ladies,
+    gents: gents,
+    ladies: ladies,
+    accommodation: document.querySelector('input[name="accom"]:checked').value,
+    timestamp: new Date().toISOString()
+  };
+
+  try{
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+
+    if(result.status === 'success'){
+      document.getElementById('formBody').parentElement.style.display = 'none';
+      submitBtn.style.display = 'none';
+      const statusBox = document.getElementById('statusBox');
+      statusBox.classList.add('show');
+      statusBox.classList.remove('error');
+      document.getElementById('statusIcon').textContent = '✓';
+      document.getElementById('statusTitle').textContent = 'Registration Successful';
+      document.getElementById('statusMsg').textContent =
+        `Thank you! ${counts.gents + counts.ladies} member(s) registered from ${payload.city}. We look forward to your participation.`;
+    } else {
+      throw new Error(result.message || 'Unknown error');
+    }
+  }catch(err){
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = 'Submit Registration';
+    const statusBox = document.getElementById('statusBox');
+    statusBox.classList.add('show','error');
+    document.getElementById('statusIcon').textContent = '✕';
+    document.getElementById('statusTitle').textContent = 'Submission Failed';
+    document.getElementById('statusMsg').textContent = 'Something went wrong. Please check your connection and try again, or contact the organizers.';
+    document.querySelector('form').style.display='block';
+    setTimeout(()=>{ statusBox.classList.remove('show','error'); }, 3500);
+  }
+});
+</script>
+
+</body>
+</html>
