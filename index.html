@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shripad Shrivallabh Charitamrut Samohik Parayan — Registration</title>
+<title>श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण (Shripad Shrivallabh Charitamrut Samohik Parayan)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Serif:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Serif:wght@600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --saffron:#e2711d;
@@ -16,13 +16,11 @@
     --ink:#332218;
     --border:#e8d9c0;
     --success:#2f7d4f;
-    --warn:#b3541e;
-    --warn-bg:#fdecd8;
   }
   *{box-sizing:border-box;}
   body{
     margin:0;
-    font-family:'Poppins',sans-serif;
+    font-family:'Poppins','Noto Sans Devanagari',sans-serif;
     background:linear-gradient(180deg,#fff8ee 0%,#fbeed9 100%);
     color:var(--ink);
     min-height:100vh;
@@ -36,13 +34,22 @@
     box-shadow:0 4px 18px rgba(0,0,0,0.15);
   }
   header h1{
-    font-family:'Noto Serif',serif;
-    font-size:clamp(20px,4.5vw,32px);
-    margin:0 0 6px;
+    font-family:'Noto Serif','Noto Sans Devanagari',serif;
+    font-size:clamp(19px,4.3vw,30px);
+    margin:0 0 4px;
     letter-spacing:.3px;
   }
+  header h1 .eng{
+    display:block;
+    font-family:'Poppins',sans-serif;
+    font-size:clamp(12px,2.6vw,15px);
+    font-weight:400;
+    color:#f3d9b0;
+    margin-top:4px;
+    letter-spacing:.2px;
+  }
   header p{
-    margin:4px 0;
+    margin:10px 0 0;
     font-size:clamp(13px,3vw,16px);
     color:#f3d9b0;
   }
@@ -75,14 +82,15 @@
     font-size:15px;
     font-weight:600;
     color:var(--saffron-dark);
-    text-transform:uppercase;
-    letter-spacing:.8px;
+    letter-spacing:.3px;
     margin-bottom:14px;
     padding-bottom:8px;
     border-bottom:2px solid var(--border);
-    display:flex;
-    align-items:center;
-    gap:8px;
+  }
+  .section-title .eng{
+    font-weight:400;
+    color:#a68a63;
+    font-size:12.5px;
   }
   .field{
     margin-bottom:18px;
@@ -93,6 +101,11 @@
     font-size:14.5px;
     margin-bottom:6px;
     color:var(--ink);
+  }
+  label .eng{
+    font-weight:400;
+    color:#8a7454;
+    font-size:12.5px;
   }
   label .req{
     color:var(--saffron-dark);
@@ -176,8 +189,7 @@
     font-size:13.5px;
     color:var(--maroon);
     margin-bottom:10px;
-    text-transform:uppercase;
-    letter-spacing:.4px;
+    letter-spacing:.3px;
   }
   .grid-3{
     display:grid;
@@ -231,22 +243,6 @@
   .radio-option .opt-text span{
     font-size:12.5px;
     color:#7a6a55;
-  }
-  #capWarning{
-    display:none;
-    margin-top:10px;
-    background:var(--warn-bg);
-    border:1.5px solid #f0c48a;
-    color:var(--warn);
-    padding:10px 14px;
-    border-radius:10px;
-    font-size:13.5px;
-    line-height:1.4;
-  }
-  #capCounter{
-    font-size:12.5px;
-    color:#8a7454;
-    margin-top:8px;
   }
   .submit-btn{
     width:100%;
@@ -321,14 +317,23 @@
     font-size:12px;
     color:#a3906f;
   }
+  .city-wrap{
+    position:relative;
+  }
+  #cityOther{
+    margin-top:10px;
+    display:none;
+  }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण</h1>
-  <p>Pithapuram · Registration Form</p>
-  <div class="dates">21st – 22nd – 23rd November</div>
+  <h1>श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण
+    <span class="eng">(Shripad Shrivallabh Charitamrut Samohik Parayan)</span>
+  </h1>
+  <p>पिठापुरम · नोंदणी फॉर्म (Pithapuram · Registration Form)</p>
+  <div class="dates">21 – 22 – 23 नोव्हेंबर (November)</div>
 </header>
 
 <div class="container">
@@ -338,19 +343,24 @@
 
       <!-- Location -->
       <div class="section">
-        <div class="section-title">Participant Location</div>
+        <div class="section-title">ठिकाण <span class="eng">(Location)</span></div>
         <div class="field" id="field-city">
-          <label>City / Village<span class="req">*</span></label>
-          <input type="text" id="city" placeholder="Enter your city or village" required>
-          <div class="error-text">Please enter your city/village.</div>
+          <label>शहर / गाव <span class="eng">(City / Village)</span><span class="req">*</span></label>
+          <div class="city-wrap">
+            <select id="citySelect" required>
+              <option value="">— निवडा (Select) —</option>
+            </select>
+          </div>
+          <input type="text" id="cityOther" placeholder="गावाचे नाव लिहा (Type your village name)">
+          <div class="error-text">कृपया शहर/गाव निवडा (Please select your city/village).</div>
         </div>
       </div>
 
       <!-- Gents -->
       <div class="section">
-        <div class="section-title">Gents Travelling</div>
+        <div class="section-title">पुरुष <span class="eng">(Gents Travelling)</span></div>
         <div class="field">
-          <label>Number of Gents<span class="req">*</span></label>
+          <label>पुरुषांची संख्या <span class="eng">(Number of Gents)</span><span class="req">*</span></label>
           <div class="stepper">
             <button type="button" onclick="changeCount('gents',-1)">−</button>
             <div class="count" id="gentsCount">0</div>
@@ -362,9 +372,9 @@
 
       <!-- Ladies -->
       <div class="section">
-        <div class="section-title">Ladies Travelling</div>
+        <div class="section-title">स्त्रिया <span class="eng">(Ladies Travelling)</span></div>
         <div class="field">
-          <label>Number of Ladies<span class="req">*</span></label>
+          <label>स्त्रियांची संख्या <span class="eng">(Number of Ladies)</span><span class="req">*</span></label>
           <div class="stepper">
             <button type="button" onclick="changeCount('ladies',-1)">−</button>
             <div class="count" id="ladiesCount">0</div>
@@ -376,48 +386,79 @@
 
       <!-- Accommodation -->
       <div class="section">
-        <div class="section-title">Accommodation</div>
+        <div class="section-title">निवास <span class="eng">(Accommodation)</span></div>
         <div class="field" id="field-accom">
           <div class="radio-group" id="accomGroup">
             <label class="radio-option" data-value="free">
               <input type="radio" name="accom" value="free">
               <span class="opt-text">
-                <strong>Yes — Free (Devasthanam)</strong>
-                <span>Limited to first 600 people. Allocation on first-come basis.</span>
+                <strong>होय — मोफत, देवस्थान <span class="eng" style="font-weight:400;">(Yes — Free, Devasthanam)</span></strong>
+                <span>मर्यादित जागा (Limited availability)</span>
               </span>
             </label>
             <label class="radio-option" data-value="own">
               <input type="radio" name="accom" value="own">
               <span class="opt-text">
-                <strong>No — Own Arrangement</strong>
-                <span>You will arrange your own stay.</span>
+                <strong>नाही — स्वतःची व्यवस्था <span class="eng" style="font-weight:400;">(No — Own Arrangement)</span></strong>
+                <span>तुम्ही स्वतः व्यवस्था कराल (You will arrange your own stay)</span>
               </span>
             </label>
           </div>
-          <div class="error-text">Please select an accommodation option.</div>
-          <div id="capWarning">⚠ Free accommodation has crossed 600 registered people. You may still select this option, but availability is not guaranteed — please arrange a backup if possible.</div>
-          <div id="capCounter"></div>
+          <div class="error-text">कृपया निवास पर्याय निवडा (Please select an accommodation option).</div>
         </div>
       </div>
 
     </div>
 
-    <button type="submit" class="submit-btn" id="submitBtn">Submit Registration</button>
+    <button type="submit" class="submit-btn" id="submitBtn">नोंदणी सबमिट करा (Submit Registration)</button>
   </form>
 
   <div id="statusBox">
     <div id="statusIcon">✓</div>
-    <h2 id="statusTitle">Registration Successful</h2>
-    <p id="statusMsg">Thank you for registering. We look forward to your participation.</p>
+    <h2 id="statusTitle">नोंदणी यशस्वी (Registration Successful)</h2>
+    <p id="statusMsg">धन्यवाद! आम्ही तुमची वाट पाहत आहोत. (Thank you for registering. We look forward to your participation.)</p>
   </div>
 
-  <footer>Shripad Shrivallabh Charitamrut Samohik Parayan · Pithapuram, 2026</footer>
+  <footer>श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण · Pithapuram, 2026</footer>
 </div>
 
 <script>
 // ====== CONFIG ======
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx1ZfRr54Ki9XOH76phFeg7AC5FQGmfVaP5bnUpzM79w-wiRCwLEGzOuYKTIf4auUmo/exec";
-const FREE_ACCOM_CAP = 600;
+
+// Standardized city/town list — keeps data clean instead of free-text
+// (Hyderabad / Hyd / हैदराबाद all becoming different values in the sheet)
+const CITY_LIST = [
+  "Hyderabad","Secunderabad","Warangal","Nizamabad","Karimnagar","Khammam",
+  "Rangareddy","Medchal","Sangareddy",
+  "Vijayawada","Visakhapatnam","Guntur","Rajahmundry","Kakinada","Nellore",
+  "Tirupati","Kurnool","Anantapur","Kadapa","Chittoor","Eluru","Ongole",
+  "Machilipatnam","Srikakulam","Vizianagaram",
+  "Pithapuram","Samalkot","Peddapuram","Anaparthi","Prathipadu",
+  "Mumbai","Pune","Nagpur","Nashik","Bangalore","Chennai","Delhi","Kolkata","Ahmedabad",
+  "Other / इतर"
+];
+
+// ====== INIT CITY DROPDOWN ======
+const citySelect = document.getElementById('citySelect');
+CITY_LIST.forEach(c=>{
+  const opt = document.createElement('option');
+  opt.value = c;
+  opt.textContent = c;
+  citySelect.appendChild(opt);
+});
+citySelect.addEventListener('change', ()=>{
+  const otherBox = document.getElementById('cityOther');
+  if(citySelect.value.startsWith('Other')){
+    otherBox.style.display = 'block';
+    otherBox.required = true;
+  } else {
+    otherBox.style.display = 'none';
+    otherBox.required = false;
+    otherBox.value = '';
+  }
+  document.getElementById('field-city').classList.remove('invalid');
+});
 
 // ====== STATE ======
 let counts = { gents: 0, ladies: 0 };
@@ -434,7 +475,7 @@ function changeCount(type, delta){
 function renderBlocks(type){
   const container = document.getElementById(type + 'Blocks');
   const n = counts[type];
-  const label = type === 'gents' ? 'Gent' : 'Lady';
+  const label = type === 'gents' ? 'पुरुष / Gent' : 'स्त्री / Lady';
 
   // preserve existing values when re-rendering
   const existing = [];
@@ -455,13 +496,13 @@ function renderBlocks(type){
       <div class="p-title">${label} ${i+1}</div>
       <div class="grid-3">
         <div class="full">
-          <input type="text" class="p-name" placeholder="Full Name" value="${vals.name.replace(/"/g,'&quot;')}" required>
+          <input type="text" class="p-name" placeholder="पूर्ण नाव (Full Name)" value="${vals.name.replace(/"/g,'&quot;')}" required>
         </div>
         <div>
-          <input type="number" class="p-age" placeholder="Age" min="0" max="120" value="${vals.age}" required>
+          <input type="number" class="p-age" placeholder="वय (Age)" min="0" max="120" value="${vals.age}" required>
         </div>
         <div>
-          <input type="tel" class="p-mobile" placeholder="Mobile Number" value="${vals.mobile}" required>
+          <input type="tel" class="p-mobile" placeholder="मोबाईल (Mobile)" value="${vals.mobile}" required>
         </div>
       </div>
     `;
@@ -479,30 +520,14 @@ document.querySelectorAll('.radio-option').forEach(opt=>{
   });
 });
 
-// ====== CAP COUNTER (fetched from sheet via Apps Script) ======
-async function loadCapCount(){
-  const counterEl = document.getElementById('capCounter');
-  try{
-    const res = await fetch(SCRIPT_URL + '?action=getFreeAccomCount');
-    const data = await res.json();
-    const used = data.count || 0;
-    counterEl.textContent = `Free accommodation: ${used} / ${FREE_ACCOM_CAP} registered`;
-    if(used >= FREE_ACCOM_CAP){
-      document.getElementById('capWarning').style.display = 'block';
-    }
-  }catch(e){
-    counterEl.textContent = '';
-  }
-}
-loadCapCount();
-
 // ====== VALIDATION ======
 function validate(){
   let valid = true;
 
   const cityField = document.getElementById('field-city');
-  const cityVal = document.getElementById('city').value.trim();
-  if(!cityVal){
+  const cityVal = citySelect.value;
+  const cityOtherVal = document.getElementById('cityOther').value.trim();
+  if(!cityVal || (cityVal.startsWith('Other') && !cityOtherVal)){
     cityField.classList.add('invalid');
     valid = false;
   } else {
@@ -510,7 +535,7 @@ function validate(){
   }
 
   if(counts.gents === 0 && counts.ladies === 0){
-    alert('Please add at least 1 Gent or Lady travelling.');
+    alert('किमान १ पुरुष किंवा स्त्री जोडा. (Please add at least 1 Gent or Lady travelling.)');
     valid = false;
   }
 
@@ -550,7 +575,7 @@ document.getElementById('regForm').addEventListener('submit', async function(e){
 
   const submitBtn = document.getElementById('submitBtn');
   submitBtn.disabled = true;
-  submitBtn.innerHTML = '<span class="spinner"></span>Submitting...';
+  submitBtn.innerHTML = '<span class="spinner"></span>सबमिट करत आहे... (Submitting...)';
 
   const gents = [];
   document.querySelectorAll('#gentsBlocks .person-card').forEach(card=>{
@@ -570,8 +595,12 @@ document.getElementById('regForm').addEventListener('submit', async function(e){
     });
   });
 
+  const finalCity = citySelect.value.startsWith('Other')
+    ? document.getElementById('cityOther').value.trim()
+    : citySelect.value;
+
   const payload = {
-    city: document.getElementById('city').value.trim(),
+    city: finalCity,
     gentsCount: counts.gents,
     ladiesCount: counts.ladies,
     gents: gents,
@@ -595,20 +624,20 @@ document.getElementById('regForm').addEventListener('submit', async function(e){
       statusBox.classList.add('show');
       statusBox.classList.remove('error');
       document.getElementById('statusIcon').textContent = '✓';
-      document.getElementById('statusTitle').textContent = 'Registration Successful';
+      document.getElementById('statusTitle').textContent = 'नोंदणी यशस्वी (Registration Successful)';
       document.getElementById('statusMsg').textContent =
-        `Thank you! ${counts.gents + counts.ladies} member(s) registered from ${payload.city}. We look forward to your participation.`;
+        `धन्यवाद! ${counts.gents + counts.ladies} सदस्यांची नोंदणी झाली. (Thank you! ${counts.gents + counts.ladies} member(s) registered from ${payload.city}.)`;
     } else {
       throw new Error(result.message || 'Unknown error');
     }
   }catch(err){
     submitBtn.disabled = false;
-    submitBtn.innerHTML = 'Submit Registration';
+    submitBtn.innerHTML = 'नोंदणी सबमिट करा (Submit Registration)';
     const statusBox = document.getElementById('statusBox');
     statusBox.classList.add('show','error');
     document.getElementById('statusIcon').textContent = '✕';
-    document.getElementById('statusTitle').textContent = 'Submission Failed';
-    document.getElementById('statusMsg').textContent = 'Something went wrong. Please check your connection and try again, or contact the organizers.';
+    document.getElementById('statusTitle').textContent = 'त्रुटी (Submission Failed)';
+    document.getElementById('statusMsg').textContent = 'काहीतरी चूक झाली. कृपया पुन्हा प्रयत्न करा. (Something went wrong. Please try again.)';
     document.querySelector('form').style.display='block';
     setTimeout(()=>{ statusBox.classList.remove('show','error'); }, 3500);
   }
