@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Parayan Registrations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --saffron:#e2711d;
+    --saffron-dark:#c85a0e;
+    --maroon:#7a2e2e;
+    --ink:#332218;
+    --border:#e8d9c0;
+    --bg:#fdf8f0;
+    --card:#ffffff;
+    --blue:#2f6fa8;
+    --pink:#b5457a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding:20px;
+  }
+  h1{
+    font-size:clamp(18px,4vw,26px);
+    color:var(--maroon);
+    margin:0 0 4px;
+  }
+  .sub{
+    color:#8a7454;
+    font-size:13px;
+    margin-bottom:20px;
+  }
+  #lockScreen{
+    max-width:380px;
+    margin:80px auto;
+    background:var(--card);
+    padding:30px;
+    border-radius:14px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.08);
+    text-align:center;
+  }
+  #lockScreen input{
+    width:100%;
+    padding:12px;
+    border:1.5px solid var(--border);
+    border-radius:8px;
+    font-size:15px;
+    margin:14px 0;
+  }
+  #lockScreen button{
+    width:100%;
+    padding:12px;
+    background:var(--saffron);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  #dashboard{
+    display:none;
+    max-width:1000px;
+    margin:0 auto;
+  }
+  .refresh-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .refresh-row button{
+    background:var(--saffron);
+    color:#fff;
+    border:none;
+    padding:9px 16px;
+    border-radius:8px;
+    font-size:13.5px;
+    cursor:pointer;
+    font-weight:500;
+  }
+  #lastUpdated{
+    font-size:12px;
+    color:#8a7454;
+  }
+  .stat-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-bottom:24px;
+  }
+  @media(min-width:700px){
+    .stat-grid{ grid-template-columns:repeat(4,1fr); }
+  }
+  .stat-card{
+    background:var(--card);
+    border-radius:14px;
+    padding:18px;
+    box-shadow:0 4px 14px rgba(122,46,46,0.08);
+    border:1px solid var(--border);
+  }
+  .stat-card .num{
+    font-size:28px;
+    font-weight:700;
+    color:var(--saffron-dark);
+  }
+  .stat-card .lbl{
+    font-size:12.5px;
+    color:#8a7454;
+    margin-top:4px;
+  }
+  .stat-card.gents .num{ color:var(--blue); }
+  .stat-card.ladies .num{ color:var(--pink); }
+  .panel{
+    background:var(--card);
+    border-radius:14px;
+    padding:20px;
+    box-shadow:0 4px 14px rgba(122,46,46,0.08);
+    border:1px solid var(--border);
+    margin-bottom:20px;
+  }
+  .panel h2{
+    font-size:15px;
+    color:var(--maroon);
+    margin:0 0 14px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  th, td{
+    text-align:left;
+    padding:8px 10px;
+    border-bottom:1px solid var(--border);
+  }
+  th{
+    color:#8a7454;
+    font-weight:600;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.3px;
+  }
+  .bar-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .bar-label{
+    width:130px;
+    font-size:13px;
+    flex-shrink:0;
+  }
+  .bar-track{
+    flex:1;
+    background:#f3e6d2;
+    border-radius:6px;
+    height:20px;
+    overflow:hidden;
+  }
+  .bar-fill{
+    height:100%;
+    background:linear-gradient(90deg,var(--saffron),var(--saffron-dark));
+    border-radius:6px;
+    transition:width .4s ease;
+  }
+  .bar-count{
+    width:40px;
+    text-align:right;
+    font-size:13px;
+    font-weight:600;
+    flex-shrink:0;
+  }
+  .accom-split{
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .accom-pill{
+    flex:1;
+    min-width:140px;
+    padding:16px;
+    border-radius:12px;
+    text-align:center;
+  }
+  .accom-pill.free{
+    background:#fdecd8;
+  }
+  .accom-pill.own{
+    background:#e8f2ea;
+  }
+  .accom-pill .num{
+    font-size:24px;
+    font-weight:700;
+  }
+  .accom-pill.free .num{ color:var(--saffron-dark); }
+  .accom-pill.own .num{ color:#2f7d4f; }
+  .accom-pill .lbl{
+    font-size:12.5px;
+    color:#6b5a45;
+    margin-top:4px;
+  }
+  #loadingMsg, #errorMsg{
+    text-align:center;
+    padding:40px;
+    color:#8a7454;
+  }
+  #errorMsg{
+    display:none;
+    color:#c0392b;
+  }
+</style>
+</head>
+<body>
+
+<div id="lockScreen">
+  <h1 style="text-align:center;">Admin Access</h1>
+  <p class="sub" style="text-align:center;">Enter the admin key to view registration analytics</p>
+  <input type="password" id="adminKey" placeholder="Admin key">
+  <button onclick="tryUnlock()">View Dashboard</button>
+</div>
+
+<div id="dashboard">
+  <h1>Registration Analytics</h1>
+  <div class="sub">श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण · Pithapuram · 21–23 Nov</div>
+
+  <div class="refresh-row">
+    <span id="lastUpdated"></span>
+    <button onclick="loadData()">↻ Refresh</button>
+  </div>
+
+  <div id="loadingMsg">Loading data...</div>
+  <div id="errorMsg">Could not load data. Check SCRIPT_URL and that the Apps Script is deployed.</div>
+
+  <div id="content" style="display:none;">
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="num" id="statTotal">0</div>
+        <div class="lbl">Total People Registered</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="statSubmissions">0</div>
+        <div class="lbl">Total Submissions</div>
+      </div>
+      <div class="stat-card gents">
+        <div class="num" id="statGents">0</div>
+        <div class="lbl">Gents</div>
+      </div>
+      <div class="stat-card ladies">
+        <div class="num" id="statLadies">0</div>
+        <div class="lbl">Ladies</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Accommodation Demand</h2>
+      <div class="accom-split">
+        <div class="accom-pill free">
+          <div class="num" id="accomFree">0</div>
+          <div class="lbl">Free (Devasthanam) requested</div>
+        </div>
+        <div class="accom-pill own">
+          <div class="num" id="accomOwn">0</div>
+          <div class="lbl">Own Arrangement</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>City / Village Breakdown</h2>
+      <div id="cityBars"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Age Distribution</h2>
+      <div id="ageBars"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====== CONFIG ======
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx1ZfRr54Ki9XOH76phFeg7AC5FQGmfVaP5bnUpzM79w-wiRCwLEGzOuYKTIf4auUmo/exec";
+const ADMIN_KEY = "Admin@1";
+
+function tryUnlock(){
+  const val = document.getElementById('adminKey').value;
+  if(val === ADMIN_KEY){
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadData();
+  } else {
+    alert('Incorrect key.');
+  }
+}
+
+async function loadData(){
+  document.getElementById('loadingMsg').style.display = 'block';
+  document.getElementById('errorMsg').style.display = 'none';
+  document.getElementById('content').style.display = 'none';
+
+  try{
+    const res = await fetch(SCRIPT_URL + '?action=getAnalytics');
+    const data = await res.json();
+    render(data);
+    document.getElementById('lastUpdated').textContent =
+      'Last updated: ' + new Date().toLocaleTimeString();
+    document.getElementById('loadingMsg').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+  }catch(e){
+    document.getElementById('loadingMsg').style.display = 'none';
+    document.getElementById('errorMsg').style.display = 'block';
+  }
+}
+
+function render(data){
+  document.getElementById('statTotal').textContent = data.totalPeople || 0;
+  document.getElementById('statSubmissions').textContent = data.totalSubmissions || 0;
+  document.getElementById('statGents').textContent = data.totalGents || 0;
+  document.getElementById('statLadies').textContent = data.totalLadies || 0;
+  document.getElementById('accomFree').textContent = data.accomFree || 0;
+  document.getElementById('accomOwn').textContent = data.accomOwn || 0;
+
+  // City breakdown bars
+  const cityBars = document.getElementById('cityBars');
+  cityBars.innerHTML = '';
+  const cities = data.cityBreakdown || [];
+  const maxCity = Math.max(1, ...cities.map(c=>c.count));
+  cities.sort((a,b)=>b.count - a.count).forEach(c=>{
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = `
+      <div class="bar-label">${c.city}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(c.count/maxCity*100)}%"></div></div>
+      <div class="bar-count">${c.count}</div>
+    `;
+    cityBars.appendChild(row);
+  });
+  if(cities.length === 0){
+    cityBars.innerHTML = '<p style="color:#a3906f;font-size:13px;">No data yet.</p>';
+  }
+
+  // Age breakdown bars
+  const ageBars = document.getElementById('ageBars');
+  ageBars.innerHTML = '';
+  const ages = data.ageBreakdown || [];
+  const maxAge = Math.max(1, ...ages.map(a=>a.count));
+  ages.forEach(a=>{
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = `
+      <div class="bar-label">${a.range}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(a.count/maxAge*100)}%"></div></div>
+      <div class="bar-count">${a.count}</div>
+    `;
+    ageBars.appendChild(row);
+  });
+  if(ages.length === 0){
+    ageBars.innerHTML = '<p style="color:#a3906f;font-size:13px;">No data yet.</p>';
+  }
+}
+</script>
+
+</body>
+</html>
