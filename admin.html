@@ -19,58 +19,79 @@
     --pink:#b5457a;
     --green:#2f7d4f;
     --red:#b33a30;
+    --muted:#8a7454;
   }
   *{box-sizing:border-box;}
+  html,body{margin:0;max-width:100%;overflow-x:hidden;}
   body{
-    margin:0;
     font-family:'Poppins',sans-serif;
     background:var(--bg);
     color:var(--ink);
-    padding:20px;
+    padding:18px;
   }
   h1{
-    font-size:clamp(18px,4vw,28px);
-    color:var(--maroon);
     margin:0 0 4px;
+    font-size:clamp(20px,4vw,30px);
+    color:var(--maroon);
   }
   .sub{
-    color:#8a7454;
+    color:var(--muted);
     font-size:13px;
-    margin-bottom:20px;
+    margin-bottom:18px;
+  }
+  .card,.panel{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    box-shadow:0 10px 28px rgba(122,46,46,0.08);
   }
   #lockScreen{
-    max-width:380px;
-    margin:80px auto;
-    background:var(--card);
-    padding:30px;
-    border-radius:14px;
-    box-shadow:0 8px 24px rgba(0,0,0,0.08);
+    width:min(100%,420px);
+    margin:72px auto;
+    padding:28px;
     text-align:center;
   }
-  #lockScreen input{
-    width:100%;
-    padding:12px;
-    border:1.5px solid var(--border);
-    border-radius:8px;
-    font-size:15px;
-    margin:14px 0;
+  input,select,button{
+    font:inherit;
   }
-  #lockScreen button,.action-btn,.filter-btn,.tab-btn{
+  input,select{
+    width:100%;
+    min-width:0;
+    padding:12px 14px;
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    background:#fffdf9;
+    color:var(--ink);
+  }
+  input:focus,select:focus{
+    outline:none;
+    border-color:var(--saffron);
+    box-shadow:0 0 0 3px rgba(226,113,29,0.12);
+  }
+  button{
     border:none;
     cursor:pointer;
-    font-family:inherit;
   }
-  #lockScreen button,.action-btn{
+  .action-btn,.tab-btn,.status-btn{
+    border-radius:10px;
+    padding:11px 14px;
+    font-weight:600;
+  }
+  .action-btn{
     background:var(--saffron);
     color:#fff;
-    padding:12px 16px;
-    border-radius:10px;
-    font-size:14px;
-    font-weight:600;
+  }
+  .action-btn.secondary{
+    background:#f4e7d5;
+    color:var(--maroon);
+  }
+  .action-btn.danger{
+    background:var(--red);
+    color:#fff;
   }
   #dashboard{
     display:none;
-    max-width:1120px;
+    max-width:1240px;
     margin:0 auto;
   }
   .top-row{
@@ -81,68 +102,50 @@
     flex-wrap:wrap;
     margin-bottom:18px;
   }
-  .actions{
+  .top-actions{
     display:flex;
     gap:10px;
     flex-wrap:wrap;
-  }
-  .ghost-btn{
-    background:#fff2df;
-    color:var(--maroon);
   }
   #lastUpdated{
     font-size:12px;
-    color:#8a7454;
+    color:var(--muted);
   }
-  .tabs,.filters{
+  #loadingMsg,#errorMsg{
+    text-align:center;
+    padding:42px 18px;
+    color:var(--muted);
+  }
+  #errorMsg{display:none;color:#c0392b;}
+  .tabs{
     display:flex;
     gap:10px;
     flex-wrap:wrap;
+    margin-bottom:16px;
   }
-  .tab-btn,.filter-btn{
-    border:1.5px solid var(--border);
-    background:#fff8ee;
+  .tab-btn{
+    background:#fff5e8;
     color:var(--maroon);
-    padding:10px 14px;
-    border-radius:999px;
-    font-size:13px;
-    font-weight:600;
+    border:1px solid var(--border);
   }
-  .tab-btn.active,.filter-btn.active{
+  .tab-btn.active{
     background:var(--saffron);
-    border-color:var(--saffron);
     color:#fff;
+    border-color:var(--saffron);
   }
   .tab-panel{display:none;}
   .tab-panel.active{display:block;}
-  .panel{
-    background:var(--card);
-    border-radius:14px;
-    padding:20px;
-    box-shadow:0 4px 14px rgba(122,46,46,0.08);
-    border:1px solid var(--border);
-    margin-bottom:20px;
-  }
-  .panel h2{
-    font-size:15px;
-    color:var(--maroon);
-    margin:0 0 14px;
-  }
   .stat-grid{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:repeat(2,minmax(0,1fr));
     gap:12px;
-    margin-bottom:24px;
+    margin-bottom:18px;
   }
   @media(min-width:760px){
-    .stat-grid{grid-template-columns:repeat(4,1fr);}
+    .stat-grid{grid-template-columns:repeat(5,minmax(0,1fr));}
   }
   .stat-card{
-    background:var(--card);
-    border-radius:14px;
     padding:18px;
-    box-shadow:0 4px 14px rgba(122,46,46,0.08);
-    border:1px solid var(--border);
   }
   .stat-card .num{
     font-size:28px;
@@ -150,30 +153,38 @@
     color:var(--saffron-dark);
   }
   .stat-card .lbl{
-    font-size:12.5px;
-    color:#8a7454;
     margin-top:4px;
+    font-size:12.5px;
+    color:var(--muted);
   }
   .stat-card.gents .num{color:var(--blue);}
   .stat-card.ladies .num{color:var(--pink);}
-  .accom-split{
-    display:flex;
-    gap:16px;
-    flex-wrap:wrap;
+  .stat-card.cities .num{color:var(--green);}
+  .panel{
+    padding:18px;
+    margin-bottom:18px;
   }
-  .accom-pill{
-    flex:1;
-    min-width:140px;
-    padding:16px;
+  .panel h2{
+    margin:0 0 14px;
+    font-size:15px;
+    color:var(--maroon);
+  }
+  .accom-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+  .accom-card{
     border-radius:12px;
+    padding:16px;
     text-align:center;
   }
-  .accom-pill.free{background:#fdecd8;}
-  .accom-pill.own{background:#e8f2ea;}
-  .accom-pill .num{font-size:24px;font-weight:700;}
-  .accom-pill.free .num{color:var(--saffron-dark);}
-  .accom-pill.own .num{color:var(--green);}
-  .accom-pill .lbl{font-size:12.5px;color:#6b5a45;margin-top:4px;}
+  .accom-card.free{background:#fdecd8;}
+  .accom-card.own{background:#e8f2ea;}
+  .accom-card .num{font-size:24px;font-weight:700;}
+  .accom-card.free .num{color:var(--saffron-dark);}
+  .accom-card.own .num{color:var(--green);}
+  .accom-card .lbl{font-size:12.5px;color:#6b5a45;}
   .bar-row{
     display:flex;
     align-items:center;
@@ -181,28 +192,77 @@
     margin-bottom:10px;
   }
   .bar-label{
-    width:130px;
-    font-size:13px;
+    width:140px;
     flex-shrink:0;
+    font-size:13px;
+    color:var(--ink);
   }
   .bar-track{
     flex:1;
-    background:#f3e6d2;
-    border-radius:6px;
-    height:20px;
+    height:18px;
+    background:#f4e5d0;
+    border-radius:999px;
     overflow:hidden;
   }
   .bar-fill{
     height:100%;
     background:linear-gradient(90deg,var(--saffron),var(--saffron-dark));
-    border-radius:6px;
   }
   .bar-count{
-    width:40px;
+    width:38px;
+    flex-shrink:0;
     text-align:right;
     font-size:13px;
     font-weight:600;
-    flex-shrink:0;
+  }
+  .toolbar{
+    display:grid;
+    grid-template-columns:repeat(1,minmax(0,1fr));
+    gap:12px;
+    margin-bottom:16px;
+  }
+  @media(min-width:700px){
+    .toolbar{grid-template-columns:repeat(3,minmax(0,1fr));}
+  }
+  @media(min-width:1000px){
+    .toolbar{grid-template-columns:1.1fr 1fr 1fr 1fr 1fr;}
+  }
+  .filter-group label{
+    display:block;
+    font-size:12px;
+    font-weight:600;
+    color:var(--muted);
+    margin-bottom:6px;
+    text-transform:uppercase;
+    letter-spacing:.3px;
+  }
+  .status-switch{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .status-btn{
+    background:#fff8ee;
+    border:1px solid var(--border);
+    color:var(--maroon);
+    padding:10px 12px;
+  }
+  .status-btn.active{
+    background:var(--saffron);
+    border-color:var(--saffron);
+    color:#fff;
+  }
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .meta-info{
+    font-size:13px;
+    color:var(--muted);
   }
   .table-wrap{
     overflow:auto;
@@ -211,86 +271,71 @@
   }
   table{
     width:100%;
+    min-width:980px;
     border-collapse:collapse;
-    min-width:720px;
     background:#fff;
   }
   th,td{
-    text-align:left;
-    padding:10px 12px;
+    padding:11px 12px;
     border-bottom:1px solid var(--border);
     font-size:13.5px;
+    text-align:left;
+    vertical-align:top;
   }
   th{
-    color:#8a7454;
-    font-weight:600;
-    font-size:12px;
+    background:#fffaf3;
+    color:var(--muted);
     text-transform:uppercase;
     letter-spacing:.3px;
-    background:#fffaf3;
+    font-size:11.5px;
   }
   tbody tr:nth-child(even){background:#fcf7ef;}
-  tbody tr{cursor:pointer;}
   tbody tr:hover{background:#fff1df;}
+  tbody tr{cursor:pointer;}
   .status-pill{
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    min-width:88px;
+    min-width:84px;
     padding:6px 10px;
     border-radius:999px;
     font-size:12px;
     font-weight:600;
   }
   .status-pill.active{background:#e8f2ea;color:var(--green);}
-  .status-pill.inactive{background:#f9e6e3;color:var(--red);}
-  #loadingMsg,#errorMsg{
-    text-align:center;
-    padding:40px;
-    color:#8a7454;
-  }
-  #errorMsg{display:none;color:#c0392b;}
-  .meta-row{
-    display:flex;
-    justify-content:space-between;
-    gap:12px;
-    align-items:center;
-    flex-wrap:wrap;
-    margin-bottom:14px;
-  }
+  .status-pill.inactive{background:#f8e3e0;color:var(--red);}
   .empty-note{
-    color:#8a7454;
     font-size:13px;
+    color:var(--muted);
     margin:0;
   }
   .modal-backdrop{
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,0.35);
+    background:rgba(0,0,0,0.38);
     display:none;
     align-items:center;
     justify-content:center;
-    padding:20px;
+    padding:16px;
   }
   .modal-backdrop.show{display:flex;}
   .modal-card{
-    width:min(100%,420px);
+    width:min(100%,460px);
     background:#fff;
     border-radius:16px;
     padding:20px;
-    box-shadow:0 20px 50px rgba(0,0,0,0.25);
+    box-shadow:0 18px 46px rgba(0,0,0,0.24);
   }
   .modal-title{
-    font-size:18px;
-    font-weight:700;
-    color:var(--maroon);
     margin:0 0 14px;
+    color:var(--maroon);
+    font-size:18px;
   }
   .detail-grid{
     display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-    margin-bottom:18px;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    margin-bottom:16px;
   }
   .detail-card{
     background:#fff8ee;
@@ -301,9 +346,9 @@
   .detail-card.full{grid-column:1 / -1;}
   .detail-label{
     font-size:11px;
+    color:var(--muted);
     text-transform:uppercase;
-    letter-spacing:.4px;
-    color:#8a7454;
+    letter-spacing:.35px;
     margin-bottom:4px;
   }
   .detail-value{
@@ -316,73 +361,76 @@
     gap:10px;
     flex-wrap:wrap;
   }
-  .danger-btn{background:var(--red);}
-  .secondary-btn{background:#efe2cf;color:var(--maroon);}
   @media(max-width:640px){
     body{padding:14px;}
-    .panel{padding:16px;}
+    .panel,.card,#lockScreen{padding:16px;}
     .detail-grid{grid-template-columns:1fr;}
+    .accom-grid{grid-template-columns:1fr;}
   }
 </style>
 </head>
 <body>
 
-<div id="lockScreen">
-  <h1 style="text-align:center;">Admin Access</h1>
-  <p class="sub" style="text-align:center;">Enter the admin key to view registration analytics</p>
-  <input type="password" id="adminKey" placeholder="Admin key">
-  <button onclick="tryUnlock()">View Dashboard</button>
+<div id="lockScreen" class="card">
+  <h1>Admin Access</h1>
+  <p class="sub">Enter the admin key to open registrations and analytics.</p>
+  <input type="password" id="adminKey" placeholder="Admin key" autocomplete="current-password">
+  <button type="button" class="action-btn" id="loginBtn">View Dashboard</button>
 </div>
 
 <div id="dashboard">
-  <h1>Registration Analytics</h1>
-  <div class="sub">Shripad Shrivallabh Charitamrut Samohik Parayan · Pithapuram · 21-23 Nov</div>
+  <h1>Registration Dashboard</h1>
+  <div class="sub">Shripad Shrivallabh Charitamrut Samohik Parayan · Pithapuram</div>
 
   <div class="top-row">
-    <span id="lastUpdated"></span>
-    <div class="actions">
-      <button class="action-btn ghost-btn" onclick="downloadExcel()">Download Excel</button>
-      <button class="action-btn" onclick="loadData()">Refresh</button>
+    <div id="lastUpdated"></div>
+    <div class="top-actions">
+      <button type="button" class="action-btn secondary" id="downloadBtn">Download Excel</button>
+      <button type="button" class="action-btn" id="refreshBtn">Refresh</button>
     </div>
   </div>
 
   <div id="loadingMsg">Loading data...</div>
-  <div id="errorMsg">Could not load data. Check `SCRIPT_URL`, deployment access, and the latest Apps Script version.</div>
+  <div id="errorMsg">Could not load data. Check the Apps Script deployment and latest published version.</div>
 
   <div id="content" style="display:none;">
-    <div class="tabs" style="margin-bottom:18px;">
+    <div class="tabs">
       <button type="button" class="tab-btn active" data-tab="analyticsTab">Analytics</button>
       <button type="button" class="tab-btn" data-tab="dataTab">All Submissions</button>
     </div>
 
     <div id="analyticsTab" class="tab-panel active">
       <div class="stat-grid">
-        <div class="stat-card">
+        <div class="stat-card card">
           <div class="num" id="statTotal">0</div>
-          <div class="lbl">Active People</div>
+          <div class="lbl">People</div>
         </div>
-        <div class="stat-card">
-          <div class="num" id="statSubmissions">0</div>
-          <div class="lbl">Active Submissions</div>
-        </div>
-        <div class="stat-card gents">
+        <div class="stat-card card gents">
           <div class="num" id="statGents">0</div>
-          <div class="lbl">Active Gents</div>
+          <div class="lbl">Gents</div>
         </div>
-        <div class="stat-card ladies">
+        <div class="stat-card card ladies">
           <div class="num" id="statLadies">0</div>
-          <div class="lbl">Active Ladies</div>
+          <div class="lbl">Ladies</div>
+        </div>
+        <div class="stat-card card cities">
+          <div class="num" id="statCities">0</div>
+          <div class="lbl">Cities</div>
+        </div>
+        <div class="stat-card card">
+          <div class="num" id="statShown">0</div>
+          <div class="lbl">Rows Shown</div>
         </div>
       </div>
 
       <div class="panel">
-        <h2>Accommodation Demand</h2>
-        <div class="accom-split">
-          <div class="accom-pill free">
+        <h2>Accommodation</h2>
+        <div class="accom-grid">
+          <div class="accom-card free">
             <div class="num" id="accomFree">0</div>
-            <div class="lbl">Free (Devasthanam)</div>
+            <div class="lbl">Free by Devasthanam</div>
           </div>
-          <div class="accom-pill own">
+          <div class="accom-card own">
             <div class="num" id="accomOwn">0</div>
             <div class="lbl">Own Arrangement</div>
           </div>
@@ -403,29 +451,59 @@
     <div id="dataTab" class="tab-panel">
       <div class="panel">
         <div class="meta-row">
-          <h2 style="margin:0;">All Submitted Data</h2>
-          <div class="filters">
-            <button type="button" class="filter-btn active" data-filter="active">Active People</button>
-            <button type="button" class="filter-btn" data-filter="all">All People</button>
-            <button type="button" class="filter-btn" data-filter="inactive">Inactive People</button>
+          <h2 style="margin:0;">Submitted People</h2>
+          <div class="meta-info" id="tableSummary">0 rows</div>
+        </div>
+
+        <div class="toolbar">
+          <div class="filter-group">
+            <label>Status</label>
+            <div class="status-switch">
+              <button type="button" class="status-btn active" data-status="active">Active</button>
+              <button type="button" class="status-btn" data-status="all">All</button>
+              <button type="button" class="status-btn" data-status="inactive">Inactive</button>
+            </div>
+          </div>
+          <div class="filter-group">
+            <label>City</label>
+            <select id="cityFilter"></select>
+          </div>
+          <div class="filter-group">
+            <label>Submission ID</label>
+            <select id="submissionFilter"></select>
+          </div>
+          <div class="filter-group">
+            <label>Accommodation</label>
+            <select id="accommodationFilter"></select>
+          </div>
+          <div class="filter-group">
+            <label>View Language</label>
+            <select id="translateFilter">
+              <option value="">Original</option>
+              <option value="en">English Translation</option>
+            </select>
           </div>
         </div>
+
         <div class="table-wrap">
-          <table id="dataTable">
+          <table>
             <thead>
               <tr>
+                <th>Sr. No.</th>
                 <th>Name</th>
                 <th>Gender</th>
                 <th>Age</th>
                 <th>Mobile Number</th>
                 <th>City</th>
                 <th>Accommodation</th>
+                <th>Status</th>
+                <th>Submission ID</th>
               </tr>
             </thead>
             <tbody id="dataTableBody"></tbody>
           </table>
         </div>
-        <p id="dataEmpty" class="empty-note" style="display:none;">No rows available for the selected filter.</p>
+        <p id="dataEmpty" class="empty-note" style="display:none;">No data for the selected filter.</p>
       </div>
     </div>
   </div>
@@ -442,11 +520,12 @@
       <div class="detail-card"><div class="detail-label">Accommodation</div><div class="detail-value" id="modalAccommodation"></div></div>
       <div class="detail-card"><div class="detail-label">Status</div><div class="detail-value" id="modalStatus"></div></div>
       <div class="detail-card full"><div class="detail-label">Submission ID</div><div class="detail-value" id="modalSubmissionId"></div></div>
+      <div class="detail-card full"><div class="detail-label">Person ID</div><div class="detail-value" id="modalPersonId"></div></div>
     </div>
     <div class="modal-actions">
-      <button class="action-btn" id="modalActivateBtn">Mark Active</button>
-      <button class="action-btn danger-btn" id="modalDeactivateBtn">Mark Inactive</button>
-      <button class="action-btn secondary-btn" onclick="closeUserModal()">Close</button>
+      <button type="button" class="action-btn" id="activateBtn">Mark Active</button>
+      <button type="button" class="action-btn danger" id="deactivateBtn">Mark Inactive</button>
+      <button type="button" class="action-btn secondary" id="closeModalBtn">Close</button>
     </div>
   </div>
 </div>
@@ -454,240 +533,382 @@
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTkXBHASxYiSdqjy1eyYQASuqgDY-qvABIwISYEyOaKg8Bvg8H1WsVAOT7CWo78dat/exec";
 const ADMIN_KEY = "Admin@1";
-let allRows = [];
-let currentFilter = "active";
+const filters = {
+  status: "active",
+  city: "",
+  submissionId: "",
+  accommodation: "",
+  translate: ""
+};
+let rawRows = [];
+let displayedRows = [];
 let selectedRow = null;
 
-document.querySelectorAll('.tab-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(el=>el.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById(btn.dataset.tab).classList.add('active');
+const adminKeyInput = document.getElementById("adminKey");
+const cityFilter = document.getElementById("cityFilter");
+const submissionFilter = document.getElementById("submissionFilter");
+const accommodationFilter = document.getElementById("accommodationFilter");
+const translateFilter = document.getElementById("translateFilter");
+
+document.getElementById("loginBtn").addEventListener("click", tryUnlock);
+adminKeyInput.addEventListener("keydown", function(event){
+  if(event.key === "Enter"){
+    event.preventDefault();
+    tryUnlock();
+  }
+});
+document.getElementById("refreshBtn").addEventListener("click", loadData);
+document.getElementById("downloadBtn").addEventListener("click", downloadExcel);
+document.getElementById("activateBtn").addEventListener("click", function(){ updateSelectedStatus("active"); });
+document.getElementById("deactivateBtn").addEventListener("click", function(){ updateSelectedStatus("inactive"); });
+document.getElementById("closeModalBtn").addEventListener("click", closeUserModal);
+document.getElementById("userModal").addEventListener("click", function(event){
+  if(event.target.id === "userModal") closeUserModal();
+});
+
+document.querySelectorAll(".tab-btn").forEach(function(button){
+  button.addEventListener("click", function(){
+    document.querySelectorAll(".tab-btn").forEach(function(item){ item.classList.remove("active"); });
+    document.querySelectorAll(".tab-panel").forEach(function(item){ item.classList.remove("active"); });
+    button.classList.add("active");
+    document.getElementById(button.dataset.tab).classList.add("active");
   });
 });
 
-document.querySelectorAll('.filter-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    currentFilter = btn.dataset.filter;
-    document.querySelectorAll('.filter-btn').forEach(el=>el.classList.remove('active'));
-    btn.classList.add('active');
-    renderTable();
+document.querySelectorAll(".status-btn").forEach(function(button){
+  button.addEventListener("click", function(){
+    filters.status = button.dataset.status;
+    document.querySelectorAll(".status-btn").forEach(function(item){ item.classList.remove("active"); });
+    button.classList.add("active");
+    applyCurrentFilters();
   });
 });
 
-document.getElementById('modalActivateBtn').addEventListener('click', ()=>updateSelectedStatus('active'));
-document.getElementById('modalDeactivateBtn').addEventListener('click', ()=>updateSelectedStatus('inactive'));
-document.getElementById('userModal').addEventListener('click', (event)=>{
-  if(event.target.id === 'userModal') closeUserModal();
+cityFilter.addEventListener("change", function(){
+  filters.city = cityFilter.value;
+  applyCurrentFilters();
+});
+submissionFilter.addEventListener("change", function(){
+  filters.submissionId = submissionFilter.value;
+  applyCurrentFilters();
+});
+accommodationFilter.addEventListener("change", function(){
+  filters.accommodation = accommodationFilter.value;
+  applyCurrentFilters();
+});
+translateFilter.addEventListener("change", async function(){
+  filters.translate = translateFilter.value;
+  await loadTranslatedRows();
+  applyCurrentFilters();
 });
 
 function tryUnlock(){
-  const val = document.getElementById('adminKey').value;
-  if(val === ADMIN_KEY){
-    document.getElementById('lockScreen').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
-    loadData();
-  } else {
-    alert('Incorrect key.');
+  if(adminKeyInput.value !== ADMIN_KEY){
+    alert("Incorrect key.");
+    return;
   }
+  document.getElementById("lockScreen").style.display = "none";
+  document.getElementById("dashboard").style.display = "block";
+  loadData();
 }
 
 async function loadData(){
-  document.getElementById('loadingMsg').style.display = 'block';
-  document.getElementById('errorMsg').style.display = 'none';
-  document.getElementById('content').style.display = 'none';
-
+  setLoadingState(true);
   try{
-    const [analyticsRes, rowsRes] = await Promise.all([
-      fetch(SCRIPT_URL + '?action=getAnalytics'),
-      fetch(SCRIPT_URL + '?action=getAllData')
-    ]);
-    const analyticsPayload = await analyticsRes.json();
-    const rowsPayload = await rowsRes.json();
-    if(analyticsPayload.status !== 'success'){
-      throw new Error(analyticsPayload.message || 'Analytics request failed');
-    }
-    if(rowsPayload.status !== 'success'){
-      throw new Error(rowsPayload.message || 'Data request failed');
-    }
-    allRows = Array.isArray(rowsPayload.data) ? rowsPayload.data : [];
-    renderAnalytics(analyticsPayload.data || {});
-    renderTable();
-    document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
-    document.getElementById('loadingMsg').style.display = 'none';
-    document.getElementById('content').style.display = 'block';
-  }catch(err){
-    document.getElementById('loadingMsg').style.display = 'none';
-    document.getElementById('errorMsg').style.display = 'block';
+    await loadTranslatedRows();
+    populateDropdowns(rawRows);
+    applyCurrentFilters();
+    document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleString();
+    document.getElementById("content").style.display = "block";
+    document.getElementById("errorMsg").style.display = "none";
+  }catch(error){
+    document.getElementById("errorMsg").style.display = "block";
+    document.getElementById("content").style.display = "none";
+  }finally{
+    setLoadingState(false);
   }
 }
 
-function renderAnalytics(data){
-  document.getElementById('statTotal').textContent = data.totalPeople || 0;
-  document.getElementById('statSubmissions').textContent = data.totalSubmissions || 0;
-  document.getElementById('statGents').textContent = data.totalGents || 0;
-  document.getElementById('statLadies').textContent = data.totalLadies || 0;
-  document.getElementById('accomFree').textContent = data.accomFree || 0;
-  document.getElementById('accomOwn').textContent = data.accomOwn || 0;
-
-  const cityBars = document.getElementById('cityBars');
-  cityBars.innerHTML = '';
-  const cities = (data.cityBreakdown || []).slice().sort((a,b)=>b.count - a.count);
-  const maxCity = Math.max(1, ...cities.map(c=>c.count));
-  cities.forEach(c=>{
-    const row = document.createElement('div');
-    row.className = 'bar-row';
-    row.innerHTML = `<div class="bar-label">${safeCell(c.city)}</div><div class="bar-track"><div class="bar-fill" style="width:${(c.count / maxCity) * 100}%"></div></div><div class="bar-count">${c.count}</div>`;
-    cityBars.appendChild(row);
+async function loadTranslatedRows(){
+  const query = buildQuery({
+    action: "getAllData",
+    translate: filters.translate
   });
-  if(!cities.length) cityBars.innerHTML = '<p class="empty-note">No active data yet.</p>';
-
-  const ageBars = document.getElementById('ageBars');
-  ageBars.innerHTML = '';
-  const ages = data.ageBreakdown || [];
-  const maxAge = Math.max(1, ...ages.map(a=>a.count));
-  ages.forEach(a=>{
-    const row = document.createElement('div');
-    row.className = 'bar-row';
-    row.innerHTML = `<div class="bar-label">${safeCell(a.range)}</div><div class="bar-track"><div class="bar-fill" style="width:${(a.count / maxAge) * 100}%"></div></div><div class="bar-count">${a.count}</div>`;
-    ageBars.appendChild(row);
-  });
-  if(!ages.length) ageBars.innerHTML = '<p class="empty-note">No active data yet.</p>';
+  const response = await fetch(SCRIPT_URL + "?" + query);
+  const payload = await response.json();
+  if(payload.status !== "success") throw new Error(payload.message || "Could not load rows");
+  rawRows = Array.isArray(payload.data) ? payload.data : [];
 }
 
-function renderTable(){
-  const tbody = document.getElementById('dataTableBody');
-  const empty = document.getElementById('dataEmpty');
-  tbody.innerHTML = '';
-  const rows = getFilteredRows();
-  if(!rows.length){
-    empty.style.display = 'block';
+function setLoadingState(isLoading){
+  document.getElementById("loadingMsg").style.display = isLoading ? "block" : "none";
+  if(isLoading){
+    document.getElementById("errorMsg").style.display = "none";
+    document.getElementById("content").style.display = "none";
+  }
+}
+
+function populateDropdowns(rows){
+  setSelectOptions(cityFilter, "All Cities", uniqueSorted(rows.map(function(row){ return row["City (from PIN)"]; })));
+  setSelectOptions(submissionFilter, "All Submission IDs", uniqueSorted(rows.map(function(row){ return row["Submission ID"]; })));
+  setSelectOptions(accommodationFilter, "All Accommodation", uniqueSorted(rows.map(function(row){ return formatAccommodation(row["Accommodation"]); })));
+  cityFilter.value = filters.city;
+  submissionFilter.value = filters.submissionId;
+  accommodationFilter.value = filters.accommodation ? formatAccommodation(filters.accommodation) : "";
+}
+
+function setSelectOptions(select, placeholder, values){
+  const previous = select.value;
+  select.innerHTML = "";
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = placeholder;
+  select.appendChild(defaultOption);
+  values.forEach(function(value){
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = value;
+    select.appendChild(option);
+  });
+  if(Array.from(select.options).some(function(option){ return option.value === previous; })){
+    select.value = previous;
+  }
+}
+
+function applyCurrentFilters(){
+  displayedRows = rawRows.filter(function(row){
+    const status = normalizeStatus(row["Status"]);
+    const city = String(row["City (from PIN)"] || "");
+    const submissionId = String(row["Submission ID"] || "");
+    const accommodation = formatAccommodation(row["Accommodation"]);
+    if(filters.status !== "all" && status !== filters.status) return false;
+    if(filters.city && city !== filters.city) return false;
+    if(filters.submissionId && submissionId !== filters.submissionId) return false;
+    if(filters.accommodation && accommodation !== filters.accommodation) return false;
+    return true;
+  });
+  renderAnalytics(displayedRows);
+  renderTable(displayedRows);
+}
+
+function renderAnalytics(rows){
+  const stats = buildAnalytics(rows);
+  document.getElementById("statTotal").textContent = stats.totalPeople;
+  document.getElementById("statGents").textContent = stats.totalGents;
+  document.getElementById("statLadies").textContent = stats.totalLadies;
+  document.getElementById("statCities").textContent = stats.cityCount;
+  document.getElementById("statShown").textContent = rows.length;
+  document.getElementById("accomFree").textContent = stats.accomFree;
+  document.getElementById("accomOwn").textContent = stats.accomOwn;
+  renderBars("cityBars", stats.cityBreakdown, "city");
+  renderBars("ageBars", stats.ageBreakdown, "range");
+}
+
+function buildAnalytics(rows){
+  const cityMap = {};
+  const ageBuckets = {"0-12":0,"13-25":0,"26-40":0,"41-60":0,"60+":0};
+  const result = {
+    totalPeople: 0,
+    totalGents: 0,
+    totalLadies: 0,
+    cityCount: 0,
+    accomFree: 0,
+    accomOwn: 0,
+    cityBreakdown: [],
+    ageBreakdown: []
+  };
+
+  rows.forEach(function(row){
+    const city = String(row["City (from PIN)"] || "");
+    const age = Number(row["Age"]);
+    result.totalPeople += 1;
+    if(row["Type"] === "Gent") result.totalGents += 1;
+    if(row["Type"] === "Lady") result.totalLadies += 1;
+    if(row["Accommodation"] === "free") result.accomFree += 1;
+    if(row["Accommodation"] === "own") result.accomOwn += 1;
+    if(city) cityMap[city] = (cityMap[city] || 0) + 1;
+    if(!Number.isNaN(age)){
+      if(age <= 12) ageBuckets["0-12"] += 1;
+      else if(age <= 25) ageBuckets["13-25"] += 1;
+      else if(age <= 40) ageBuckets["26-40"] += 1;
+      else if(age <= 60) ageBuckets["41-60"] += 1;
+      else ageBuckets["60+"] += 1;
+    }
+  });
+
+  result.cityBreakdown = Object.keys(cityMap).sort().map(function(city){
+    return { city: city, count: cityMap[city] };
+  });
+  result.cityCount = result.cityBreakdown.length;
+  result.ageBreakdown = Object.keys(ageBuckets).map(function(range){
+    return { range: range, count: ageBuckets[range] };
+  });
+  return result;
+}
+
+function renderBars(targetId, items, labelKey){
+  const target = document.getElementById(targetId);
+  target.innerHTML = "";
+  if(!items.length || items.every(function(item){ return Number(item.count || 0) === 0; })){
+    target.innerHTML = '<p class="empty-note">No data for the selected filter.</p>';
     return;
   }
-  empty.style.display = 'none';
-  rows.forEach((row, index)=>{
-    const tr = document.createElement('tr');
-    tr.dataset.index = String(index);
-    tr.innerHTML = `
-      <td>${safeCell(row['Name'])}</td>
-      <td>${safeCell(row['Type'] === 'Gent' ? 'Male' : 'Female')}</td>
-      <td>${safeCell(row['Age'])}</td>
-      <td>${safeCell(row['Mobile Number'])}</td>
-      <td>${safeCell(row['City (from PIN)'])}</td>
-      <td>${safeCell(row['Accommodation'] === 'free' ? 'Free' : 'Own')}</td>
-    `;
-    tr.addEventListener('click', ()=>openUserModal(row));
-    tbody.appendChild(tr);
+  const sortedItems = items.slice().sort(function(a, b){ return b.count - a.count; });
+  const maxCount = Math.max.apply(null, sortedItems.map(function(item){ return item.count; }));
+  sortedItems.forEach(function(item){
+    const row = document.createElement("div");
+    row.className = "bar-row";
+    row.innerHTML =
+      '<div class="bar-label">' + safeCell(item[labelKey]) + '</div>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + ((item.count / Math.max(maxCount, 1)) * 100) + '%"></div></div>' +
+      '<div class="bar-count">' + safeCell(item.count) + '</div>';
+    target.appendChild(row);
   });
 }
 
-function getFilteredRows(){
-  return allRows.filter(row=>{
-    const status = normalizeStatus(row['Status']);
-    if(currentFilter === 'all') return true;
-    return status === currentFilter;
+function renderTable(rows){
+  const body = document.getElementById("dataTableBody");
+  const empty = document.getElementById("dataEmpty");
+  const summary = document.getElementById("tableSummary");
+  body.innerHTML = "";
+  summary.textContent = rows.length + " row" + (rows.length === 1 ? "" : "s");
+  if(!rows.length){
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+  rows.forEach(function(row, index){
+    const tr = document.createElement("tr");
+    tr.innerHTML =
+      "<td>" + safeCell(index + 1) + "</td>" +
+      "<td>" + safeCell(row["Name"]) + "</td>" +
+      "<td>" + safeCell(formatGender(row["Type"])) + "</td>" +
+      "<td>" + safeCell(row["Age"]) + "</td>" +
+      "<td>" + safeCell(row["Mobile Number"]) + "</td>" +
+      "<td>" + safeCell(row["City (from PIN)"]) + "</td>" +
+      "<td>" + safeCell(formatAccommodation(row["Accommodation"])) + "</td>" +
+      '<td><span class="status-pill ' + normalizeStatus(row["Status"]) + '">' + safeCell(capitalize(normalizeStatus(row["Status"]))) + "</span></td>" +
+      "<td>" + safeCell(row["Submission ID"]) + "</td>";
+    tr.addEventListener("click", function(){ openUserModal(row); });
+    body.appendChild(tr);
   });
-}
-
-function normalizeStatus(value){
-  return String(value || '').toLowerCase() === 'inactive' ? 'inactive' : 'active';
 }
 
 function openUserModal(row){
   selectedRow = row;
-  document.getElementById('modalName').textContent = row['Name'] || 'Person Details';
-  document.getElementById('modalGender').textContent = row['Type'] === 'Gent' ? 'Male' : 'Female';
-  document.getElementById('modalAge').textContent = row['Age'] || '-';
-  document.getElementById('modalMobile').textContent = row['Mobile Number'] || '-';
-  document.getElementById('modalCity').textContent = row['City (from PIN)'] || '-';
-  document.getElementById('modalAccommodation').textContent = row['Accommodation'] === 'free' ? 'Free' : 'Own';
-  document.getElementById('modalStatus').textContent = capitalize(normalizeStatus(row['Status']));
-  document.getElementById('modalSubmissionId').textContent = row['Submission ID'] || '-';
-  document.getElementById('userModal').classList.add('show');
+  document.getElementById("modalName").textContent = row["Name"] || "Person Details";
+  document.getElementById("modalGender").textContent = formatGender(row["Type"]);
+  document.getElementById("modalAge").textContent = row["Age"] || "-";
+  document.getElementById("modalMobile").textContent = row["Mobile Number"] || "-";
+  document.getElementById("modalCity").textContent = row["City (from PIN)"] || "-";
+  document.getElementById("modalAccommodation").textContent = formatAccommodation(row["Accommodation"]);
+  document.getElementById("modalStatus").textContent = capitalize(normalizeStatus(row["Status"]));
+  document.getElementById("modalSubmissionId").textContent = row["Submission ID"] || "-";
+  document.getElementById("modalPersonId").textContent = row["Person ID"] || "-";
+  document.getElementById("userModal").classList.add("show");
 }
 
 function closeUserModal(){
   selectedRow = null;
-  document.getElementById('userModal').classList.remove('show');
+  document.getElementById("userModal").classList.remove("show");
 }
 
 async function updateSelectedStatus(nextStatus){
-  if(!selectedRow) return;
+  if(!selectedRow || !selectedRow["Person ID"]) return;
   try{
     const response = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({
-        action: 'updateStatus',
-        rowNumber: selectedRow._rowNumber,
+        action: "updateStatus",
+        personId: selectedRow["Person ID"],
         nextStatus: nextStatus
       })
     });
     const payload = await response.json();
-    if(payload.status !== 'success'){
-      throw new Error(payload.message || 'Status update failed');
-    }
-    const updated = payload.data;
-    allRows = allRows.map(row=>row._rowNumber === updated._rowNumber ? updated : row);
-    renderTable();
+    if(payload.status !== "success") throw new Error(payload.message || "Status update failed");
     closeUserModal();
-    loadData();
-  }catch(err){
-    alert('Could not update status. Please try again.');
+    await loadData();
+  }catch(error){
+    alert("Could not update status. Please try again.");
   }
 }
 
 function downloadExcel(){
-  const rows = getFilteredRows();
-  if(!rows.length){
-    alert('No data available for export.');
+  if(!displayedRows.length){
+    alert("No data available for export.");
     return;
   }
-  const header = ['Name','Gender','Age','Mobile Number','City','Accommodation','Status'];
-  const tableRows = rows.map(row=>[
-    row['Name'],
-    row['Type'] === 'Gent' ? 'Male' : 'Female',
-    row['Age'],
-    row['Mobile Number'],
-    row['City (from PIN)'],
-    row['Accommodation'] === 'free' ? 'Free' : 'Own',
-    capitalize(normalizeStatus(row['Status']))
-  ]);
-  const html = `
-    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
-      <head><meta charset="UTF-8"></head>
-      <body>
-        <table border="1">
-          <tr>${header.map(cell=>`<th>${safeCell(cell)}</th>`).join('')}</tr>
-          ${tableRows.map(row=>`<tr>${row.map(cell=>`<td>${safeCell(cell)}</td>`).join('')}</tr>`).join('')}
-        </table>
-      </body>
-    </html>`;
-  const blob = new Blob([html], {type:'application/vnd.ms-excel'});
-  const link = document.createElement('a');
-  const statusSuffix = currentFilter === 'all' ? 'all' : currentFilter;
+  const header = ["Sr. No.","Name","Gender","Age","Mobile Number","City","Accommodation","Status","Submission ID"];
+  const htmlRows = displayedRows.map(function(row, index){
+    const cells = [
+      index + 1,
+      row["Name"],
+      formatGender(row["Type"]),
+      row["Age"],
+      row["Mobile Number"],
+      row["City (from PIN)"],
+      formatAccommodation(row["Accommodation"]),
+      capitalize(normalizeStatus(row["Status"])),
+      row["Submission ID"]
+    ];
+    return "<tr>" + cells.map(function(cell){ return "<td>" + safeCell(cell) + "</td>"; }).join("") + "</tr>";
+  }).join("");
+  const html =
+    '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">' +
+    "<head><meta charset=\"UTF-8\"></head><body><table border=\"1\">" +
+    "<tr>" + header.map(function(cell){ return "<th>" + safeCell(cell) + "</th>"; }).join("") + "</tr>" +
+    htmlRows +
+    "</table></body></html>";
+  const blob = new Blob([html], { type: "application/vnd.ms-excel" });
+  const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = `parayan-submissions-${statusSuffix}.xls`;
+  link.download = "parayan-submissions-" + filters.status + ".xls";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(link.href);
 }
 
-function safeCell(value){
-  if(value === null || value === undefined) return '';
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+function buildQuery(params){
+  const query = new URLSearchParams();
+  Object.keys(params).forEach(function(key){
+    if(params[key]) query.set(key, params[key]);
+  });
+  return query.toString();
+}
+
+function uniqueSorted(values){
+  return Array.from(new Set(values.map(function(value){ return String(value || "").trim(); }).filter(Boolean))).sort(function(a, b){
+    return a.localeCompare(b);
+  });
+}
+
+function normalizeStatus(value){
+  return String(value || "").toLowerCase() === "inactive" ? "inactive" : "active";
+}
+
+function formatAccommodation(value){
+  return String(value || "").toLowerCase() === "free" ? "Free" : String(value || "").toLowerCase() === "own" ? "Own" : String(value || "");
+}
+
+function formatGender(value){
+  return value === "Gent" ? "Male" : value === "Lady" ? "Female" : String(value || "");
 }
 
 function capitalize(value){
-  const text = String(value || '');
-  return text ? text.charAt(0).toUpperCase() + text.slice(1) : '';
+  const text = String(value || "");
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : "";
+}
+
+function safeCell(value){
+  if(value === null || value === undefined) return "";
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 </script>
 
