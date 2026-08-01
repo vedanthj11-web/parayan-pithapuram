@@ -477,10 +477,11 @@
             <select id="accommodationFilter"></select>
           </div>
           <div class="filter-group">
-            <label>View Language</label>
+            <label>Language Opted</label>
             <select id="translateFilter">
-              <option value="">Original</option>
-              <option value="en">English Translation</option>
+              <option value="all">All</option>
+              <option value="en">English</option>
+              <option value="mr">Marathi</option>
             </select>
           </div>
         </div>
@@ -489,15 +490,13 @@
           <table>
             <thead>
               <tr>
+                <th>Submission Number</th>
                 <th>Sr. No.</th>
                 <th>Name</th>
-                <th>Gender</th>
-                <th>Age</th>
                 <th>Mobile Number</th>
+                <th>Age</th>
                 <th>City</th>
                 <th>Accommodation</th>
-                <th>Status</th>
-                <th>Submission Number</th>
               </tr>
             </thead>
             <tbody id="dataTableBody"></tbody>
@@ -538,7 +537,7 @@ const filters = {
   city: "",
   submissionId: "",
   accommodation: "",
-  translate: ""
+  formLanguage: "all"
 };
 let rawRows = [];
 let displayedRows = [];
@@ -596,9 +595,8 @@ accommodationFilter.addEventListener("change", function(){
   filters.accommodation = accommodationFilter.value;
   applyCurrentFilters();
 });
-translateFilter.addEventListener("change", async function(){
-  filters.translate = translateFilter.value;
-  await loadTranslatedRows();
+translateFilter.addEventListener("change", function(){
+  filters.formLanguage = translateFilter.value;
   applyCurrentFilters();
 });
 
@@ -631,13 +629,12 @@ async function loadData(){
 
 async function loadTranslatedRows(){
   const query = buildQuery({
-    action: "getAllData",
-    translate: filters.translate
+    action: "getAllData"
   });
   const response = await fetch(SCRIPT_URL + "?" + query);
   const payload = await response.json();
   if(payload.status !== "success") throw new Error(payload.message || "Could not load rows");
-  rawRows = Array.isArray(payload.data) ? payload.data.map(normalizeRowShape) : [];
+  rawRows = annotateSubmissionNumbers(Array.isArray(payload.data) ? payload.data.map(normalizeRowShape) : []);
 }
 
 function setLoadingState(isLoading){
@@ -655,6 +652,7 @@ function populateDropdowns(rows){
   cityFilter.value = filters.city;
   submissionFilter.value = filters.submissionId;
   accommodationFilter.value = filters.accommodation ? formatAccommodation(filters.accommodation) : "";
+  translateFilter.value = filters.formLanguage;
 }
 
 function setSelectOptions(select, placeholder, values){
@@ -681,10 +679,12 @@ function applyCurrentFilters(){
     const city = String(row["City (from PIN)"] || "");
     const submissionId = String(row["Submission ID"] || "");
     const accommodation = formatAccommodation(row["Accommodation"]);
+    const formLanguage = String(row["Form Language"] || "en").toLowerCase();
     if(filters.status !== "all" && status !== filters.status) return false;
     if(filters.city && city !== filters.city) return false;
     if(filters.submissionId && submissionId !== filters.submissionId) return false;
     if(filters.accommodation && accommodation !== filters.accommodation) return false;
+    if(filters.formLanguage !== "all" && formLanguage !== filters.formLanguage) return false;
     return true;
   });
   renderAnalytics(displayedRows);
@@ -780,15 +780,13 @@ function renderTable(rows){
   rows.forEach(function(row, index){
     const tr = document.createElement("tr");
     tr.innerHTML =
+      "<td>" + safeCell(row["_submissionNumber"] || "") + "</td>" +
       "<td>" + safeCell(row["_serial"] || index + 1) + "</td>" +
       "<td>" + safeCell(row["Name"]) + "</td>" +
-      "<td>" + safeCell(formatGender(row["Type"])) + "</td>" +
-      "<td>" + safeCell(row["Age"]) + "</td>" +
       "<td>" + safeCell(row["Mobile Number"]) + "</td>" +
+      "<td>" + safeCell(row["Age"]) + "</td>" +
       "<td>" + safeCell(row["City (from PIN)"]) + "</td>" +
-      "<td>" + safeCell(formatAccommodation(row["Accommodation"])) + "</td>" +
-      '<td><span class="status-pill ' + normalizeStatus(row["Status"]) + '">' + safeCell(capitalize(normalizeStatus(row["Status"]))) + "</span></td>" +
-      "<td>" + safeCell(row["Submission ID"]) + "</td>";
+      "<td>" + safeCell(formatAccommodation(row["Accommodation"])) + "</td>";
     tr.addEventListener("click", function(){ openUserModal(row); });
     body.appendChild(tr);
   });
@@ -840,18 +838,16 @@ function downloadExcel(){
     alert("No data available for export.");
     return;
   }
-  const header = ["Sr. No.","Name","Gender","Age","Mobile Number","City","Accommodation","Status","Submission Number"];
+  const header = ["Submission Number","Sr. No.","Name","Mobile Number","Age","City","Accommodation"];
   const htmlRows = displayedRows.map(function(row, index){
     const cells = [
+      row["_submissionNumber"] || "",
       row["_serial"] || index + 1,
       row["Name"],
-      formatGender(row["Type"]),
-      row["Age"],
       row["Mobile Number"],
+      row["Age"],
       row["City (from PIN)"],
-      formatAccommodation(row["Accommodation"]),
-      capitalize(normalizeStatus(row["Status"])),
-      row["Submission ID"]
+      formatAccommodation(row["Accommodation"])
     ];
     return "<tr>" + cells.map(function(cell){ return "<td>" + safeCell(cell) + "</td>"; }).join("") + "</tr>";
   }).join("");
@@ -902,7 +898,26 @@ function normalizeRowShape(row){
   if(!looksLikePersonId(normalized["Person ID"]) && String(normalized["Submission ID"] || "").trim()){
     normalized["Person ID"] = buildPersonId(normalized);
   }
+  normalized["Form Language"] = String(normalized["Form Language"] || "en").toLowerCase() === "mr" ? "mr" : "en";
   return normalized;
+}
+
+function annotateSubmissionNumbers(rows){
+  const submissionMap = {};
+  let counter = 0;
+  rows.slice().reverse().forEach(function(row){
+    const submissionId = String(row["Submission ID"] || "").trim();
+    if(!submissionId) return;
+    if(!submissionMap[submissionId]){
+      counter += 1;
+      submissionMap[submissionId] = counter;
+    }
+  });
+  return rows.map(function(row){
+    const copy = Object.assign({}, row);
+    copy["_submissionNumber"] = submissionMap[String(copy["Submission ID"] || "").trim()] || "";
+    return copy;
+  });
 }
 
 function buildPersonId(row){
@@ -950,9 +965,6 @@ function safeCell(value){
     .replace(/'/g, "&#39;");
 }
 </script>
-
-</body>
-</html>
 
 </body>
 </html>
