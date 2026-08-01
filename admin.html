@@ -265,7 +265,7 @@ function tryUnlock(){
 async function loadData(){
   setLoadingState(true);
   try{
-    const response = await fetch(SCRIPT_URL + "?action=getAllData");
+    const response = await fetch(SCRIPT_URL + "?action=getAllData&_=" + Date.now());
     const payload = await response.json();
     if(payload.status !== "success") throw new Error(payload.message || "Could not load rows");
     rawRows = Array.isArray(payload.data) ? payload.data : [];
@@ -440,7 +440,8 @@ async function updateSelectedStatus(nextStatus){
     closeUserModal();
     await loadData();
   }catch(error){
-    alert("Could not update status. Please try again.");
+    console.error("Status update failed:", error);
+    alert(error && error.message ? error.message : "Could not update status. Please try again.");
   }
 }
 
