@@ -71,8 +71,9 @@
   table{width:100%;min-width:980px;border-collapse:collapse;background:#fff;}
   th,td{padding:11px 12px;border-bottom:1px solid var(--border);font-size:13.5px;text-align:left;vertical-align:top;}
   th{background:#fffaf3;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;font-size:11.5px;}
-  tbody tr:nth-child(even){background:#fcf7ef;}
-  tbody tr:hover{background:#fff1df;}
+  tr.submission-band-a td{background:#fffaf3;}
+  tr.submission-band-b td{background:#fdecd8;}
+  tbody tr:hover td{background:#fff1df;}
   tbody tr{cursor:pointer;}
   .empty-note{font-size:13px;color:var(--muted);margin:0;}
   .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.38);display:none;align-items:center;justify-content:center;padding:16px;}
@@ -188,6 +189,7 @@
                 <th>Sr. No.</th>
                 <th>Name</th>
                 <th>Mobile Number</th>
+                <th>Second Mobile</th>
                 <th>Age</th>
                 <th>City</th>
                 <th>Accommodation</th>
@@ -202,19 +204,6 @@
   </div>
 </div>
 
-<div class="contact-footer">
-  <h2>For help, contact:</h2>
-  <div class="contact-grid">
-    <div class="contact-item">Prasad Bhivre - <a href="tel:9673462498">9673462498</a></div>
-    <div class="contact-item">Priyanka Tai Patil - <a href="tel:9552192169">9552192169</a></div>
-    <div class="contact-item">Devendra Kamod - <a href="tel:7249506691">7249506691</a></div>
-    <div class="contact-item">Gnaneshwar Kamod - <a href="tel:9850055906">9850055906</a></div>
-    <div class="contact-item">Jitendra Patil - <a href="tel:8668423639">8668423639</a></div>
-    <div class="contact-item">Rupali Joshi - <a href="tel:9422070342">9422070342</a></div>
-    <div class="contact-item">B.D. Wani - <a href="tel:7447542324">7447542324</a></div>
-  </div>
-</div>
-
 <div id="userModal" class="modal-backdrop" role="dialog" aria-modal="true">
   <div class="modal-card">
     <h3 class="modal-title" id="modalName">Person Details</h3>
@@ -222,6 +211,7 @@
       <div class="detail-card"><div class="detail-label">Gender</div><div class="detail-value" id="modalGender"></div></div>
       <div class="detail-card"><div class="detail-label">Age</div><div class="detail-value" id="modalAge"></div></div>
       <div class="detail-card"><div class="detail-label">Mobile</div><div class="detail-value" id="modalMobile"></div></div>
+      <div class="detail-card"><div class="detail-label">Second Mobile</div><div class="detail-value" id="modalAlternateMobile"></div></div>
       <div class="detail-card"><div class="detail-label">City</div><div class="detail-value" id="modalCity"></div></div>
       <div class="detail-card"><div class="detail-label">Accommodation</div><div class="detail-value" id="modalAccommodation"></div></div>
       <div class="detail-card"><div class="detail-label">Status</div><div class="detail-value" id="modalStatus"></div></div>
@@ -244,6 +234,7 @@ let rawRows = [];
 let displayedRows = [];
 let selectedRow = null;
 let currentRequestId = 0;
+let alternateMobileBySubmission = {};
 
 const adminKeyInput = document.getElementById("adminKey");
 const cityFilter = document.getElementById("cityFilter");
@@ -300,6 +291,7 @@ async function loadData(){
     if(payload.status !== "success") throw new Error(payload.message || "Could not load rows");
     if(requestId !== currentRequestId) return;
     rawRows = Array.isArray(payload.data) ? payload.data : [];
+    alternateMobileBySubmission = buildAlternateMobileMap(rawRows);
     populateDropdowns(rawRows);
     applyCurrentFilters();
     document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleString();
@@ -424,13 +416,21 @@ function renderTable(rows){
   summary.textContent = rows.length + " row" + (rows.length === 1 ? "" : "s");
   if(!rows.length){ empty.style.display = "block"; return; }
   empty.style.display = "none";
-  rows.forEach(function(row){
+  let previousSubmissionNumber = null;
+  let currentBand = "submission-band-a";
+  rows.forEach(function(row, index){
+    if(row["Submission Number"] !== previousSubmissionNumber){
+      currentBand = currentBand === "submission-band-a" ? "submission-band-b" : "submission-band-a";
+      previousSubmissionNumber = row["Submission Number"];
+    }
     const tr = document.createElement("tr");
+    tr.className = currentBand;
     tr.innerHTML =
       "<td>" + safeCell(row["Submission Number"]) + "</td>" +
-      "<td>" + safeCell(row["_serial"]) + "</td>" +
+      "<td>" + safeCell(index + 1) + "</td>" +
       "<td>" + safeCell(row["Name"]) + "</td>" +
       "<td>" + safeCell(row["Mobile Number"]) + "</td>" +
+      "<td>" + safeCell(getDisplayAlternateMobile(row)) + "</td>" +
       "<td>" + safeCell(row["Age"]) + "</td>" +
       "<td>" + safeCell(row["City (from PIN)"]) + "</td>" +
       "<td>" + safeCell(formatAccommodation(row["Accommodation"])) + "</td>";
@@ -445,6 +445,7 @@ function openUserModal(row){
   document.getElementById("modalGender").textContent = row["Type"] === "Gent" ? "Male" : "Female";
   document.getElementById("modalAge").textContent = row["Age"] || "-";
   document.getElementById("modalMobile").textContent = row["Mobile Number"] || "-";
+  document.getElementById("modalAlternateMobile").textContent = getDisplayAlternateMobile(row) || "-";
   document.getElementById("modalCity").textContent = row["City (from PIN)"] || "-";
   document.getElementById("modalAccommodation").textContent = formatAccommodation(row["Accommodation"]);
   document.getElementById("modalStatus").textContent = capitalize(normalizeStatus(row["Status"]));
@@ -478,10 +479,17 @@ async function updateSelectedStatus(nextStatus){
 
 function downloadExcel(){
   if(!displayedRows.length){ alert("No data available for export."); return; }
-  const header = ["Submission Number","Sr. No.","Name","Mobile Number","Age","City","Accommodation"];
-  const rows = displayedRows.map(function(row){
-    const cells = [row["Submission Number"], row["_serial"], row["Name"], row["Mobile Number"], row["Age"], row["City (from PIN)"], formatAccommodation(row["Accommodation"])];
-    return "<tr>" + cells.map(function(cell){ return "<td>" + safeCell(cell) + "</td>"; }).join("") + "</tr>";
+  const header = ["Submission Number","Sr. No.","Name","Mobile Number","Second Mobile","Age","City","Accommodation"];
+  let previousSubmissionNumber = null;
+  let useBandA = true;
+  const rows = displayedRows.map(function(row, index){
+    if(row["Submission Number"] !== previousSubmissionNumber){
+      useBandA = !useBandA;
+      previousSubmissionNumber = row["Submission Number"];
+    }
+    const bg = useBandA ? "#fffaf3" : "#fdecd8";
+    const cells = [row["Submission Number"], index + 1, row["Name"], row["Mobile Number"], getDisplayAlternateMobile(row), row["Age"], row["City (from PIN)"], formatAccommodation(row["Accommodation"])];
+    return "<tr style=\"background-color:" + bg + ";\">" + cells.map(function(cell){ return "<td>" + safeCell(cell) + "</td>"; }).join("") + "</tr>";
   }).join("");
   const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body><table border="1"><tr>' + header.map(function(cell){ return "<th>" + safeCell(cell) + "</th>"; }).join("") + "</tr>" + rows + "</table></body></html>";
   const blob = new Blob([html], { type: "application/vnd.ms-excel" });
@@ -496,6 +504,24 @@ function downloadExcel(){
 
 function uniqueSorted(values){
   return Array.from(new Set(values.map(function(value){ return String(value || "").trim(); }).filter(Boolean))).sort(function(a, b){ return a.localeCompare(b); });
+}
+
+function buildAlternateMobileMap(rows){
+  const map = {};
+  rows.forEach(function(row){
+    const submissionNumber = String(row["Submission Number"] || "").trim();
+    const alternateMobile = String(row["Alternate Mobile Number"] || "").trim();
+    if(submissionNumber && alternateMobile && !map[submissionNumber]){
+      map[submissionNumber] = alternateMobile;
+    }
+  });
+  return map;
+}
+
+function getDisplayAlternateMobile(row){
+  const directValue = String(row["Alternate Mobile Number"] || "").trim();
+  if(directValue) return directValue;
+  return alternateMobileBySubmission[String(row["Submission Number"] || "").trim()] || "";
 }
 
 function normalizeStatus(value){
