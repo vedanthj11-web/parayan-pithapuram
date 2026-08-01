@@ -7,370 +7,87 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --saffron:#e2711d;
-    --saffron-dark:#c85a0e;
-    --maroon:#7a2e2e;
-    --ink:#332218;
-    --border:#e8d9c0;
-    --bg:#fdf8f0;
-    --card:#ffffff;
-    --blue:#2f6fa8;
-    --pink:#b5457a;
-    --green:#2f7d4f;
-    --red:#b33a30;
-    --muted:#8a7454;
-  }
+  :root{--saffron:#e2711d;--saffron-dark:#c85a0e;--maroon:#7a2e2e;--ink:#332218;--border:#e8d9c0;--bg:#fdf8f0;--card:#ffffff;--blue:#2f6fa8;--pink:#b5457a;--green:#2f7d4f;--red:#b33a30;--muted:#8a7454;}
   *{box-sizing:border-box;}
   html,body{margin:0;max-width:100%;overflow-x:hidden;}
-  body{
-    font-family:'Poppins',sans-serif;
-    background:var(--bg);
-    color:var(--ink);
-    padding:18px;
-  }
-  h1{
-    margin:0 0 4px;
-    font-size:clamp(20px,4vw,30px);
-    color:var(--maroon);
-  }
-  .sub{
-    color:var(--muted);
-    font-size:13px;
-    margin-bottom:18px;
-  }
-  .card,.panel{
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:16px;
-    box-shadow:0 10px 28px rgba(122,46,46,0.08);
-  }
-  #lockScreen{
-    width:min(100%,420px);
-    margin:72px auto;
-    padding:28px;
-    text-align:center;
-  }
-  input,select,button{
-    font:inherit;
-  }
-  input,select{
-    width:100%;
-    min-width:0;
-    padding:12px 14px;
-    border:1.5px solid var(--border);
-    border-radius:10px;
-    background:#fffdf9;
-    color:var(--ink);
-  }
-  input:focus,select:focus{
-    outline:none;
-    border-color:var(--saffron);
-    box-shadow:0 0 0 3px rgba(226,113,29,0.12);
-  }
-  button{
-    border:none;
-    cursor:pointer;
-  }
-  .action-btn,.tab-btn,.status-btn{
-    border-radius:10px;
-    padding:11px 14px;
-    font-weight:600;
-  }
-  .action-btn{
-    background:var(--saffron);
-    color:#fff;
-  }
-  .action-btn.secondary{
-    background:#f4e7d5;
-    color:var(--maroon);
-  }
-  .action-btn.danger{
-    background:var(--red);
-    color:#fff;
-  }
-  #dashboard{
-    display:none;
-    max-width:1240px;
-    margin:0 auto;
-  }
-  .top-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
-    flex-wrap:wrap;
-    margin-bottom:18px;
-  }
-  .top-actions{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-  }
-  #lastUpdated{
-    font-size:12px;
-    color:var(--muted);
-  }
-  #loadingMsg,#errorMsg{
-    text-align:center;
-    padding:42px 18px;
-    color:var(--muted);
-  }
+  body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--ink);padding:18px;}
+  h1{margin:0 0 4px;font-size:clamp(20px,4vw,30px);color:var(--maroon);}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:18px;}
+  .card,.panel{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 28px rgba(122,46,46,0.08);}
+  #lockScreen{width:min(100%,420px);margin:72px auto;padding:28px;text-align:center;}
+  input,select,button{font:inherit;}
+  input,select{width:100%;min-width:0;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;background:#fffdf9;color:var(--ink);}
+  input:focus,select:focus{outline:none;border-color:var(--saffron);box-shadow:0 0 0 3px rgba(226,113,29,0.12);}
+  button{border:none;cursor:pointer;}
+  .action-btn,.tab-btn,.status-btn{border-radius:10px;padding:11px 14px;font-weight:600;}
+  .action-btn{background:var(--saffron);color:#fff;}
+  .action-btn.secondary{background:#f4e7d5;color:var(--maroon);}
+  .action-btn.danger{background:var(--red);color:#fff;}
+  #dashboard{display:none;max-width:1240px;margin:0 auto;}
+  .top-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;}
+  .top-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  #lastUpdated{font-size:12px;color:var(--muted);}
+  #loadingMsg,#errorMsg{text-align:center;padding:42px 18px;color:var(--muted);}
   #errorMsg{display:none;color:#c0392b;}
-  .tabs{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-bottom:16px;
-  }
-  .tab-btn{
-    background:#fff5e8;
-    color:var(--maroon);
-    border:1px solid var(--border);
-  }
-  .tab-btn.active{
-    background:var(--saffron);
-    color:#fff;
-    border-color:var(--saffron);
-  }
+  .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab-btn{background:#fff5e8;color:var(--maroon);border:1px solid var(--border);}
+  .tab-btn.active{background:var(--saffron);color:#fff;border-color:var(--saffron);}
   .tab-panel{display:none;}
   .tab-panel.active{display:block;}
-  .stat-grid{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:12px;
-    margin-bottom:18px;
-  }
-  @media(min-width:760px){
-    .stat-grid{grid-template-columns:repeat(5,minmax(0,1fr));}
-  }
-  .stat-card{
-    padding:18px;
-  }
-  .stat-card .num{
-    font-size:28px;
-    font-weight:700;
-    color:var(--saffron-dark);
-  }
-  .stat-card .lbl{
-    margin-top:4px;
-    font-size:12.5px;
-    color:var(--muted);
-  }
+  .stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px;}
+  @media(min-width:760px){.stat-grid{grid-template-columns:repeat(5,minmax(0,1fr));}}
+  .stat-card{padding:18px;}
+  .stat-card .num{font-size:28px;font-weight:700;color:var(--saffron-dark);}
+  .stat-card .lbl{margin-top:4px;font-size:12.5px;color:var(--muted);}
   .stat-card.gents .num{color:var(--blue);}
   .stat-card.ladies .num{color:var(--pink);}
   .stat-card.cities .num{color:var(--green);}
-  .panel{
-    padding:18px;
-    margin-bottom:18px;
-  }
-  .panel h2{
-    margin:0 0 14px;
-    font-size:15px;
-    color:var(--maroon);
-  }
-  .accom-grid{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:12px;
-  }
-  .accom-card{
-    border-radius:12px;
-    padding:16px;
-    text-align:center;
-  }
+  .panel{padding:18px;margin-bottom:18px;}
+  .panel h2{margin:0 0 14px;font-size:15px;color:var(--maroon);}
+  .accom-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+  .accom-card{border-radius:12px;padding:16px;text-align:center;}
   .accom-card.free{background:#fdecd8;}
   .accom-card.own{background:#e8f2ea;}
   .accom-card .num{font-size:24px;font-weight:700;}
   .accom-card.free .num{color:var(--saffron-dark);}
   .accom-card.own .num{color:var(--green);}
   .accom-card .lbl{font-size:12.5px;color:#6b5a45;}
-  .bar-row{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-bottom:10px;
-  }
-  .bar-label{
-    width:140px;
-    flex-shrink:0;
-    font-size:13px;
-    color:var(--ink);
-  }
-  .bar-track{
-    flex:1;
-    height:18px;
-    background:#f4e5d0;
-    border-radius:999px;
-    overflow:hidden;
-  }
-  .bar-fill{
-    height:100%;
-    background:linear-gradient(90deg,var(--saffron),var(--saffron-dark));
-  }
-  .bar-count{
-    width:38px;
-    flex-shrink:0;
-    text-align:right;
-    font-size:13px;
-    font-weight:600;
-  }
-  .toolbar{
-    display:grid;
-    grid-template-columns:repeat(1,minmax(0,1fr));
-    gap:12px;
-    margin-bottom:16px;
-  }
-  @media(min-width:700px){
-    .toolbar{grid-template-columns:repeat(3,minmax(0,1fr));}
-  }
-  @media(min-width:1000px){
-    .toolbar{grid-template-columns:1.1fr 1fr 1fr 1fr 1fr;}
-  }
-  .filter-group label{
-    display:block;
-    font-size:12px;
-    font-weight:600;
-    color:var(--muted);
-    margin-bottom:6px;
-    text-transform:uppercase;
-    letter-spacing:.3px;
-  }
-  .status-switch{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-  }
-  .status-btn{
-    background:#fff8ee;
-    border:1px solid var(--border);
-    color:var(--maroon);
-    padding:10px 12px;
-  }
-  .status-btn.active{
-    background:var(--saffron);
-    border-color:var(--saffron);
-    color:#fff;
-  }
-  .meta-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
-    flex-wrap:wrap;
-    margin-bottom:14px;
-  }
-  .meta-info{
-    font-size:13px;
-    color:var(--muted);
-  }
-  .table-wrap{
-    overflow:auto;
-    border:1px solid var(--border);
-    border-radius:12px;
-  }
-  table{
-    width:100%;
-    min-width:980px;
-    border-collapse:collapse;
-    background:#fff;
-  }
-  th,td{
-    padding:11px 12px;
-    border-bottom:1px solid var(--border);
-    font-size:13.5px;
-    text-align:left;
-    vertical-align:top;
-  }
-  th{
-    background:#fffaf3;
-    color:var(--muted);
-    text-transform:uppercase;
-    letter-spacing:.3px;
-    font-size:11.5px;
-  }
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .bar-label{width:140px;flex-shrink:0;font-size:13px;color:var(--ink);}
+  .bar-track{flex:1;height:18px;background:#f4e5d0;border-radius:999px;overflow:hidden;}
+  .bar-fill{height:100%;background:linear-gradient(90deg,var(--saffron),var(--saffron-dark));}
+  .bar-count{width:38px;flex-shrink:0;text-align:right;font-size:13px;font-weight:600;}
+  .toolbar{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px;margin-bottom:16px;}
+  @media(min-width:700px){.toolbar{grid-template-columns:repeat(3,minmax(0,1fr));}}
+  @media(min-width:1000px){.toolbar{grid-template-columns:1.1fr 1fr 1fr 1fr 1fr;}}
+  .filter-group label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px;}
+  .status-switch{display:flex;gap:8px;flex-wrap:wrap;}
+  .status-btn{background:#fff8ee;border:1px solid var(--border);color:var(--maroon);padding:10px 12px;}
+  .status-btn.active{background:var(--saffron);border-color:var(--saffron);color:#fff;}
+  .meta-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+  .meta-info{font-size:13px;color:var(--muted);}
+  .table-wrap{overflow:auto;border:1px solid var(--border);border-radius:12px;}
+  table{width:100%;min-width:980px;border-collapse:collapse;background:#fff;}
+  th,td{padding:11px 12px;border-bottom:1px solid var(--border);font-size:13.5px;text-align:left;vertical-align:top;}
+  th{background:#fffaf3;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;font-size:11.5px;}
   tbody tr:nth-child(even){background:#fcf7ef;}
   tbody tr:hover{background:#fff1df;}
   tbody tr{cursor:pointer;}
-  .status-pill{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    min-width:84px;
-    padding:6px 10px;
-    border-radius:999px;
-    font-size:12px;
-    font-weight:600;
-  }
-  .status-pill.active{background:#e8f2ea;color:var(--green);}
-  .status-pill.inactive{background:#f8e3e0;color:var(--red);}
-  .empty-note{
-    font-size:13px;
-    color:var(--muted);
-    margin:0;
-  }
-  .modal-backdrop{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.38);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    padding:16px;
-  }
+  .empty-note{font-size:13px;color:var(--muted);margin:0;}
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.38);display:none;align-items:center;justify-content:center;padding:16px;}
   .modal-backdrop.show{display:flex;}
-  .modal-card{
-    width:min(100%,460px);
-    background:#fff;
-    border-radius:16px;
-    padding:20px;
-    box-shadow:0 18px 46px rgba(0,0,0,0.24);
-  }
-  .modal-title{
-    margin:0 0 14px;
-    color:var(--maroon);
-    font-size:18px;
-  }
-  .detail-grid{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:10px;
-    margin-bottom:16px;
-  }
-  .detail-card{
-    background:#fff8ee;
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:10px;
-  }
+  .modal-card{width:min(100%,460px);background:#fff;border-radius:16px;padding:20px;box-shadow:0 18px 46px rgba(0,0,0,0.24);}
+  .modal-title{margin:0 0 14px;color:var(--maroon);font-size:18px;}
+  .detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px;}
+  .detail-card{background:#fff8ee;border:1px solid var(--border);border-radius:10px;padding:10px;}
   .detail-card.full{grid-column:1 / -1;}
-  .detail-label{
-    font-size:11px;
-    color:var(--muted);
-    text-transform:uppercase;
-    letter-spacing:.35px;
-    margin-bottom:4px;
-  }
-  .detail-value{
-    font-size:14px;
-    color:var(--ink);
-    word-break:break-word;
-  }
-  .modal-actions{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-  }
-  @media(max-width:640px){
-    body{padding:14px;}
-    .panel,.card,#lockScreen{padding:16px;}
-    .detail-grid{grid-template-columns:1fr;}
-    .accom-grid{grid-template-columns:1fr;}
-  }
+  .detail-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.35px;margin-bottom:4px;}
+  .detail-value{font-size:14px;color:var(--ink);word-break:break-word;}
+  .modal-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  @media(max-width:640px){body{padding:14px;}.panel,.card,#lockScreen{padding:16px;}.detail-grid{grid-template-columns:1fr;}.accom-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-
 <div id="lockScreen" class="card">
   <h1>Admin Access</h1>
   <p class="sub">Enter the admin key to open registrations and analytics.</p>
@@ -401,51 +118,23 @@
 
     <div id="analyticsTab" class="tab-panel active">
       <div class="stat-grid">
-        <div class="stat-card card">
-          <div class="num" id="statTotal">0</div>
-          <div class="lbl">People</div>
-        </div>
-        <div class="stat-card card gents">
-          <div class="num" id="statGents">0</div>
-          <div class="lbl">Gents</div>
-        </div>
-        <div class="stat-card card ladies">
-          <div class="num" id="statLadies">0</div>
-          <div class="lbl">Ladies</div>
-        </div>
-        <div class="stat-card card cities">
-          <div class="num" id="statCities">0</div>
-          <div class="lbl">Cities</div>
-        </div>
-        <div class="stat-card card">
-          <div class="num" id="statShown">0</div>
-          <div class="lbl">Rows Shown</div>
-        </div>
+        <div class="stat-card card"><div class="num" id="statTotal">0</div><div class="lbl">People</div></div>
+        <div class="stat-card card gents"><div class="num" id="statGents">0</div><div class="lbl">Gents</div></div>
+        <div class="stat-card card ladies"><div class="num" id="statLadies">0</div><div class="lbl">Ladies</div></div>
+        <div class="stat-card card cities"><div class="num" id="statCities">0</div><div class="lbl">Cities</div></div>
+        <div class="stat-card card"><div class="num" id="statShown">0</div><div class="lbl">Rows Shown</div></div>
       </div>
 
       <div class="panel">
         <h2>Accommodation</h2>
         <div class="accom-grid">
-          <div class="accom-card free">
-            <div class="num" id="accomFree">0</div>
-            <div class="lbl">Free by Devasthanam</div>
-          </div>
-          <div class="accom-card own">
-            <div class="num" id="accomOwn">0</div>
-            <div class="lbl">Own Arrangement</div>
-          </div>
+          <div class="accom-card free"><div class="num" id="accomFree">0</div><div class="lbl">Free by Devasthanam</div></div>
+          <div class="accom-card own"><div class="num" id="accomOwn">0</div><div class="lbl">Own Arrangement</div></div>
         </div>
       </div>
 
-      <div class="panel">
-        <h2>City Breakdown</h2>
-        <div id="cityBars"></div>
-      </div>
-
-      <div class="panel">
-        <h2>Age Distribution</h2>
-        <div id="ageBars"></div>
-      </div>
+      <div class="panel"><h2>City Breakdown</h2><div id="cityBars"></div></div>
+      <div class="panel"><h2>Age Distribution</h2><div id="ageBars"></div></div>
     </div>
 
     <div id="dataTab" class="tab-panel">
@@ -464,21 +153,12 @@
               <button type="button" class="status-btn" data-status="inactive">Inactive</button>
             </div>
           </div>
-          <div class="filter-group">
-            <label>City</label>
-            <select id="cityFilter"></select>
-          </div>
-          <div class="filter-group">
-            <label>Submission Number</label>
-            <select id="submissionFilter"></select>
-          </div>
-          <div class="filter-group">
-            <label>Accommodation</label>
-            <select id="accommodationFilter"></select>
-          </div>
+          <div class="filter-group"><label>City</label><select id="cityFilter"></select></div>
+          <div class="filter-group"><label>Submission Number</label><select id="submissionFilter"></select></div>
+          <div class="filter-group"><label>Accommodation</label><select id="accommodationFilter"></select></div>
           <div class="filter-group">
             <label>Language Opted</label>
-            <select id="translateFilter">
+            <select id="languageFilter">
               <option value="all">All</option>
               <option value="en">English</option>
               <option value="mr">Marathi</option>
@@ -518,7 +198,7 @@
       <div class="detail-card"><div class="detail-label">City</div><div class="detail-value" id="modalCity"></div></div>
       <div class="detail-card"><div class="detail-label">Accommodation</div><div class="detail-value" id="modalAccommodation"></div></div>
       <div class="detail-card"><div class="detail-label">Status</div><div class="detail-value" id="modalStatus"></div></div>
-      <div class="detail-card full"><div class="detail-label">Submission Number</div><div class="detail-value" id="modalSubmissionId"></div></div>
+      <div class="detail-card full"><div class="detail-label">Submission Number</div><div class="detail-value" id="modalSubmissionNumber"></div></div>
       <div class="detail-card full"><div class="detail-label">Person ID</div><div class="detail-value" id="modalPersonId"></div></div>
     </div>
     <div class="modal-actions">
@@ -532,13 +212,7 @@
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTkXBHASxYiSdqjy1eyYQASuqgDY-qvABIwISYEyOaKg8Bvg8H1WsVAOT7CWo78dat/exec";
 const ADMIN_KEY = "Admin@1";
-const filters = {
-  status: "active",
-  city: "",
-  submissionId: "",
-  accommodation: "",
-  formLanguage: "all"
-};
+const filters = { status: "active", city: "", submissionId: "", accommodation: "", formLanguage: "all" };
 let rawRows = [];
 let displayedRows = [];
 let selectedRow = null;
@@ -547,23 +221,16 @@ const adminKeyInput = document.getElementById("adminKey");
 const cityFilter = document.getElementById("cityFilter");
 const submissionFilter = document.getElementById("submissionFilter");
 const accommodationFilter = document.getElementById("accommodationFilter");
-const translateFilter = document.getElementById("translateFilter");
+const languageFilter = document.getElementById("languageFilter");
 
 document.getElementById("loginBtn").addEventListener("click", tryUnlock);
-adminKeyInput.addEventListener("keydown", function(event){
-  if(event.key === "Enter"){
-    event.preventDefault();
-    tryUnlock();
-  }
-});
+adminKeyInput.addEventListener("keydown", function(event){ if(event.key === "Enter"){ event.preventDefault(); tryUnlock(); } });
 document.getElementById("refreshBtn").addEventListener("click", loadData);
 document.getElementById("downloadBtn").addEventListener("click", downloadExcel);
 document.getElementById("activateBtn").addEventListener("click", function(){ updateSelectedStatus("active"); });
 document.getElementById("deactivateBtn").addEventListener("click", function(){ updateSelectedStatus("inactive"); });
 document.getElementById("closeModalBtn").addEventListener("click", closeUserModal);
-document.getElementById("userModal").addEventListener("click", function(event){
-  if(event.target.id === "userModal") closeUserModal();
-});
+document.getElementById("userModal").addEventListener("click", function(event){ if(event.target.id === "userModal") closeUserModal(); });
 
 document.querySelectorAll(".tab-btn").forEach(function(button){
   button.addEventListener("click", function(){
@@ -583,28 +250,13 @@ document.querySelectorAll(".status-btn").forEach(function(button){
   });
 });
 
-cityFilter.addEventListener("change", function(){
-  filters.city = cityFilter.value;
-  applyCurrentFilters();
-});
-submissionFilter.addEventListener("change", function(){
-  filters.submissionId = submissionFilter.value;
-  applyCurrentFilters();
-});
-accommodationFilter.addEventListener("change", function(){
-  filters.accommodation = accommodationFilter.value;
-  applyCurrentFilters();
-});
-translateFilter.addEventListener("change", function(){
-  filters.formLanguage = translateFilter.value;
-  applyCurrentFilters();
-});
+cityFilter.addEventListener("change", function(){ filters.city = cityFilter.value; applyCurrentFilters(); });
+submissionFilter.addEventListener("change", function(){ filters.submissionId = submissionFilter.value; applyCurrentFilters(); });
+accommodationFilter.addEventListener("change", function(){ filters.accommodation = accommodationFilter.value; applyCurrentFilters(); });
+languageFilter.addEventListener("change", function(){ filters.formLanguage = languageFilter.value; applyCurrentFilters(); });
 
 function tryUnlock(){
-  if(adminKeyInput.value !== ADMIN_KEY){
-    alert("Incorrect key.");
-    return;
-  }
+  if(adminKeyInput.value !== ADMIN_KEY){ alert("Incorrect key."); return; }
   document.getElementById("lockScreen").style.display = "none";
   document.getElementById("dashboard").style.display = "block";
   loadData();
@@ -613,46 +265,39 @@ function tryUnlock(){
 async function loadData(){
   setLoadingState(true);
   try{
-    await loadTranslatedRows();
+    const response = await fetch(SCRIPT_URL + "?action=getAllData");
+    const payload = await response.json();
+    if(payload.status !== "success") throw new Error(payload.message || "Could not load rows");
+    rawRows = Array.isArray(payload.data) ? payload.data : [];
     populateDropdowns(rawRows);
     applyCurrentFilters();
     document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleString();
     document.getElementById("content").style.display = "block";
     document.getElementById("errorMsg").style.display = "none";
   }catch(error){
-    document.getElementById("errorMsg").style.display = "block";
     document.getElementById("content").style.display = "none";
+    document.getElementById("errorMsg").style.display = "block";
   }finally{
     setLoadingState(false);
   }
 }
 
-async function loadTranslatedRows(){
-  const query = buildQuery({
-    action: "getAllData"
-  });
-  const response = await fetch(SCRIPT_URL + "?" + query);
-  const payload = await response.json();
-  if(payload.status !== "success") throw new Error(payload.message || "Could not load rows");
-  rawRows = annotateSubmissionNumbers(Array.isArray(payload.data) ? payload.data.map(normalizeRowShape) : []);
-}
-
 function setLoadingState(isLoading){
   document.getElementById("loadingMsg").style.display = isLoading ? "block" : "none";
   if(isLoading){
-    document.getElementById("errorMsg").style.display = "none";
     document.getElementById("content").style.display = "none";
+    document.getElementById("errorMsg").style.display = "none";
   }
 }
 
 function populateDropdowns(rows){
   setSelectOptions(cityFilter, "All Cities", uniqueSorted(rows.map(function(row){ return row["City (from PIN)"]; })));
-  setSelectOptions(submissionFilter, "All Submission Numbers", uniqueSorted(rows.map(function(row){ return row["Submission Number"] || row["_submissionNumber"]; })));
+  setSelectOptions(submissionFilter, "All Submission Numbers", uniqueSorted(rows.map(function(row){ return row["Submission Number"]; })));
   setSelectOptions(accommodationFilter, "All Accommodation", uniqueSorted(rows.map(function(row){ return formatAccommodation(row["Accommodation"]); })));
   cityFilter.value = filters.city;
   submissionFilter.value = filters.submissionId;
-  accommodationFilter.value = filters.accommodation ? formatAccommodation(filters.accommodation) : "";
-  translateFilter.value = filters.formLanguage;
+  accommodationFilter.value = filters.accommodation;
+  languageFilter.value = filters.formLanguage;
 }
 
 function setSelectOptions(select, placeholder, values){
@@ -668,23 +313,16 @@ function setSelectOptions(select, placeholder, values){
     option.textContent = value;
     select.appendChild(option);
   });
-  if(Array.from(select.options).some(function(option){ return option.value === previous; })){
-    select.value = previous;
-  }
+  if(Array.from(select.options).some(function(option){ return option.value === previous; })){ select.value = previous; }
 }
 
 function applyCurrentFilters(){
   displayedRows = rawRows.filter(function(row){
-    const status = normalizeStatus(row["Status"]);
-    const city = String(row["City (from PIN)"] || "");
-    const submissionId = String(row["Submission Number"] || row["_submissionNumber"] || "");
-    const accommodation = formatAccommodation(row["Accommodation"]);
-    const formLanguage = String(row["Form Language"] || "en").toLowerCase();
-    if(filters.status !== "all" && status !== filters.status) return false;
-    if(filters.city && city !== filters.city) return false;
-    if(filters.submissionId && submissionId !== filters.submissionId) return false;
-    if(filters.accommodation && accommodation !== filters.accommodation) return false;
-    if(filters.formLanguage !== "all" && formLanguage !== filters.formLanguage) return false;
+    if(filters.status !== "all" && normalizeStatus(row["Status"]) !== filters.status) return false;
+    if(filters.city && String(row["City (from PIN)"] || "") !== filters.city) return false;
+    if(filters.submissionId && String(row["Submission Number"] || "") !== filters.submissionId) return false;
+    if(filters.accommodation && formatAccommodation(row["Accommodation"]) !== filters.accommodation) return false;
+    if(filters.formLanguage !== "all" && String(row["Form Language"] || "en") !== filters.formLanguage) return false;
     return true;
   });
   renderAnalytics(displayedRows);
@@ -707,42 +345,27 @@ function renderAnalytics(rows){
 function buildAnalytics(rows){
   const cityMap = {};
   const ageBuckets = {"0-12":0,"13-25":0,"26-40":0,"41-60":0,"60+":0};
-  const result = {
-    totalPeople: 0,
-    totalGents: 0,
-    totalLadies: 0,
-    cityCount: 0,
-    accomFree: 0,
-    accomOwn: 0,
-    cityBreakdown: [],
-    ageBreakdown: []
-  };
-
+  const result = { totalPeople:0, totalGents:0, totalLadies:0, cityCount:0, accomFree:0, accomOwn:0, cityBreakdown:[], ageBreakdown:[] };
   rows.forEach(function(row){
     const city = String(row["City (from PIN)"] || "");
     const age = Number(row["Age"]);
-    result.totalPeople += 1;
-    if(row["Type"] === "Gent") result.totalGents += 1;
-    if(row["Type"] === "Lady") result.totalLadies += 1;
-    if(row["Accommodation"] === "free") result.accomFree += 1;
-    if(row["Accommodation"] === "own") result.accomOwn += 1;
+    result.totalPeople++;
+    if(row["Type"] === "Gent") result.totalGents++;
+    if(row["Type"] === "Lady") result.totalLadies++;
+    if(row["Accommodation"] === "free") result.accomFree++;
+    if(row["Accommodation"] === "own") result.accomOwn++;
     if(city) cityMap[city] = (cityMap[city] || 0) + 1;
     if(!Number.isNaN(age)){
-      if(age <= 12) ageBuckets["0-12"] += 1;
-      else if(age <= 25) ageBuckets["13-25"] += 1;
-      else if(age <= 40) ageBuckets["26-40"] += 1;
-      else if(age <= 60) ageBuckets["41-60"] += 1;
-      else ageBuckets["60+"] += 1;
+      if(age <= 12) ageBuckets["0-12"]++;
+      else if(age <= 25) ageBuckets["13-25"]++;
+      else if(age <= 40) ageBuckets["26-40"]++;
+      else if(age <= 60) ageBuckets["41-60"]++;
+      else ageBuckets["60+"]++;
     }
   });
-
-  result.cityBreakdown = Object.keys(cityMap).sort().map(function(city){
-    return { city: city, count: cityMap[city] };
-  });
+  result.cityBreakdown = Object.keys(cityMap).sort().map(function(city){ return { city: city, count: cityMap[city] }; });
   result.cityCount = result.cityBreakdown.length;
-  result.ageBreakdown = Object.keys(ageBuckets).map(function(range){
-    return { range: range, count: ageBuckets[range] };
-  });
+  result.ageBreakdown = Object.keys(ageBuckets).map(function(range){ return { range: range, count: ageBuckets[range] }; });
   return result;
 }
 
@@ -753,15 +376,11 @@ function renderBars(targetId, items, labelKey){
     target.innerHTML = '<p class="empty-note">No data for the selected filter.</p>';
     return;
   }
-  const sortedItems = items.slice().sort(function(a, b){ return b.count - a.count; });
-  const maxCount = Math.max.apply(null, sortedItems.map(function(item){ return item.count; }));
-  sortedItems.forEach(function(item){
+  const maxCount = Math.max.apply(null, items.map(function(item){ return item.count; }));
+  items.slice().sort(function(a, b){ return b.count - a.count; }).forEach(function(item){
     const row = document.createElement("div");
     row.className = "bar-row";
-    row.innerHTML =
-      '<div class="bar-label">' + safeCell(item[labelKey]) + '</div>' +
-      '<div class="bar-track"><div class="bar-fill" style="width:' + ((item.count / Math.max(maxCount, 1)) * 100) + '%"></div></div>' +
-      '<div class="bar-count">' + safeCell(item.count) + '</div>';
+    row.innerHTML = '<div class="bar-label">' + safeCell(item[labelKey]) + '</div><div class="bar-track"><div class="bar-fill" style="width:' + ((item.count / Math.max(maxCount, 1)) * 100) + '%"></div></div><div class="bar-count">' + safeCell(item.count) + '</div>';
     target.appendChild(row);
   });
 }
@@ -772,16 +391,13 @@ function renderTable(rows){
   const summary = document.getElementById("tableSummary");
   body.innerHTML = "";
   summary.textContent = rows.length + " row" + (rows.length === 1 ? "" : "s");
-  if(!rows.length){
-    empty.style.display = "block";
-    return;
-  }
+  if(!rows.length){ empty.style.display = "block"; return; }
   empty.style.display = "none";
-  rows.forEach(function(row, index){
+  rows.forEach(function(row){
     const tr = document.createElement("tr");
     tr.innerHTML =
-      "<td>" + safeCell(row["_submissionNumber"] || "") + "</td>" +
-      "<td>" + safeCell(row["_serial"] || index + 1) + "</td>" +
+      "<td>" + safeCell(row["Submission Number"]) + "</td>" +
+      "<td>" + safeCell(row["_serial"]) + "</td>" +
       "<td>" + safeCell(row["Name"]) + "</td>" +
       "<td>" + safeCell(row["Mobile Number"]) + "</td>" +
       "<td>" + safeCell(row["Age"]) + "</td>" +
@@ -795,13 +411,13 @@ function renderTable(rows){
 function openUserModal(row){
   selectedRow = row;
   document.getElementById("modalName").textContent = row["Name"] || "Person Details";
-  document.getElementById("modalGender").textContent = formatGender(row["Type"]);
+  document.getElementById("modalGender").textContent = row["Type"] === "Gent" ? "Male" : "Female";
   document.getElementById("modalAge").textContent = row["Age"] || "-";
   document.getElementById("modalMobile").textContent = row["Mobile Number"] || "-";
   document.getElementById("modalCity").textContent = row["City (from PIN)"] || "-";
   document.getElementById("modalAccommodation").textContent = formatAccommodation(row["Accommodation"]);
   document.getElementById("modalStatus").textContent = capitalize(normalizeStatus(row["Status"]));
-  document.getElementById("modalSubmissionId").textContent = row["Submission Number"] || row["_submissionNumber"] || "-";
+  document.getElementById("modalSubmissionNumber").textContent = row["Submission Number"] || "-";
   document.getElementById("modalPersonId").textContent = row["Person ID"] || "-";
   document.getElementById("userModal").classList.add("show");
 }
@@ -817,12 +433,7 @@ async function updateSelectedStatus(nextStatus){
     const response = await fetch(SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({
-        action: "updateStatus",
-        personId: selectedRow["Person ID"],
-        rowNumber: selectedRow["_rowNumber"],
-        nextStatus: nextStatus
-      })
+      body: JSON.stringify({ action:"updateStatus", personId:selectedRow["Person ID"], rowNumber:selectedRow["_rowNumber"], nextStatus:nextStatus })
     });
     const payload = await response.json();
     if(payload.status !== "success") throw new Error(payload.message || "Status update failed");
@@ -834,29 +445,13 @@ async function updateSelectedStatus(nextStatus){
 }
 
 function downloadExcel(){
-  if(!displayedRows.length){
-    alert("No data available for export.");
-    return;
-  }
+  if(!displayedRows.length){ alert("No data available for export."); return; }
   const header = ["Submission Number","Sr. No.","Name","Mobile Number","Age","City","Accommodation"];
-  const htmlRows = displayedRows.map(function(row, index){
-    const cells = [
-      row["_submissionNumber"] || "",
-      row["_serial"] || index + 1,
-      row["Name"],
-      row["Mobile Number"],
-      row["Age"],
-      row["City (from PIN)"],
-      formatAccommodation(row["Accommodation"])
-    ];
+  const rows = displayedRows.map(function(row){
+    const cells = [row["Submission Number"], row["_serial"], row["Name"], row["Mobile Number"], row["Age"], row["City (from PIN)"], formatAccommodation(row["Accommodation"])];
     return "<tr>" + cells.map(function(cell){ return "<td>" + safeCell(cell) + "</td>"; }).join("") + "</tr>";
   }).join("");
-  const html =
-    '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">' +
-    "<head><meta charset=\"UTF-8\"></head><body><table border=\"1\">" +
-    "<tr>" + header.map(function(cell){ return "<th>" + safeCell(cell) + "</th>"; }).join("") + "</tr>" +
-    htmlRows +
-    "</table></body></html>";
+  const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body><table border="1"><tr>' + header.map(function(cell){ return "<th>" + safeCell(cell) + "</th>"; }).join("") + "</tr>" + rows + "</table></body></html>";
   const blob = new Blob([html], { type: "application/vnd.ms-excel" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
@@ -867,84 +462,8 @@ function downloadExcel(){
   URL.revokeObjectURL(link.href);
 }
 
-function buildQuery(params){
-  const query = new URLSearchParams();
-  Object.keys(params).forEach(function(key){
-    if(params[key]) query.set(key, params[key]);
-  });
-  return query.toString();
-}
-
 function uniqueSorted(values){
-  return Array.from(new Set(values.map(function(value){ return String(value || "").trim(); }).filter(Boolean))).sort(function(a, b){
-    return a.localeCompare(b);
-  });
-}
-
-function normalizeRowShape(row){
-  const normalized = Object.assign({}, row);
-  if(normalized["Submission Number"]) {
-    normalized["_submissionNumber"] = normalized["Submission Number"];
-  }
-  if(
-    !String(normalized["Submission ID"] || "").trim() &&
-    looksLikeSubmissionNumber(normalized["Accommodation"]) &&
-    looksLikeAccommodation(normalized["Mobile Number"])
-  ){
-    normalized["Submission ID"] = String(normalized["Accommodation"] || "");
-    normalized["Accommodation"] = String(normalized["Mobile Number"] || "");
-    normalized["Mobile Number"] = String(normalized["Age"] || "");
-    normalized["Age"] = String(normalized["Name"] || "");
-    normalized["Name"] = String(normalized["Person ID"] || "");
-    normalized["Person ID"] = buildPersonId(normalized);
-  }
-  if(!looksLikePersonId(normalized["Person ID"]) && String(normalized["Submission ID"] || "").trim()){
-    normalized["Person ID"] = buildPersonId(normalized);
-  }
-  normalized["Form Language"] = String(normalized["Form Language"] || "en").toLowerCase() === "mr" ? "mr" : "en";
-  return normalized;
-}
-
-function annotateSubmissionNumbers(rows){
-  const submissionMap = {};
-  let counter = 0;
-  rows.slice().reverse().forEach(function(row){
-    const explicitNumber = Number(row["Submission Number"] || row["_submissionNumber"] || 0);
-    const submissionId = String(row["Submission ID"] || "").trim();
-    if(!submissionId) return;
-    if(explicitNumber){
-      submissionMap[submissionId] = explicitNumber;
-      if(explicitNumber > counter) counter = explicitNumber;
-      return;
-    }
-    if(!submissionMap[submissionId]){
-      counter += 1;
-      submissionMap[submissionId] = counter;
-    }
-  });
-  return rows.map(function(row){
-    const copy = Object.assign({}, row);
-    copy["_submissionNumber"] = submissionMap[String(copy["Submission ID"] || "").trim()] || "";
-    return copy;
-  });
-}
-
-function buildPersonId(row){
-  return String(row["Submission ID"] || "") + "_" + String(row["Type"] || "") + "_" + String(row["Person No."] || "");
-}
-
-function looksLikeSubmissionNumber(value){
-  const text = String(value || "").trim();
-  return /^sub_/i.test(text) || /^\d{4}-\d{2}-\d{2}t/i.test(text.toLowerCase()) || /_/.test(text);
-}
-
-function looksLikePersonId(value){
-  return /_(Gent|Lady)_/i.test(String(value || "").trim());
-}
-
-function looksLikeAccommodation(value){
-  const text = String(value || "").trim().toLowerCase();
-  return text === "free" || text === "own";
+  return Array.from(new Set(values.map(function(value){ return String(value || "").trim(); }).filter(Boolean))).sort(function(a, b){ return a.localeCompare(b); });
 }
 
 function normalizeStatus(value){
@@ -955,10 +474,6 @@ function formatAccommodation(value){
   return String(value || "").toLowerCase() === "free" ? "Free" : String(value || "").toLowerCase() === "own" ? "Own" : String(value || "");
 }
 
-function formatGender(value){
-  return value === "Gent" ? "Male" : value === "Lady" ? "Female" : String(value || "");
-}
-
 function capitalize(value){
   const text = String(value || "");
   return text ? text.charAt(0).toUpperCase() + text.slice(1) : "";
@@ -966,14 +481,8 @@ function capitalize(value){
 
 function safeCell(value){
   if(value === null || value === undefined) return "";
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+  return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 </script>
-
 </body>
 </html>
