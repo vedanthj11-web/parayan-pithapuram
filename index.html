@@ -344,16 +344,16 @@
 <body>
 <div id="languageScreen" class="language-screen">
   <div class="language-card">
-    <h1 class="language-title">Choose Your Language</h1>
-    <p class="language-subtitle">नोंदणी करण्यासाठी भाषा निवडा</p>
+    <h1 class="language-title" id="languageTitle">Choose Your Language</h1>
+    <p class="language-subtitle" id="languageSubtitle"></p>
     <div class="language-grid">
       <button type="button" class="language-btn marathi" data-language="mr">
-        <span class="big">मराठी</span>
-        <span class="small">मराठीत फॉर्म भरा</span>
+        <span class="big" id="languageMarathiTitle"></span>
+        <span class="small" id="languageMarathiText"></span>
       </button>
       <button type="button" class="language-btn english" data-language="en">
-        <span class="big">English</span>
-        <span class="small">Fill the form in English</span>
+        <span class="big" id="languageEnglishTitle"></span>
+        <span class="small" id="languageEnglishText"></span>
       </button>
     </div>
   </div>
@@ -410,13 +410,19 @@
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTkXBHASxYiSdqjy1eyYQASuqgDY-qvABIwISYEyOaKg8Bvg8H1WsVAOT7CWo78dat/exec";
-const REQUEST_TIMEOUT_MS = 15000;
+const REQUEST_TIMEOUT_MS = 25000;
 const MAX_PARTICIPANTS = 6;
 let currentLanguage = "";
 let participantCount = 0;
 
 const TEXTS = {
   en: {
+    languageTitle: "Choose Your Language",
+    languageSubtitle: "\u0928\u094b\u0902\u0926\u0923\u0940 \u0915\u0930\u0923\u094d\u092f\u093e\u0938\u093e\u0920\u0940 \u092d\u093e\u0937\u093e \u0928\u093f\u0935\u0921\u093e",
+    languageMarathiTitle: "\u092e\u0930\u093e\u0920\u0940",
+    languageMarathiText: "\u092e\u0930\u093e\u0920\u0940\u0924 \u092b\u0949\u0930\u094d\u092e \u092d\u0930\u093e",
+    languageEnglishTitle: "English",
+    languageEnglishText: "Fill the form in English",
     pageTitle: "Shripad Shrivallabh Charitamrut Samohik Parayan",
     headerTitle: "Shripad Shrivallabh Charitamrut Samohik Parayan",
     headerSubtitle: "Pithapuram Registration Form",
@@ -424,9 +430,11 @@ const TEXTS = {
     countSectionTitle: "Participants",
     countLabel: "How many people are participating? *",
     personTitle: "Participant",
+    bookingPersonNote: "(the one who is doing the booking, and can be contacted)",
     namePlaceholder: "Full Name",
     agePlaceholder: "Age",
     mobilePlaceholder: "Mobile Number",
+    alternateMobilePlaceholder: "Second Mobile Number",
     genderMale: "Male",
     genderFemale: "Female",
     participantError: "Please add at least 1 participant and complete all details.",
@@ -451,6 +459,12 @@ const TEXTS = {
     footer: "Shripad Shrivallabh Charitamrut Samohik Parayan · Pithapuram, 2026"
   },
   mr: {
+    languageTitle: "\u0924\u0941\u092e\u094d\u0939\u0940 \u0915\u094b\u0923\u0924\u094d\u092f\u093e \u092d\u093e\u0937\u0947\u0924 \u092b\u0949\u0930\u094d\u092e \u092d\u0930\u0923\u093e\u0930?",
+    languageSubtitle: "\u0928\u094b\u0902\u0926\u0923\u0940 \u0915\u0930\u0923\u094d\u092f\u093e\u0938\u093e\u0920\u0940 \u092d\u093e\u0937\u093e \u0928\u093f\u0935\u0921\u093e",
+    languageMarathiTitle: "\u092e\u0930\u093e\u0920\u0940",
+    languageMarathiText: "\u092e\u0930\u093e\u0920\u0940\u0924 \u092b\u0949\u0930\u094d\u092e \u092d\u0930\u093e",
+    languageEnglishTitle: "English",
+    languageEnglishText: "\u0907\u0902\u0917\u094d\u0930\u091c\u0940\u0924 \u092b\u0949\u0930\u094d\u092e \u092d\u0930\u093e",
     pageTitle: "\u0936\u094d\u0930\u0940\u092a\u093e\u0926 \u0936\u094d\u0930\u0940\u0935\u0932\u094d\u0932\u092d \u091a\u0930\u093f\u0924\u093e\u092e\u0943\u0924 \u0938\u093e\u092e\u0942\u0939\u093f\u0915 \u092a\u093e\u0930\u093e\u092f\u0923",
     headerTitle: "\u0936\u094d\u0930\u0940\u092a\u093e\u0926 \u0936\u094d\u0930\u0940\u0935\u0932\u094d\u0932\u092d \u091a\u0930\u093f\u0924\u093e\u092e\u0943\u0924 \u0938\u093e\u092e\u0942\u0939\u093f\u0915 \u092a\u093e\u0930\u093e\u092f\u0923",
     headerSubtitle: "\u092a\u093f\u0920\u093e\u092a\u0941\u0930\u092e \u0928\u094b\u0902\u0926\u0923\u0940 \u092b\u0949\u0930\u094d\u092e",
@@ -458,9 +472,11 @@ const TEXTS = {
     countSectionTitle: "\u0938\u0939\u092d\u093e\u0917\u0940",
     countLabel: "\u0915\u093f\u0924\u0940 \u091c\u0923 \u0938\u0939\u092d\u093e\u0917\u0940 \u0906\u0939\u0947\u0924? *",
     personTitle: "\u0938\u0939\u092d\u093e\u0917\u0940",
+    bookingPersonNote: "(\u0939\u0947 \u092c\u0941\u0915\u093f\u0902\u0917 \u0915\u0930\u0923\u093e\u0930\u0947 \u0906\u0939\u0947\u0924 \u0906\u0923\u093f \u092f\u093e\u0902\u091a\u094d\u092f\u093e\u0936\u0940 \u0938\u0902\u092a\u0930\u094d\u0915 \u0938\u093e\u0927\u0924\u093e \u092f\u0947\u0908\u0932)",
     namePlaceholder: "\u092a\u0942\u0930\u094d\u0923 \u0928\u093e\u0935",
     agePlaceholder: "\u0935\u092f",
     mobilePlaceholder: "\u092e\u094b\u092c\u093e\u0908\u0932 \u0915\u094d\u0930\u092e\u093e\u0902\u0915",
+    alternateMobilePlaceholder: "\u0926\u0941\u0938\u0930\u093e \u092e\u094b\u092c\u093e\u0908\u0932 \u0915\u094d\u0930\u092e\u093e\u0902\u0915",
     genderMale: "\u092a\u0941\u0930\u0941\u0937",
     genderFemale: "\u0938\u094d\u0924\u094d\u0930\u0940",
     participantError: "\u0915\u0943\u092a\u092f\u093e \u0915\u092e\u0940\u0924 \u0915\u092e\u0940 1 \u0938\u0939\u092d\u093e\u0917\u0940 \u092d\u0930\u093e \u0906\u0923\u093f \u0938\u0930\u094d\u0935 \u092e\u093e\u0939\u093f\u0924\u0940 \u092a\u0942\u0930\u094d\u0923 \u0915\u0930\u093e.",
@@ -493,6 +509,16 @@ document.querySelectorAll(".language-btn").forEach(function(button){
 });
 
 document.getElementById("regForm").addEventListener("submit", handleSubmit);
+renderLanguageChooser();
+
+function renderLanguageChooser(){
+  document.getElementById("languageTitle").textContent = TEXTS.en.languageTitle;
+  document.getElementById("languageSubtitle").textContent = TEXTS.en.languageSubtitle;
+  document.getElementById("languageMarathiTitle").textContent = TEXTS.en.languageMarathiTitle;
+  document.getElementById("languageMarathiText").textContent = TEXTS.en.languageMarathiText;
+  document.getElementById("languageEnglishTitle").textContent = TEXTS.en.languageEnglishTitle;
+  document.getElementById("languageEnglishText").textContent = TEXTS.en.languageEnglishText;
+}
 
 function selectLanguage(language){
   currentLanguage = language;
@@ -554,21 +580,23 @@ function renderParticipantBlocks(){
       name: card.querySelector(".p-name").value,
       age: card.querySelector(".p-age").value,
       mobile: card.querySelector(".p-mobile").value,
+      alternateMobile: card.querySelector(".p-alt-mobile") ? card.querySelector(".p-alt-mobile").value : "",
       gender: (card.querySelector('input[type="radio"]:checked') || {}).value || ""
     });
   });
   container.innerHTML = "";
   for(let i = 0; i < participantCount; i++){
-    const value = existing[i] || { name: "", age: "", mobile: "", gender: "" };
+    const value = existing[i] || { name: "", age: "", mobile: "", alternateMobile: "", gender: "" };
     const card = document.createElement("div");
     card.className = "person-card";
     card.innerHTML =
-      '<div class="p-title">' + t("personTitle") + " " + (i + 1) + "</div>" +
+      '<div class="p-title">' + t("personTitle") + " " + (i + 1) + (i === 0 ? ' <span style="font-weight:500;color:#7a6a55;">' + escapeHtml(t("bookingPersonNote")) + "</span>" : "") + "</div>" +
       '<div class="person-grid">' +
         '<input type="text" class="p-name" placeholder="' + escapeHtml(t("namePlaceholder")) + '" value="' + escapeHtml(value.name) + '" required>' +
         '<input type="number" class="p-age" placeholder="' + escapeHtml(t("agePlaceholder")) + '" value="' + escapeHtml(value.age) + '" min="0" max="120" required>' +
         '<input type="tel" class="p-mobile" placeholder="' + escapeHtml(t("mobilePlaceholder")) + '" value="' + escapeHtml(value.mobile) + '" required>' +
       '</div>' +
+      (i === 0 ? '<div style="margin-top:10px;"><input type="tel" class="p-alt-mobile" placeholder="' + escapeHtml(t("alternateMobilePlaceholder")) + '" value="' + escapeHtml(value.alternateMobile) + '" required></div>' : "") +
       '<div class="gender-group" style="margin-top:10px;">' +
         renderGenderOption(i, "male", t("genderMale"), value.gender === "male") +
         renderGenderOption(i, "female", t("genderFemale"), value.gender === "female") +
@@ -632,8 +660,9 @@ function validate(){
     const name = card.querySelector(".p-name");
     const age = card.querySelector(".p-age");
     const mobile = card.querySelector(".p-mobile");
+    const alternateMobile = card.querySelector(".p-alt-mobile");
     const gender = card.querySelector('input[type="radio"]:checked');
-    [name, age, mobile].forEach(function(input){
+    [name, age, mobile, alternateMobile].filter(Boolean).forEach(function(input){
       if(!input.value.trim()){
         input.style.borderColor = "#c0392b";
         valid = false;
@@ -682,6 +711,7 @@ function collectParticipants(){
       name: card.querySelector(".p-name").value.trim(),
       age: card.querySelector(".p-age").value.trim(),
       mobile: card.querySelector(".p-mobile").value.trim(),
+      alternateMobile: card.querySelector(".p-alt-mobile") ? card.querySelector(".p-alt-mobile").value.trim() : "",
       gender: card.querySelector('input[type="radio"]:checked').value
     });
   });
@@ -733,13 +763,15 @@ async function handleSubmit(event){
 }
 
 async function verifySubmission(submissionId){
-  try{
-    const response = await fetch(SCRIPT_URL + "?action=getSubmissionStatus&submissionId=" + encodeURIComponent(submissionId));
-    const payload = await response.json();
-    return Boolean(payload && payload.status === "success" && payload.data && payload.data.exists);
-  }catch(error){
-    return false;
+  for(let attempt = 0; attempt < 4; attempt++){
+    try{
+      const response = await fetch(SCRIPT_URL + "?action=getSubmissionStatus&submissionId=" + encodeURIComponent(submissionId));
+      const payload = await response.json();
+      if(Boolean(payload && payload.status === "success" && payload.data && payload.data.exists)) return true;
+    }catch(error){}
+    await wait(1200);
   }
+  return false;
 }
 
 function showSuccess(count, verifiedAfterRetry, submissionId){
@@ -764,6 +796,12 @@ function showFailure(){
   setTimeout(function(){
     statusBox.classList.remove("show", "error");
   }, 3500);
+}
+
+function wait(ms){
+  return new Promise(function(resolve){
+    setTimeout(resolve, ms);
+  });
 }
 
 function formatMessage(template, values){
