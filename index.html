@@ -410,7 +410,11 @@
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTkXBHASxYiSdqjy1eyYQASuqgDY-qvABIwISYEyOaKg8Bvg8H1WsVAOT7CWo78dat/exec";
-const REQUEST_TIMEOUT_MS = 60000;
+const REQUEST_TIMEOUT_MS = 8000;
+const MOBILE_REGEX = /^\d{10}$/;
+const AGE_REGEX = /^(?:1[01]\d|120|[1-9]\d?)$/;
+const VERIFY_ATTEMPTS = 2;
+const VERIFY_WAIT_MS = 700;
 const MAX_PARTICIPANTS = 6;
 let currentLanguage = "";
 let participantCount = 0;
@@ -453,8 +457,8 @@ const TEXTS = {
     submit: "Submit Registration",
     submitting: "Submitting...",
     successTitle: "Registration Successful",
-    successMessage: "Thank you. Registration completed for {count} participant(s). Your Booking ID is {submissionId}.",
-    successMessageRetry: "Registration was saved. Registration completed for {count} participant(s). Your Booking ID is {submissionId}.",
+    successMessage: "Thank you. Registration completed for {count} participant(s). Your Booking ID is {bookingId}.",
+    successMessageRetry: "Registration was saved. Registration completed for {count} participant(s). Your Booking ID is {bookingId}.",
     failureTitle: "Submission Failed",
     failureMessage: "The submission could not be confirmed. Please try again.",
     footer: "Shripad Shrivallabh Charitamrut Samohik Parayan · Pithapuram, 2026"
@@ -495,8 +499,8 @@ const TEXTS = {
     submit: "\u0928\u094b\u0902\u0926\u0923\u0940 \u0938\u092c\u092e\u093f\u091f \u0915\u0930\u093e",
     submitting: "\u0938\u092c\u092e\u093f\u091f \u0915\u0930\u0924 \u0906\u0939\u0947...",
     successTitle: "\u0928\u094b\u0902\u0926\u0923\u0940 \u092f\u0936\u0938\u094d\u0935\u0940",
-    successMessage: "\u0927\u0928\u094d\u092f\u0935\u093e\u0926. {count} \u0938\u0939\u092d\u093e\u0917\u0940\u0902\u091a\u0940 \u0928\u094b\u0902\u0926\u0923\u0940 \u092a\u0942\u0930\u094d\u0923 \u091d\u093e\u0932\u0940. \u0924\u0941\u092e\u091a\u093e \u092c\u0941\u0915\u093f\u0902\u0917 \u0906\u092f\u0921\u0940 {submissionId} \u0906\u0939\u0947.",
-    successMessageRetry: "\u0928\u094b\u0902\u0926\u0923\u0940 \u091c\u0924\u0928 \u091d\u093e\u0932\u0940 \u0906\u0939\u0947. {count} \u0938\u0939\u092d\u093e\u0917\u0940\u0902\u091a\u0940 \u0928\u094b\u0902\u0926\u0923\u0940 \u092a\u0942\u0930\u094d\u0923 \u091d\u093e\u0932\u0940. \u0924\u0941\u092e\u091a\u093e \u092c\u0941\u0915\u093f\u0902\u0917 \u0906\u092f\u0921\u0940 {submissionId} \u0906\u0939\u0947.",
+    successMessage: "\u0927\u0928\u094d\u092f\u0935\u093e\u0926. {count} \u0938\u0939\u092d\u093e\u0917\u0940\u0902\u091a\u0940 \u0928\u094b\u0902\u0926\u0923\u0940 \u092a\u0942\u0930\u094d\u0923 \u091d\u093e\u0932\u0940. \u0924\u0941\u092e\u091a\u093e \u092c\u0941\u0915\u093f\u0902\u0917 \u0906\u092f\u0921\u0940 {bookingId} \u0906\u0939\u0947.",
+    successMessageRetry: "\u0928\u094b\u0902\u0926\u0923\u0940 \u091c\u0924\u0928 \u091d\u093e\u0932\u0940 \u0906\u0939\u0947. {count} \u0938\u0939\u092d\u093e\u0917\u0940\u0902\u091a\u0940 \u0928\u094b\u0902\u0926\u0923\u0940 \u092a\u0942\u0930\u094d\u0923 \u091d\u093e\u0932\u0940. \u0924\u0941\u092e\u091a\u093e \u092c\u0941\u0915\u093f\u0902\u0917 \u0906\u092f\u0921\u0940 {bookingId} \u0906\u0939\u0947.",
     failureTitle: "\u0938\u092c\u092e\u093f\u0936\u0928 \u0905\u092f\u0936\u0938\u094d\u0935\u0940",
     failureMessage: "\u0938\u092c\u092e\u093f\u0936\u0928 \u0916\u093e\u0924\u094d\u0930\u0940\u0936\u0940\u0930 \u0939\u094b\u090a \u0936\u0915\u0932\u0947 \u0928\u093e\u0939\u0940. \u0915\u0943\u092a\u092f\u093e \u092a\u0941\u0928\u094d\u0939\u093e \u092a\u094d\u0930\u092f\u0924\u094d\u0928 \u0915\u0930\u093e.",
     footer: "\u0936\u094d\u0930\u0940\u092a\u093e\u0926 \u0936\u094d\u0930\u0940\u0935\u0932\u094d\u0932\u092d \u091a\u0930\u093f\u0924\u093e\u092e\u0943\u0924 \u0938\u093e\u092e\u0942\u0939\u093f\u0915 \u092a\u093e\u0930\u093e\u092f\u0923 \u00b7 \u092a\u093f\u0920\u093e\u092a\u0941\u0930\u092e, 2026"
@@ -675,6 +679,18 @@ function validate(){
         input.style.borderColor = "";
       }
     });
+    if(age && age.value.trim() && !AGE_REGEX.test(age.value.trim())){
+      age.style.borderColor = "#c0392b";
+      valid = false;
+    }
+    if(mobile && mobile.value.trim() && !MOBILE_REGEX.test(mobile.value.trim())){
+      mobile.style.borderColor = "#c0392b";
+      valid = false;
+    }
+    if(alternateMobile && alternateMobile.value.trim() && !MOBILE_REGEX.test(alternateMobile.value.trim())){
+      alternateMobile.style.borderColor = "#c0392b";
+      valid = false;
+    }
     card.querySelectorAll(".gender-option").forEach(function(option){
       option.style.borderColor = "";
     });
@@ -723,21 +739,6 @@ function collectParticipants(){
   return participants;
 }
 
-function splitParticipantsByGender(participants){
-  const result = { gents: [], ladies: [] };
-  participants.forEach(function(person){
-    const entry = {
-      name: person.name,
-      age: person.age,
-      mobile: person.mobile,
-      alternateMobile: person.alternateMobile || ""
-    };
-    if(person.gender === "male") result.gents.push(entry);
-    if(person.gender === "female") result.ladies.push(entry);
-  });
-  return result;
-}
-
 function currentResolvedLocationFor(pincode){
   if(resolvedLocation && resolvedLocation._pincode === pincode){
     return {
@@ -758,16 +759,11 @@ async function handleSubmit(event){
   submitBtn.innerHTML = '<span class="spinner"></span>' + escapeHtml(t("submitting"));
 
   const participants = collectParticipants();
-  const grouped = splitParticipantsByGender(participants);
   const submissionId = "sub_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
   const pincode = document.getElementById("pincode").value.trim();
   const requestTimestamp = new Date().toISOString();
   const payload = {
     participants: participants,
-    gents: grouped.gents,
-    ladies: grouped.ladies,
-    gentsCount: grouped.gents.length,
-    ladiesCount: grouped.ladies.length,
     pincode: pincode,
     accommodation: document.querySelector('input[name="accom"]:checked').value,
     timestamp: requestTimestamp,
@@ -779,21 +775,26 @@ async function handleSubmit(event){
   try{
     const controller = new AbortController();
     const timeoutId = setTimeout(function(){ controller.abort(); }, REQUEST_TIMEOUT_MS);
-    const response = await fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(payload),
-      signal: controller.signal
-    });
-    clearTimeout(timeoutId);
+    let response;
+    try{
+      response = await fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
     const result = await response.json();
     if(result.status !== "success") throw new Error(result.message || "Submission failed");
-    const bookingId = await resolveBookingId_(result, payload);
-    showSuccess(participants.length, false, bookingId || result.submissionNumber || submissionId);
+    const bookingId = String(result.submissionNumber || "");
+    if(!bookingId) throw new Error("Missing submission number");
+    showSuccess(participants.length, false, bookingId);
   }catch(error){
-    const verification = await verifySubmission(submissionId, payload);
+    const verification = await verifySubmission(submissionId);
     if(verification.confirmed){
-      showSuccess(participants.length, true, verification.bookingId || submissionId);
+      showSuccess(participants.length, true, verification.bookingId);
       return;
     }
     submitBtn.disabled = false;
@@ -821,72 +822,22 @@ async function prefetchLocation(pincode){
   return resolvedLocation;
 }
 
-async function verifySubmission(submissionId, payload){
-  for(let attempt = 0; attempt < 4; attempt++){
+async function verifySubmission(submissionId){
+  for(let attempt = 0; attempt < VERIFY_ATTEMPTS; attempt++){
     try{
       const response = await fetch(SCRIPT_URL + "?action=getSubmissionStatus&submissionId=" + encodeURIComponent(submissionId));
       const result = await response.json();
       if(Boolean(result && result.status === "success" && result.data && result.data.exists)) {
-        return { confirmed: true, bookingId: result.data.submissionNumber || "" };
-      }
-      if(Boolean(result && result.status === "ok")) {
-        const fallback = await verifySubmissionFromAllData(submissionId, payload);
-        if(fallback.confirmed) return fallback;
+        return { confirmed: true, bookingId: String(result.data.submissionNumber || "") };
       }
     }catch(error){
-      const fallback = await verifySubmissionFromAllData(submissionId, payload);
-      if(fallback.confirmed) return fallback;
     }
-    await wait(1200);
+    if(attempt < VERIFY_ATTEMPTS - 1) await wait(VERIFY_WAIT_MS);
   }
   return { confirmed: false, bookingId: "" };
 }
 
-async function verifySubmissionFromAllData(submissionId, payload){
-  try{
-    const response = await fetch(SCRIPT_URL + "?action=getAllData");
-    const result = await response.json();
-    if(!result || result.status !== "success" || !Array.isArray(result.data)) return { confirmed: false, bookingId: "" };
-
-    const expectedTimestamp = String(payload && payload.timestamp || "");
-    const expectedPincode = String(payload && payload.pincode || "");
-    const expectedPeople = Array.isArray(payload && payload.participants) ? payload.participants : [];
-    const firstPerson = expectedPeople[0] || {};
-    const firstName = String(firstPerson.name || "").trim().toLowerCase();
-    const firstMobile = String(firstPerson.mobile || "").trim();
-
-    const directMatch = result.data.find(function(row){
-      return String(row["Submission ID"] || "") === String(submissionId);
-    });
-    if(directMatch) {
-      return { confirmed: true, bookingId: String(directMatch["Submission Number"] || "") };
-    }
-
-    const matchedRows = result.data.filter(function(row){
-      const rowTimestamp = String(row["Timestamp"] || "");
-      const rowPincode = String(row["PIN Code"] || "");
-      const rowName = String(row["Name"] || "").trim().toLowerCase();
-      const rowMobile = String(row["Mobile Number"] || "").trim();
-      return rowTimestamp === expectedTimestamp && rowPincode === expectedPincode && rowName === firstName && rowMobile === firstMobile;
-    });
-
-    if(matchedRows.length >= expectedPeople.length && expectedPeople.length > 0) {
-      return { confirmed: true, bookingId: String(matchedRows[0]["Submission Number"] || "") };
-    }
-    return { confirmed: false, bookingId: "" };
-  }catch(error){
-    return { confirmed: false, bookingId: "" };
-  }
-}
-
-async function resolveBookingId_(result, payload){
-  if(result && result.submissionNumber) return String(result.submissionNumber);
-  const serverSubmissionId = String(result && result.submissionId || "");
-  const verification = await verifySubmission(serverSubmissionId || payload.submissionId, payload);
-  return verification.bookingId || "";
-}
-
-function showSuccess(count, verifiedAfterRetry, submissionId){
+function showSuccess(count, verifiedAfterRetry, bookingId){
   document.querySelector("form").style.display = "none";
   const statusBox = document.getElementById("statusBox");
   statusBox.classList.add("show");
@@ -895,7 +846,7 @@ function showSuccess(count, verifiedAfterRetry, submissionId){
   document.getElementById("statusTitle").textContent = t("successTitle");
   document.getElementById("statusMsg").textContent = formatMessage(
     verifiedAfterRetry ? t("successMessageRetry") : t("successMessage"),
-    { count: count, submissionId: submissionId }
+    { count: count, bookingId: bookingId }
   );
 }
 
