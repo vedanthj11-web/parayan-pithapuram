@@ -23,6 +23,7 @@
   .action-btn{background:var(--saffron);color:#fff;}
   .action-btn.secondary{background:#f4e7d5;color:var(--maroon);}
   .action-btn.danger{background:var(--red);color:#fff;}
+  .ghost-btn{background:#f4e7d5;color:var(--maroon);}
   #dashboard{display:none;max-width:1240px;margin:0 auto;}
   .top-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;}
   .top-actions{display:flex;gap:10px;flex-wrap:wrap;}
@@ -84,6 +85,13 @@
   .detail-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.35px;margin-bottom:4px;}
   .detail-value{font-size:14px;color:var(--ink);word-break:break-word;}
   .modal-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .contact-footer{margin-top:24px;background:#fffaf3;border:1px solid var(--border);border-radius:16px;padding:18px;}
+  .contact-footer h2{margin:0 0 12px;font-size:15px;color:var(--maroon);}
+  .contact-grid{display:grid;grid-template-columns:1fr;gap:10px 18px;}
+  .contact-item{font-size:13.5px;color:var(--ink);}
+  .contact-item a{color:var(--saffron-dark);text-decoration:none;font-weight:600;}
+  .contact-item a:hover{text-decoration:underline;}
+  @media(min-width:760px){.contact-grid{grid-template-columns:1fr 1fr;}}
   @media(max-width:640px){body{padding:14px;}.panel,.card,#lockScreen{padding:16px;}.detail-grid{grid-template-columns:1fr;}.accom-grid{grid-template-columns:1fr;}}
 </style>
 </head>
@@ -122,7 +130,6 @@
         <div class="stat-card card gents"><div class="num" id="statGents">0</div><div class="lbl">Gents</div></div>
         <div class="stat-card card ladies"><div class="num" id="statLadies">0</div><div class="lbl">Ladies</div></div>
         <div class="stat-card card cities"><div class="num" id="statCities">0</div><div class="lbl">Cities</div></div>
-        <div class="stat-card card"><div class="num" id="statShown">0</div><div class="lbl">Rows Shown</div></div>
       </div>
 
       <div class="panel">
@@ -154,7 +161,14 @@
             </div>
           </div>
           <div class="filter-group"><label>City</label><select id="cityFilter"></select></div>
-          <div class="filter-group"><label>Submission Number</label><select id="submissionFilter"></select></div>
+          <div class="filter-group">
+            <label>Gender</label>
+            <select id="genderFilter">
+              <option value="all">All</option>
+              <option value="Gent">Gents</option>
+              <option value="Lady">Ladies</option>
+            </select>
+          </div>
           <div class="filter-group"><label>Accommodation</label><select id="accommodationFilter"></select></div>
           <div class="filter-group">
             <label>Language Opted</label>
@@ -188,6 +202,19 @@
   </div>
 </div>
 
+<div class="contact-footer">
+  <h2>For help, contact:</h2>
+  <div class="contact-grid">
+    <div class="contact-item">Prasad Bhivre - <a href="tel:9673462498">9673462498</a></div>
+    <div class="contact-item">Priyanka Tai Patil - <a href="tel:9552192169">9552192169</a></div>
+    <div class="contact-item">Devendra Kamod - <a href="tel:7249506691">7249506691</a></div>
+    <div class="contact-item">Gnaneshwar Kamod - <a href="tel:9850055906">9850055906</a></div>
+    <div class="contact-item">Jitendra Patil - <a href="tel:8668423639">8668423639</a></div>
+    <div class="contact-item">Rupali Joshi - <a href="tel:9422070342">9422070342</a></div>
+    <div class="contact-item">B.D. Wani - <a href="tel:7447542324">7447542324</a></div>
+  </div>
+</div>
+
 <div id="userModal" class="modal-backdrop" role="dialog" aria-modal="true">
   <div class="modal-card">
     <h3 class="modal-title" id="modalName">Person Details</h3>
@@ -212,14 +239,15 @@
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTkXBHASxYiSdqjy1eyYQASuqgDY-qvABIwISYEyOaKg8Bvg8H1WsVAOT7CWo78dat/exec";
 const ADMIN_KEY = "Admin@1";
-const filters = { status: "active", city: "", submissionId: "", accommodation: "", formLanguage: "all" };
+const filters = { status: "active", city: "", gender: "all", accommodation: "", formLanguage: "all" };
 let rawRows = [];
 let displayedRows = [];
 let selectedRow = null;
+let currentRequestId = 0;
 
 const adminKeyInput = document.getElementById("adminKey");
 const cityFilter = document.getElementById("cityFilter");
-const submissionFilter = document.getElementById("submissionFilter");
+const genderFilter = document.getElementById("genderFilter");
 const accommodationFilter = document.getElementById("accommodationFilter");
 const languageFilter = document.getElementById("languageFilter");
 
@@ -251,7 +279,7 @@ document.querySelectorAll(".status-btn").forEach(function(button){
 });
 
 cityFilter.addEventListener("change", function(){ filters.city = cityFilter.value; applyCurrentFilters(); });
-submissionFilter.addEventListener("change", function(){ filters.submissionId = submissionFilter.value; applyCurrentFilters(); });
+genderFilter.addEventListener("change", function(){ filters.gender = genderFilter.value; applyCurrentFilters(); });
 accommodationFilter.addEventListener("change", function(){ filters.accommodation = accommodationFilter.value; applyCurrentFilters(); });
 languageFilter.addEventListener("change", function(){ filters.formLanguage = languageFilter.value; applyCurrentFilters(); });
 
@@ -263,11 +291,14 @@ function tryUnlock(){
 }
 
 async function loadData(){
+  currentRequestId++;
+  const requestId = currentRequestId;
   setLoadingState(true);
   try{
     const response = await fetch(SCRIPT_URL + "?action=getAllData&_=" + Date.now());
     const payload = await response.json();
     if(payload.status !== "success") throw new Error(payload.message || "Could not load rows");
+    if(requestId !== currentRequestId) return;
     rawRows = Array.isArray(payload.data) ? payload.data : [];
     populateDropdowns(rawRows);
     applyCurrentFilters();
@@ -275,9 +306,11 @@ async function loadData(){
     document.getElementById("content").style.display = "block";
     document.getElementById("errorMsg").style.display = "none";
   }catch(error){
+    if(requestId !== currentRequestId) return;
     document.getElementById("content").style.display = "none";
     document.getElementById("errorMsg").style.display = "block";
   }finally{
+    if(requestId !== currentRequestId) return;
     setLoadingState(false);
   }
 }
@@ -292,10 +325,9 @@ function setLoadingState(isLoading){
 
 function populateDropdowns(rows){
   setSelectOptions(cityFilter, "All Cities", uniqueSorted(rows.map(function(row){ return row["City (from PIN)"]; })));
-  setSelectOptions(submissionFilter, "All Submission Numbers", uniqueSorted(rows.map(function(row){ return row["Submission Number"]; })));
   setSelectOptions(accommodationFilter, "All Accommodation", uniqueSorted(rows.map(function(row){ return formatAccommodation(row["Accommodation"]); })));
   cityFilter.value = filters.city;
-  submissionFilter.value = filters.submissionId;
+  genderFilter.value = filters.gender;
   accommodationFilter.value = filters.accommodation;
   languageFilter.value = filters.formLanguage;
 }
@@ -320,7 +352,7 @@ function applyCurrentFilters(){
   displayedRows = rawRows.filter(function(row){
     if(filters.status !== "all" && normalizeStatus(row["Status"]) !== filters.status) return false;
     if(filters.city && String(row["City (from PIN)"] || "") !== filters.city) return false;
-    if(filters.submissionId && String(row["Submission Number"] || "") !== filters.submissionId) return false;
+    if(filters.gender !== "all" && String(row["Type"] || "") !== filters.gender) return false;
     if(filters.accommodation && formatAccommodation(row["Accommodation"]) !== filters.accommodation) return false;
     if(filters.formLanguage !== "all" && String(row["Form Language"] || "en") !== filters.formLanguage) return false;
     return true;
@@ -335,7 +367,6 @@ function renderAnalytics(rows){
   document.getElementById("statGents").textContent = stats.totalGents;
   document.getElementById("statLadies").textContent = stats.totalLadies;
   document.getElementById("statCities").textContent = stats.cityCount;
-  document.getElementById("statShown").textContent = rows.length;
   document.getElementById("accomFree").textContent = stats.accomFree;
   document.getElementById("accomOwn").textContent = stats.accomOwn;
   renderBars("cityBars", stats.cityBreakdown, "city");
