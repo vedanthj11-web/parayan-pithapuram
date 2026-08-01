@@ -3,358 +3,782 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण (Shripad Shrivallabh Charitamrut Samohik Parayan)</title>
+<title>Shripad Shrivallabh Charitamrut Samohik Parayan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Serif:wght@600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Serif:wght@600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--saffron:#e2711d;--saffron-dark:#c85a0e;--maroon:#7a2e2e;--cream:#fff8ee;--ink:#332218;--border:#e8d9c0;--success:#2f7d4f;}
+  :root{
+    --saffron:#e2711d;
+    --saffron-dark:#c85a0e;
+    --maroon:#7a2e2e;
+    --cream:#fff8ee;
+    --ink:#332218;
+    --border:#e8d9c0;
+    --success:#2f7d4f;
+    --error:#c0392b;
+  }
   *{box-sizing:border-box;}
-  html,body{max-width:100%;overflow-x:hidden;}
-  body{margin:0;font-family:'Poppins','Noto Sans Devanagari',sans-serif;background:linear-gradient(180deg,#fff8ee 0%,#fbeed9 100%);color:var(--ink);min-height:100vh;padding:0 0 60px 0;}
-  header{background:linear-gradient(120deg,var(--maroon),#5c2020);color:#fdf1df;padding:28px 20px 34px;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,0.15);}
-  header h1{font-family:'Noto Serif','Noto Sans Devanagari',serif;font-size:clamp(19px,4.3vw,30px);margin:0 0 4px;letter-spacing:.3px;}
-  header h1 .eng{display:block;font-family:'Poppins',sans-serif;font-size:clamp(12px,2.6vw,15px);font-weight:400;color:#f3d9b0;margin-top:4px;letter-spacing:.2px;}
-  header p{margin:10px 0 0;font-size:clamp(13px,3vw,16px);color:#f3d9b0;}
-  .dates{display:inline-block;margin-top:10px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.3);padding:6px 16px;border-radius:20px;font-size:14px;letter-spacing:.5px;}
-  .container{width:min(100%,720px);max-width:720px;margin:-20px auto 0;padding:0 16px;}
-  form{background:#fffefb;border-radius:16px;box-shadow:0 10px 30px rgba(122,46,46,0.12);padding:clamp(18px,4vw,36px);margin-top:20px;}
-  .intro{font-size:13px;color:#7a6a55;background:#fff6ea;border:1px solid var(--border);padding:12px 14px;border-radius:12px;margin-bottom:22px;}
-  .section{margin-bottom:30px;}
-  .section-title{font-size:15px;font-weight:600;color:var(--saffron-dark);letter-spacing:.3px;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--border);}
-  .section-title .eng{font-weight:400;color:#a68a63;font-size:12.5px;}
+  html,body{margin:0;max-width:100%;overflow-x:hidden;}
+  body{
+    font-family:'Poppins','Noto Sans Devanagari',sans-serif;
+    background:linear-gradient(180deg,#fff8ee 0%,#fbeed9 100%);
+    color:var(--ink);
+    min-height:100vh;
+  }
+  .page{padding:0 0 60px;}
+  .language-screen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:
+      radial-gradient(circle at top left, rgba(226,113,29,0.18), transparent 40%),
+      radial-gradient(circle at bottom right, rgba(122,46,46,0.16), transparent 38%),
+      linear-gradient(180deg,#fff8ee 0%,#fbe7c6 100%);
+  }
+  .language-card{
+    width:min(100%,760px);
+    background:rgba(255,255,255,0.95);
+    border:1px solid rgba(232,217,192,0.9);
+    border-radius:28px;
+    box-shadow:0 22px 56px rgba(122,46,46,0.14);
+    padding:28px;
+    text-align:center;
+  }
+  .language-title{
+    font-family:'Noto Serif','Noto Sans Devanagari',serif;
+    font-size:clamp(28px,5vw,44px);
+    color:var(--maroon);
+    margin:0 0 12px;
+    line-height:1.15;
+  }
+  .language-subtitle{
+    margin:0 0 28px;
+    font-size:clamp(16px,2.6vw,20px);
+    color:#7a6a55;
+  }
+  .language-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:16px;
+  }
+  .language-btn{
+    border:none;
+    cursor:pointer;
+    width:100%;
+    min-height:180px;
+    border-radius:22px;
+    padding:24px 20px;
+    font:inherit;
+    transition:transform .14s ease, box-shadow .14s ease, background .14s ease;
+    box-shadow:0 12px 30px rgba(122,46,46,0.1);
+  }
+  .language-btn:hover{transform:translateY(-2px);}
+  .language-btn.marathi{
+    background:linear-gradient(135deg,#7a2e2e,#9e4c2e);
+    color:#fff7ea;
+  }
+  .language-btn.english{
+    background:linear-gradient(135deg,#e2711d,#f1a349);
+    color:#fffaf3;
+  }
+  .language-btn .big{
+    display:block;
+    font-size:clamp(26px,5vw,40px);
+    font-weight:700;
+    margin-bottom:10px;
+  }
+  .language-btn .small{
+    display:block;
+    font-size:clamp(15px,2.8vw,20px);
+    opacity:.95;
+  }
+  header{
+    background:linear-gradient(120deg,var(--maroon),#5c2020);
+    color:#fdf1df;
+    padding:28px 20px 34px;
+    text-align:center;
+    box-shadow:0 4px 18px rgba(0,0,0,0.15);
+  }
+  header h1{
+    font-family:'Noto Serif','Noto Sans Devanagari',serif;
+    font-size:clamp(20px,4vw,30px);
+    margin:0 0 8px;
+    line-height:1.3;
+  }
+  header p{
+    margin:0;
+    font-size:clamp(14px,2.8vw,16px);
+    color:#f3d9b0;
+  }
+  .dates{
+    display:inline-block;
+    margin-top:12px;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.28);
+    padding:6px 16px;
+    border-radius:999px;
+    font-size:14px;
+    letter-spacing:.2px;
+  }
+  .container{
+    width:min(100%,720px);
+    margin:-20px auto 0;
+    padding:0 16px;
+  }
+  form{
+    background:#fffefb;
+    border-radius:18px;
+    box-shadow:0 10px 30px rgba(122,46,46,0.12);
+    padding:clamp(18px,4vw,34px);
+    margin-top:20px;
+  }
+  .section{margin-bottom:28px;}
+  .section-title{
+    font-size:16px;
+    font-weight:700;
+    color:var(--saffron-dark);
+    margin-bottom:14px;
+    padding-bottom:8px;
+    border-bottom:2px solid var(--border);
+  }
   .field{margin-bottom:18px;}
-  label{display:block;font-weight:500;font-size:14.5px;margin-bottom:6px;color:var(--ink);}
-  label .eng{font-weight:400;color:#8a7454;font-size:12.5px;}
-  label .req{color:var(--saffron-dark);margin-left:2px;}
-  .hint{font-size:12px;color:#a3906f;margin-top:5px;}
-  input[type="text"],input[type="tel"],input[type="number"]{width:100%;padding:12px 14px;font-size:15px;border:1.5px solid var(--border);border-radius:10px;background:#fffdf9;font-family:inherit;color:var(--ink);transition:border-color .15s, box-shadow .15s;-webkit-appearance:none;appearance:none;}
-  input:focus{outline:none;border-color:var(--saffron);box-shadow:0 0 0 3px rgba(226,113,29,0.15);}
-  .count-pills{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
-  .count-pill{width:100%;min-height:48px;border-radius:10px;border:1.5px solid var(--border);background:#fffdf9;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;cursor:pointer;transition:all .15s;}
-  .count-pill.plus{grid-column:span 2;font-size:13px;padding:0 14px;}
+  label{
+    display:block;
+    font-weight:600;
+    font-size:14.5px;
+    margin-bottom:6px;
+    color:var(--ink);
+  }
+  .req{color:var(--saffron-dark);}
+  .hint{
+    font-size:12px;
+    color:#a3906f;
+    margin-top:5px;
+  }
+  input[type="text"],input[type="tel"],input[type="number"]{
+    width:100%;
+    padding:12px 14px;
+    font-size:15px;
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    background:#fffdf9;
+    font-family:inherit;
+    color:var(--ink);
+    transition:border-color .15s, box-shadow .15s;
+    appearance:none;
+  }
+  input:focus{
+    outline:none;
+    border-color:var(--saffron);
+    box-shadow:0 0 0 3px rgba(226,113,29,0.15);
+  }
+  .count-pills{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+  }
+  .count-pill{
+    min-height:52px;
+    border-radius:12px;
+    border:1.5px solid var(--border);
+    background:#fffdf9;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:17px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .15s;
+  }
   .count-pill:hover{border-color:var(--saffron);}
-  .count-pill.selected{background:var(--saffron);border-color:var(--saffron);color:#fff;}
-  .overflow-input{margin-top:10px;display:none;}
-  .person-blocks{margin-top:16px;display:flex;flex-direction:column;gap:14px;}
-  .person-card{background:var(--cream);border:1.5px solid var(--border);border-radius:12px;padding:14px;animation:fadeIn .25s ease;}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
-  .person-card .p-title{font-weight:600;font-size:13.5px;color:var(--maroon);margin-bottom:10px;letter-spacing:.3px;}
-  .grid-3{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .grid-3 .full{grid-column:1 / -1;}
-  @media (min-width:600px){.grid-3{grid-template-columns:2fr 1fr 1.5fr;}.grid-3 .full{grid-column:auto;}.count-pills{grid-template-columns:repeat(7,minmax(0,1fr));}.count-pill.plus{grid-column:span 1;}}
-  .radio-group{display:flex;flex-direction:column;gap:10px;}
-  .radio-option{display:flex;align-items:flex-start;gap:10px;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .15s, background .15s;}
-  .radio-option:hover{border-color:var(--saffron);}
-  .radio-option.selected{border-color:var(--saffron);background:#fff3e4;}
-  .radio-option input{margin-top:3px;accent-color:var(--saffron-dark);width:18px;height:18px;flex-shrink:0;}
-  .radio-option .opt-text strong{display:block;font-size:14.5px;}
-  .radio-option .opt-text span{font-size:12.5px;color:#7a6a55;}
-  .submit-btn{width:100%;padding:16px;font-size:16px;font-weight:600;color:#fff;background:linear-gradient(120deg,var(--saffron),var(--saffron-dark));border:none;border-radius:12px;cursor:pointer;box-shadow:0 6px 16px rgba(226,113,29,0.35);transition:transform .1s, box-shadow .1s;letter-spacing:.3px;}
-  .submit-btn:active{transform:scale(0.98);}
-  .submit-btn:disabled{opacity:0.6;cursor:not-allowed;}
-  .error-text{color:#c0392b;font-size:12.5px;margin-top:5px;display:none;}
-  .field.invalid input{border-color:#c0392b;}
+  .count-pill.selected{
+    background:var(--saffron);
+    border-color:var(--saffron);
+    color:#fff;
+  }
+  .person-blocks{
+    margin-top:16px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .person-card{
+    background:var(--cream);
+    border:1.5px solid var(--border);
+    border-radius:14px;
+    padding:14px;
+  }
+  .p-title{
+    font-weight:700;
+    font-size:14px;
+    color:var(--maroon);
+    margin-bottom:10px;
+  }
+  .person-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+  .gender-group{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .gender-option,.radio-option{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    border:1.5px solid var(--border);
+    border-radius:12px;
+    padding:12px 14px;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+    background:#fffdf9;
+  }
+  .gender-option:hover,.radio-option:hover{border-color:var(--saffron);}
+  .gender-option.selected,.radio-option.selected{
+    border-color:var(--saffron);
+    background:#fff3e4;
+  }
+  .gender-option input,.radio-option input{
+    margin-top:2px;
+    accent-color:var(--saffron-dark);
+    width:18px;
+    height:18px;
+    flex-shrink:0;
+  }
+  .radio-group{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .option-text strong{
+    display:block;
+    font-size:14.5px;
+  }
+  .option-text span{
+    font-size:12.5px;
+    color:#7a6a55;
+  }
+  .submit-btn{
+    width:100%;
+    padding:16px;
+    font-size:16px;
+    font-weight:700;
+    color:#fff;
+    background:linear-gradient(120deg,var(--saffron),var(--saffron-dark));
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    box-shadow:0 6px 16px rgba(226,113,29,0.35);
+  }
+  .submit-btn:disabled{opacity:.65;cursor:not-allowed;}
+  .error-text{
+    color:var(--error);
+    font-size:12.5px;
+    margin-top:5px;
+    display:none;
+  }
+  .field.invalid input{border-color:var(--error);}
   .field.invalid .error-text{display:block;}
-  #statusBox{display:none;text-align:center;padding:40px 20px;}
+  .inline-error{
+    color:var(--error);
+    font-size:12.5px;
+    margin-top:8px;
+    display:none;
+  }
+  .inline-error.show{display:block;}
+  #statusBox{
+    display:none;
+    text-align:center;
+    padding:40px 20px;
+  }
   #statusBox.show{display:block;}
-  #statusBox.error #statusIcon{color:#c0392b;}
-  #statusIcon{font-size:52px;margin-bottom:14px;color:var(--success);}
-  #statusBox h2{font-family:'Noto Serif',serif;margin-bottom:8px;}
-  #statusBox p{color:#6b5a45;font-size:14.5px;word-break:break-word;}
-  .spinner{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.5);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px;}
+  #statusBox.error #statusIcon{color:var(--error);}
+  #statusIcon{
+    font-size:52px;
+    margin-bottom:14px;
+    color:var(--success);
+  }
+  #statusBox h2{
+    font-family:'Noto Serif','Noto Sans Devanagari',serif;
+    margin-bottom:8px;
+  }
+  #statusBox p{
+    color:#6b5a45;
+    font-size:14.5px;
+    word-break:break-word;
+  }
+  .spinner{
+    display:inline-block;
+    width:18px;
+    height:18px;
+    border:2.5px solid rgba(255,255,255,0.5);
+    border-top-color:#fff;
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+    vertical-align:middle;
+    margin-right:8px;
+  }
   @keyframes spin{to{transform:rotate(360deg);}}
-  footer{text-align:center;margin-top:24px;font-size:12px;color:#a3906f;}
+  footer{
+    text-align:center;
+    margin-top:24px;
+    font-size:12px;
+    color:#a3906f;
+  }
+  @media (min-width:640px){
+    .language-grid{grid-template-columns:1fr 1fr;}
+    .person-grid{grid-template-columns:2fr 1fr 1.4fr;}
+  }
   @media (max-width:480px){
     header{padding:24px 14px 30px;}
     form{padding:18px 14px;}
-    .radio-option{padding:12px;}
-    .submit-btn{padding:15px;font-size:15px;}
+    .language-card{padding:20px 16px;}
+    .language-btn{min-height:160px;}
   }
 </style>
 </head>
 <body>
-<header>
-  <h1>श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण <span class="eng">(Shripad Shrivallabh Charitamrut Samohik Parayan)</span></h1>
-  <p>पिठापुरम · नोंदणी फॉर्म (Pithapuram · Registration Form)</p>
-  <div class="dates">21 – 22 – 23 नोव्हेंबर (November)</div>
-</header>
-<div class="container">
-  <form id="regForm" novalidate>
-    <div id="formBody">
-      <div class="intro">Please fill traveller details first. Name, age, and mobile number are required for each person.</div>
-
-      <div class="section">
-        <div class="section-title">पुरुष <span class="eng">(Gents Participating)</span></div>
-        <div class="field">
-          <label>किती पुरुष सहभागी आहेत? <span class="eng">(How many gents are participating?)</span><span class="req">*</span></label>
-          <div class="count-pills" id="gentsPills">
-            <div class="count-pill selected" data-val="0">0</div>
-            <div class="count-pill" data-val="1">1</div>
-            <div class="count-pill" data-val="2">2</div>
-            <div class="count-pill" data-val="3">3</div>
-            <div class="count-pill" data-val="4">4</div>
-            <div class="count-pill" data-val="5">5</div>
-            <div class="count-pill plus" data-val="6+">6+</div>
-          </div>
-          <input type="number" class="overflow-input" id="gentsOverflow" min="6" max="30" placeholder="नक्की संख्या टाका (Enter exact number)">
-        </div>
-        <div class="person-blocks" id="gentsBlocks"></div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">स्त्रिया <span class="eng">(Ladies Participating)</span></div>
-        <div class="field">
-          <label>किती स्त्रिया सहभागी आहेत? <span class="eng">(How many ladies are participating?)</span><span class="req">*</span></label>
-          <div class="count-pills" id="ladiesPills">
-            <div class="count-pill selected" data-val="0">0</div>
-            <div class="count-pill" data-val="1">1</div>
-            <div class="count-pill" data-val="2">2</div>
-            <div class="count-pill" data-val="3">3</div>
-            <div class="count-pill" data-val="4">4</div>
-            <div class="count-pill" data-val="5">5</div>
-            <div class="count-pill plus" data-val="6+">6+</div>
-          </div>
-          <input type="number" class="overflow-input" id="ladiesOverflow" min="6" max="30" placeholder="नक्की संख्या टाका (Enter exact number)">
-        </div>
-        <div class="person-blocks" id="ladiesBlocks"></div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">ठिकाण <span class="eng">(Location)</span></div>
-        <div class="field" id="field-pincode">
-          <label>तुमचा पिनकोड काय आहे? <span class="eng">(What is your PIN code?)</span><span class="req">*</span></label>
-          <input type="text" id="pincode" inputmode="numeric" maxlength="6" placeholder="उदा. 533450 (e.g. 533450)" required>
-          <div class="hint">6 अंकी पिनकोड टाका (Enter your 6-digit postal PIN code)</div>
-          <div class="error-text">कृपया वैध 6 अंकी पिनकोड टाका (Please enter a valid 6-digit PIN code).</div>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">निवास <span class="eng">(Accommodation)</span></div>
-        <div class="field" id="field-accom">
-          <div class="radio-group" id="accomGroup">
-            <label class="radio-option" data-value="free">
-              <input type="radio" name="accom" value="free">
-              <span class="opt-text"><strong>Yes, we want free accommodation provided by Devasthanam</strong><span>Limited availability only</span></span>
-            </label>
-            <label class="radio-option" data-value="own">
-              <input type="radio" name="accom" value="own">
-              <span class="opt-text"><strong>No, we will arrange our stay ourselves</strong><span>No accommodation needed from Devasthanam</span></span>
-            </label>
-          </div>
-          <div class="error-text">कृपया निवास पर्याय निवडा (Please select an accommodation option).</div>
-        </div>
-      </div>
+<div id="languageScreen" class="language-screen">
+  <div class="language-card">
+    <h1 class="language-title">Choose Your Language</h1>
+    <p class="language-subtitle">नोंदणी करण्यासाठी भाषा निवडा</p>
+    <div class="language-grid">
+      <button type="button" class="language-btn marathi" data-language="mr">
+        <span class="big">मराठी</span>
+        <span class="small">मराठीत फॉर्म भरा</span>
+      </button>
+      <button type="button" class="language-btn english" data-language="en">
+        <span class="big">English</span>
+        <span class="small">Fill the form in English</span>
+      </button>
     </div>
-    <button type="submit" class="submit-btn" id="submitBtn">नोंदणी सबमिट करा (Submit Registration)</button>
-  </form>
-  <div id="statusBox">
-    <div id="statusIcon">✓</div>
-    <h2 id="statusTitle">नोंदणी यशस्वी (Registration Successful)</h2>
-    <p id="statusMsg">धन्यवाद! आम्ही तुमची वाट पाहत आहोत.</p>
   </div>
-  <footer>श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण · Pithapuram, 2026</footer>
 </div>
+
+<div id="app" class="page" style="display:none;">
+  <header>
+    <h1 id="headerTitle"></h1>
+    <p id="headerSubtitle"></p>
+    <div class="dates" id="headerDates"></div>
+  </header>
+  <div class="container">
+    <form id="regForm" novalidate>
+      <div id="formBody">
+        <div class="section">
+          <div class="section-title" id="countSectionTitle"></div>
+          <div class="field">
+            <label id="countLabel" for="participantCount"></label>
+            <div class="count-pills" id="countPills"></div>
+          </div>
+          <div class="person-blocks" id="participantBlocks"></div>
+          <div class="inline-error" id="participantError"></div>
+        </div>
+
+        <div class="section">
+          <div class="section-title" id="locationSectionTitle"></div>
+          <div class="field" id="field-pincode">
+            <label id="pincodeLabel" for="pincode"></label>
+            <input type="text" id="pincode" inputmode="numeric" maxlength="6" required>
+            <div class="hint" id="pincodeHint"></div>
+            <div class="error-text" id="pincodeError"></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title" id="accomSectionTitle"></div>
+          <div class="field" id="field-accom">
+            <div class="radio-group" id="accomGroup"></div>
+            <div class="error-text" id="accomError"></div>
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="submit-btn" id="submitBtn"></button>
+    </form>
+
+    <div id="statusBox">
+      <div id="statusIcon">✓</div>
+      <h2 id="statusTitle"></h2>
+      <p id="statusMsg"></p>
+    </div>
+    <footer id="footerText"></footer>
+  </div>
+</div>
+
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTkXBHASxYiSdqjy1eyYQASuqgDY-qvABIwISYEyOaKg8Bvg8H1WsVAOT7CWo78dat/exec";
 const REQUEST_TIMEOUT_MS = 15000;
-let counts = { gents: 0, ladies: 0 };
+const MAX_PARTICIPANTS = 6;
+let currentLanguage = "";
+let participantCount = 0;
 
-function setupPills(type){
-  const container = document.getElementById(type + 'Pills');
-  const overflow = document.getElementById(type + 'Overflow');
-  container.querySelectorAll('.count-pill').forEach(pill=>{
-    pill.addEventListener('click', ()=>{
-      container.querySelectorAll('.count-pill').forEach(p=>p.classList.remove('selected'));
-      pill.classList.add('selected');
-      const val = pill.dataset.val;
-      if(val === '6+'){
-        overflow.style.display = 'block';
-        overflow.required = true;
-        overflow.focus();
-        counts[type] = parseInt(overflow.value, 10) || 6;
-      } else {
-        overflow.style.display = 'none';
-        overflow.required = false;
-        overflow.value = '';
-        counts[type] = parseInt(val, 10);
-      }
-      renderBlocks(type);
+const TEXTS = {
+  en: {
+    pageTitle: "Shripad Shrivallabh Charitamrut Samohik Parayan",
+    headerTitle: "Shripad Shrivallabh Charitamrut Samohik Parayan",
+    headerSubtitle: "Pithapuram Registration Form",
+    headerDates: "21 - 22 - 23 November",
+    countSectionTitle: "Participants",
+    countLabel: "How many people are participating? *",
+    personTitle: "Participant",
+    namePlaceholder: "Full Name",
+    agePlaceholder: "Age",
+    mobilePlaceholder: "Mobile Number",
+    genderMale: "Male",
+    genderFemale: "Female",
+    participantError: "Please add at least 1 participant and complete all details.",
+    locationSectionTitle: "Location",
+    pincodeLabel: "What is your PIN code? *",
+    pincodePlaceholder: "e.g. 533450",
+    pincodeHint: "Enter your 6-digit postal PIN code.",
+    pincodeError: "Please enter a valid 6-digit PIN code.",
+    accomSectionTitle: "Accommodation",
+    accomError: "Please select an accommodation option.",
+    accomFreeTitle: "Yes, we want free accommodation from Devasthanam",
+    accomFreeHint: "Limited availability only",
+    accomOwnTitle: "No, we will arrange our stay ourselves",
+    accomOwnHint: "No accommodation needed from Devasthanam",
+    submit: "Submit Registration",
+    submitting: "Submitting...",
+    successTitle: "Registration Successful",
+    successMessage: "Thank you. Registration completed for {count} participant(s). Submission Number: {submissionId}",
+    successMessageRetry: "Registration was saved. Registration completed for {count} participant(s). Submission Number: {submissionId}",
+    failureTitle: "Submission Failed",
+    failureMessage: "The submission could not be confirmed. Please try again.",
+    footer: "Shripad Shrivallabh Charitamrut Samohik Parayan · Pithapuram, 2026"
+  },
+  mr: {
+    pageTitle: "\u0936\u094d\u0930\u0940\u092a\u093e\u0926 \u0936\u094d\u0930\u0940\u0935\u0932\u094d\u0932\u092d \u091a\u0930\u093f\u0924\u093e\u092e\u0943\u0924 \u0938\u093e\u092e\u0942\u0939\u093f\u0915 \u092a\u093e\u0930\u093e\u092f\u0923",
+    headerTitle: "\u0936\u094d\u0930\u0940\u092a\u093e\u0926 \u0936\u094d\u0930\u0940\u0935\u0932\u094d\u0932\u092d \u091a\u0930\u093f\u0924\u093e\u092e\u0943\u0924 \u0938\u093e\u092e\u0942\u0939\u093f\u0915 \u092a\u093e\u0930\u093e\u092f\u0923",
+    headerSubtitle: "\u092a\u093f\u0920\u093e\u092a\u0941\u0930\u092e \u0928\u094b\u0902\u0926\u0923\u0940 \u092b\u0949\u0930\u094d\u092e",
+    headerDates: "21 - 22 - 23 \u0928\u094b\u0935\u094d\u0939\u0947\u0902\u092c\u0930",
+    countSectionTitle: "\u0938\u0939\u092d\u093e\u0917\u0940",
+    countLabel: "\u0915\u093f\u0924\u0940 \u091c\u0923 \u0938\u0939\u092d\u093e\u0917\u0940 \u0906\u0939\u0947\u0924? *",
+    personTitle: "\u0938\u0939\u092d\u093e\u0917\u0940",
+    namePlaceholder: "\u092a\u0942\u0930\u094d\u0923 \u0928\u093e\u0935",
+    agePlaceholder: "\u0935\u092f",
+    mobilePlaceholder: "\u092e\u094b\u092c\u093e\u0908\u0932 \u0915\u094d\u0930\u092e\u093e\u0902\u0915",
+    genderMale: "\u092a\u0941\u0930\u0941\u0937",
+    genderFemale: "\u0938\u094d\u0924\u094d\u0930\u0940",
+    participantError: "\u0915\u0943\u092a\u092f\u093e \u0915\u092e\u0940\u0924 \u0915\u092e\u0940 1 \u0938\u0939\u092d\u093e\u0917\u0940 \u092d\u0930\u093e \u0906\u0923\u093f \u0938\u0930\u094d\u0935 \u092e\u093e\u0939\u093f\u0924\u0940 \u092a\u0942\u0930\u094d\u0923 \u0915\u0930\u093e.",
+    locationSectionTitle: "\u0920\u093f\u0915\u093e\u0923",
+    pincodeLabel: "\u0924\u0941\u092e\u091a\u093e \u092a\u093f\u0928\u0915\u094b\u0921 \u0915\u093e\u092f \u0906\u0939\u0947? *",
+    pincodePlaceholder: "\u0909\u0926\u093e. 533450",
+    pincodeHint: "6 \u0905\u0902\u0915\u0940 \u092a\u093f\u0928\u0915\u094b\u0921 \u091f\u093e\u0915\u093e.",
+    pincodeError: "\u0915\u0943\u092a\u092f\u093e \u0935\u0948\u0927 6 \u0905\u0902\u0915\u0940 \u092a\u093f\u0928\u0915\u094b\u0921 \u091f\u093e\u0915\u093e.",
+    accomSectionTitle: "\u0928\u093f\u0935\u093e\u0938",
+    accomError: "\u0915\u0943\u092a\u092f\u093e \u0928\u093f\u0935\u093e\u0938 \u092a\u0930\u094d\u092f\u093e\u092f \u0928\u093f\u0935\u0921\u093e.",
+    accomFreeTitle: "\u0939\u094b\u092f, \u0906\u092e\u094d\u0939\u093e\u0932\u093e \u0926\u0947\u0935\u0938\u094d\u0925\u093e\u0928\u0915\u0921\u0942\u0928 \u092e\u094b\u092b\u0924 \u0928\u093f\u0935\u093e\u0938 \u0939\u0935\u093e \u0906\u0939\u0947",
+    accomFreeHint: "\u092e\u0930\u094d\u092f\u093e\u0926\u093f\u0924 \u091c\u093e\u0917\u093e \u0909\u092a\u0932\u092c\u094d\u0927",
+    accomOwnTitle: "\u0928\u093e\u0939\u0940, \u0906\u092e\u0940 \u0906\u092e\u091a\u0940 \u0935\u094d\u092f\u0935\u0938\u094d\u0925\u093e \u0938\u094d\u0935\u0924\u0903 \u0915\u0930\u0942",
+    accomOwnHint: "\u0926\u0947\u0935\u0938\u094d\u0925\u093e\u0928\u0915\u0921\u0942\u0928 \u0928\u093f\u0935\u093e\u0938 \u0928\u0915\u094b",
+    submit: "\u0928\u094b\u0902\u0926\u0923\u0940 \u0938\u092c\u092e\u093f\u091f \u0915\u0930\u093e",
+    submitting: "\u0938\u092c\u092e\u093f\u091f \u0915\u0930\u0924 \u0906\u0939\u0947...",
+    successTitle: "\u0928\u094b\u0902\u0926\u0923\u0940 \u092f\u0936\u0938\u094d\u0935\u0940",
+    successMessage: "\u0927\u0928\u094d\u092f\u0935\u093e\u0926. {count} \u0938\u0939\u092d\u093e\u0917\u0940\u0902\u091a\u0940 \u0928\u094b\u0902\u0926\u0923\u0940 \u092a\u0942\u0930\u094d\u0923 \u091d\u093e\u0932\u0940. \u0938\u092c\u092e\u093f\u0936\u0928 \u0915\u094d\u0930\u092e\u093e\u0902\u0915: {submissionId}",
+    successMessageRetry: "\u0928\u094b\u0902\u0926\u0923\u0940 \u091c\u0924\u0928 \u091d\u093e\u0932\u0940 \u0906\u0939\u0947. {count} \u0938\u0939\u092d\u093e\u0917\u0940\u0902\u091a\u0940 \u0928\u094b\u0902\u0926\u0923\u0940 \u092a\u0942\u0930\u094d\u0923 \u091d\u093e\u0932\u0940. \u0938\u092c\u092e\u093f\u0936\u0928 \u0915\u094d\u0930\u092e\u093e\u0902\u0915: {submissionId}",
+    failureTitle: "\u0938\u092c\u092e\u093f\u0936\u0928 \u0905\u092f\u0936\u0938\u094d\u0935\u0940",
+    failureMessage: "\u0938\u092c\u092e\u093f\u0936\u0928 \u0916\u093e\u0924\u094d\u0930\u0940\u0936\u0940\u0930 \u0939\u094b\u090a \u0936\u0915\u0932\u0947 \u0928\u093e\u0939\u0940. \u0915\u0943\u092a\u092f\u093e \u092a\u0941\u0928\u094d\u0939\u093e \u092a\u094d\u0930\u092f\u0924\u094d\u0928 \u0915\u0930\u093e.",
+    footer: "\u0936\u094d\u0930\u0940\u092a\u093e\u0926 \u0936\u094d\u0930\u0940\u0935\u0932\u094d\u0932\u092d \u091a\u0930\u093f\u0924\u093e\u092e\u0943\u0924 \u0938\u093e\u092e\u0942\u0939\u093f\u0915 \u092a\u093e\u0930\u093e\u092f\u0923 \u00b7 \u092a\u093f\u0920\u093e\u092a\u0941\u0930\u092e, 2026"
+  }
+};
+
+document.querySelectorAll(".language-btn").forEach(function(button){
+  button.addEventListener("click", function(){
+    selectLanguage(button.dataset.language);
+  });
+});
+
+document.getElementById("regForm").addEventListener("submit", handleSubmit);
+
+function selectLanguage(language){
+  currentLanguage = language;
+  document.getElementById("languageScreen").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  applyLanguage();
+  renderCountPills();
+  renderParticipantBlocks();
+}
+
+function t(key){
+  return TEXTS[currentLanguage][key];
+}
+
+function applyLanguage(){
+  document.documentElement.lang = currentLanguage === "mr" ? "mr" : "en";
+  document.title = t("pageTitle");
+  document.getElementById("headerTitle").textContent = t("headerTitle");
+  document.getElementById("headerSubtitle").textContent = t("headerSubtitle");
+  document.getElementById("headerDates").textContent = t("headerDates");
+  document.getElementById("countSectionTitle").textContent = t("countSectionTitle");
+  document.getElementById("countLabel").textContent = t("countLabel");
+  document.getElementById("participantError").textContent = t("participantError");
+  document.getElementById("locationSectionTitle").textContent = t("locationSectionTitle");
+  document.getElementById("pincodeLabel").textContent = t("pincodeLabel");
+  document.getElementById("pincode").placeholder = t("pincodePlaceholder");
+  document.getElementById("pincodeHint").textContent = t("pincodeHint");
+  document.getElementById("pincodeError").textContent = t("pincodeError");
+  document.getElementById("accomSectionTitle").textContent = t("accomSectionTitle");
+  document.getElementById("accomError").textContent = t("accomError");
+  document.getElementById("submitBtn").textContent = t("submit");
+  document.getElementById("footerText").textContent = t("footer");
+  renderAccommodationOptions();
+}
+
+function renderCountPills(){
+  const container = document.getElementById("countPills");
+  container.innerHTML = "";
+  for(let i = 1; i <= MAX_PARTICIPANTS; i++){
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "count-pill" + (participantCount === i ? " selected" : "");
+    button.textContent = String(i);
+    button.addEventListener("click", function(){
+      participantCount = i;
+      renderCountPills();
+      renderParticipantBlocks();
+      document.getElementById("participantError").classList.remove("show");
+    });
+    container.appendChild(button);
+  }
+}
+
+function renderParticipantBlocks(){
+  const container = document.getElementById("participantBlocks");
+  const existing = [];
+  container.querySelectorAll(".person-card").forEach(function(card){
+    existing.push({
+      name: card.querySelector(".p-name").value,
+      age: card.querySelector(".p-age").value,
+      mobile: card.querySelector(".p-mobile").value,
+      gender: (card.querySelector('input[type="radio"]:checked') || {}).value || ""
     });
   });
-  overflow.addEventListener('input', ()=>{
-    let v = parseInt(overflow.value, 10) || 0;
-    if(v < 6) v = 6;
-    if(v > 30) v = 30;
-    counts[type] = v;
-    renderBlocks(type);
+  container.innerHTML = "";
+  for(let i = 0; i < participantCount; i++){
+    const value = existing[i] || { name: "", age: "", mobile: "", gender: "" };
+    const card = document.createElement("div");
+    card.className = "person-card";
+    card.innerHTML =
+      '<div class="p-title">' + t("personTitle") + " " + (i + 1) + "</div>" +
+      '<div class="person-grid">' +
+        '<input type="text" class="p-name" placeholder="' + escapeHtml(t("namePlaceholder")) + '" value="' + escapeHtml(value.name) + '" required>' +
+        '<input type="number" class="p-age" placeholder="' + escapeHtml(t("agePlaceholder")) + '" value="' + escapeHtml(value.age) + '" min="0" max="120" required>' +
+        '<input type="tel" class="p-mobile" placeholder="' + escapeHtml(t("mobilePlaceholder")) + '" value="' + escapeHtml(value.mobile) + '" required>' +
+      '</div>' +
+      '<div class="gender-group" style="margin-top:10px;">' +
+        renderGenderOption(i, "male", t("genderMale"), value.gender === "male") +
+        renderGenderOption(i, "female", t("genderFemale"), value.gender === "female") +
+      "</div>";
+    container.appendChild(card);
+    attachCardEvents(card);
+  }
+}
+
+function renderGenderOption(index, value, label, selected){
+  return '<label class="gender-option' + (selected ? " selected" : "") + '">' +
+    '<input type="radio" name="gender_' + index + '" value="' + value + '"' + (selected ? " checked" : "") + ">" +
+    '<span class="option-text"><strong>' + escapeHtml(label) + "</strong></span>" +
+  "</label>";
+}
+
+function attachCardEvents(card){
+  card.querySelectorAll(".gender-option").forEach(function(option){
+    option.addEventListener("click", function(){
+      option.parentElement.querySelectorAll(".gender-option").forEach(function(item){ item.classList.remove("selected"); });
+      option.classList.add("selected");
+    });
   });
 }
 
-function renderBlocks(type){
-  const container = document.getElementById(type + 'Blocks');
-  const n = counts[type];
-  const label = type === 'gents' ? 'पुरुष / Gent' : 'स्त्री / Lady';
-  const existing = [];
-  container.querySelectorAll('.person-card').forEach(card=>{
-    existing.push({
-      name: card.querySelector('.p-name').value,
-      age: card.querySelector('.p-age').value,
-      mobile: card.querySelector('.p-mobile').value
+function renderAccommodationOptions(){
+  const group = document.getElementById("accomGroup");
+  const current = document.querySelector('input[name="accom"]:checked');
+  const currentValue = current ? current.value : "";
+  group.innerHTML =
+    renderAccommodationOption("free", t("accomFreeTitle"), t("accomFreeHint"), currentValue === "free") +
+    renderAccommodationOption("own", t("accomOwnTitle"), t("accomOwnHint"), currentValue === "own");
+  group.querySelectorAll(".radio-option").forEach(function(option){
+    option.addEventListener("click", function(){
+      group.querySelectorAll(".radio-option").forEach(function(item){ item.classList.remove("selected"); });
+      option.classList.add("selected");
+      option.querySelector("input").checked = true;
+      document.getElementById("field-accom").classList.remove("invalid");
     });
   });
-  container.innerHTML = '';
-  for(let i = 0; i < n; i++){
-    const vals = existing[i] || {name:'',age:'',mobile:''};
-    const card = document.createElement('div');
-    card.className = 'person-card';
-    card.innerHTML = `
-      <div class="p-title">${label} ${i + 1}</div>
-      <div class="grid-3">
-        <div class="full"><input type="text" class="p-name" placeholder="पूर्ण नाव (Full Name)" value="${escapeHtml(vals.name)}" required></div>
-        <div><input type="number" class="p-age" placeholder="वय (Age)" min="0" max="120" value="${escapeHtml(vals.age)}" required></div>
-        <div><input type="tel" class="p-mobile" placeholder="मोबाईल (Mobile)" value="${escapeHtml(vals.mobile)}" required></div>
-      </div>
-    `;
-    container.appendChild(card);
-  }
+}
+
+function renderAccommodationOption(value, title, hint, selected){
+  return '<label class="radio-option' + (selected ? " selected" : "") + '">' +
+    '<input type="radio" name="accom" value="' + value + '"' + (selected ? " checked" : "") + ">" +
+    '<span class="option-text"><strong>' + escapeHtml(title) + "</strong><span>" + escapeHtml(hint) + "</span></span>" +
+  "</label>";
 }
 
 function validate(){
   let valid = true;
-  const pinField = document.getElementById('field-pincode');
-  const pinVal = document.getElementById('pincode').value.trim();
-  if(!/^\d{6}$/.test(pinVal)){ pinField.classList.add('invalid'); valid = false; } else { pinField.classList.remove('invalid'); }
-  if(counts.gents === 0 && counts.ladies === 0){ alert('किमान १ पुरुष किंवा स्त्री जोडा.'); valid = false; }
-  ['gents','ladies'].forEach(type=>{
-    document.querySelectorAll(`#${type}Blocks .person-card`).forEach(card=>{
-      const name = card.querySelector('.p-name');
-      const age = card.querySelector('.p-age');
-      const mobile = card.querySelector('.p-mobile');
-      [name, age, mobile].forEach(inp=>{
-        if(!inp.value.trim()){ inp.style.borderColor = '#c0392b'; valid = false; } else { inp.style.borderColor = ''; }
-      });
+  const participantError = document.getElementById("participantError");
+  participantError.classList.remove("show");
+
+  if(participantCount < 1){
+    participantError.classList.add("show");
+    valid = false;
+  }
+
+  document.querySelectorAll(".person-card").forEach(function(card){
+    const name = card.querySelector(".p-name");
+    const age = card.querySelector(".p-age");
+    const mobile = card.querySelector(".p-mobile");
+    const gender = card.querySelector('input[type="radio"]:checked');
+    [name, age, mobile].forEach(function(input){
+      if(!input.value.trim()){
+        input.style.borderColor = "#c0392b";
+        valid = false;
+      } else {
+        input.style.borderColor = "";
+      }
     });
+    card.querySelectorAll(".gender-option").forEach(function(option){
+      option.style.borderColor = "";
+    });
+    if(!gender){
+      card.querySelectorAll(".gender-option").forEach(function(option){
+        option.style.borderColor = "#c0392b";
+      });
+      valid = false;
+    }
   });
-  const accomField = document.getElementById('field-accom');
+
+  if(!valid && participantCount > 0) participantError.classList.add("show");
+
+  const pinField = document.getElementById("field-pincode");
+  const pinValue = document.getElementById("pincode").value.trim();
+  if(!/^\d{6}$/.test(pinValue)){
+    pinField.classList.add("invalid");
+    valid = false;
+  } else {
+    pinField.classList.remove("invalid");
+  }
+
+  const accomField = document.getElementById("field-accom");
   const accomChecked = document.querySelector('input[name="accom"]:checked');
-  if(!accomChecked){ accomField.classList.add('invalid'); valid = false; } else { accomField.classList.remove('invalid'); }
+  if(!accomChecked){
+    accomField.classList.add("invalid");
+    valid = false;
+  } else {
+    accomField.classList.remove("invalid");
+  }
+
   return valid;
 }
 
-function showSuccess(totalPeople, verifiedAfterRetry = false, submissionId = ''){
-  document.getElementById('formBody').parentElement.style.display = 'none';
-  document.getElementById('submitBtn').style.display = 'none';
-  const statusBox = document.getElementById('statusBox');
-  statusBox.classList.add('show');
-  statusBox.classList.remove('error');
-  document.getElementById('statusIcon').textContent = '✓';
-  document.getElementById('statusTitle').textContent = 'नोंदणी यशस्वी (Registration Successful)';
-  document.getElementById('statusMsg').textContent = verifiedAfterRetry
-    ? `नोंदणी जतन झाली आहे. ${totalPeople} सदस्यांची नोंदणी झाली. Reference ID: ${submissionId}`
-    : `धन्यवाद! ${totalPeople} सदस्यांची नोंदणी झाली. Reference ID: ${submissionId}`;
-}
-
-async function verifySubmission(submissionId){
-  try{
-    const res = await fetch(`${SCRIPT_URL}?action=getSubmissionStatus&submissionId=${encodeURIComponent(submissionId)}`);
-    const payload = await res.json();
-    return Boolean(payload && payload.status === 'success' && payload.data && payload.data.exists);
-  }catch(err){
-    return false;
-  }
-}
-
-function escapeHtml(value){
-  return String(value || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-setupPills('gents');
-setupPills('ladies');
-
-document.querySelectorAll('.radio-option').forEach(opt=>{
-  opt.addEventListener('click', ()=>{
-    document.querySelectorAll('.radio-option').forEach(o=>o.classList.remove('selected'));
-    opt.classList.add('selected');
-    opt.querySelector('input').checked = true;
-    document.getElementById('field-accom').classList.remove('invalid');
+function collectParticipants(){
+  const participants = [];
+  document.querySelectorAll(".person-card").forEach(function(card){
+    participants.push({
+      name: card.querySelector(".p-name").value.trim(),
+      age: card.querySelector(".p-age").value.trim(),
+      mobile: card.querySelector(".p-mobile").value.trim(),
+      gender: card.querySelector('input[type="radio"]:checked').value
+    });
   });
-});
+  return participants;
+}
 
-document.getElementById('regForm').addEventListener('submit', async function(e){
-  e.preventDefault();
+async function handleSubmit(event){
+  event.preventDefault();
   if(!validate()) return;
-  const submitBtn = document.getElementById('submitBtn');
+
+  const submitBtn = document.getElementById("submitBtn");
   submitBtn.disabled = true;
-  submitBtn.innerHTML = '<span class="spinner"></span>सबमिट करत आहे...';
+  submitBtn.innerHTML = '<span class="spinner"></span>' + escapeHtml(t("submitting"));
 
-  const gents = [];
-  document.querySelectorAll('#gentsBlocks .person-card').forEach(card=>{
-    gents.push({
-      name: card.querySelector('.p-name').value.trim(),
-      age: card.querySelector('.p-age').value.trim(),
-      mobile: card.querySelector('.p-mobile').value.trim()
-    });
-  });
-  const ladies = [];
-  document.querySelectorAll('#ladiesBlocks .person-card').forEach(card=>{
-    ladies.push({
-      name: card.querySelector('.p-name').value.trim(),
-      age: card.querySelector('.p-age').value.trim(),
-      mobile: card.querySelector('.p-mobile').value.trim()
-    });
-  });
-
-  const submissionId = `sub_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+  const participants = collectParticipants();
+  const submissionId = "sub_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
   const payload = {
-    pincode: document.getElementById('pincode').value.trim(),
-    gentsCount: counts.gents,
-    ladiesCount: counts.ladies,
-    gents: gents,
-    ladies: ladies,
+    participants: participants,
+    pincode: document.getElementById("pincode").value.trim(),
     accommodation: document.querySelector('input[name="accom"]:checked').value,
     timestamp: new Date().toISOString(),
-    submissionId: submissionId
+    submissionId: submissionId,
+    formLanguage: currentLanguage
   };
 
   try{
     const controller = new AbortController();
-    const timeoutId = setTimeout(()=>controller.abort(), REQUEST_TIMEOUT_MS);
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: {'Content-Type':'text/plain;charset=utf-8'},
+    const timeoutId = setTimeout(function(){ controller.abort(); }, REQUEST_TIMEOUT_MS);
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload),
       signal: controller.signal
     });
     clearTimeout(timeoutId);
-    const result = await res.json();
-    if(result.status === 'success'){
-      showSuccess(counts.gents + counts.ladies, false, submissionId);
-    } else {
-      throw new Error(result.message || 'Unknown error');
-    }
-  }catch(err){
+    const result = await response.json();
+    if(result.status !== "success") throw new Error(result.message || "Submission failed");
+    showSuccess(participants.length, false, submissionId);
+  }catch(error){
     const verified = await verifySubmission(submissionId);
     if(verified){
-      showSuccess(counts.gents + counts.ladies, true, submissionId);
+      showSuccess(participants.length, true, submissionId);
       return;
     }
     submitBtn.disabled = false;
-    submitBtn.innerHTML = 'नोंदणी सबमिट करा (Submit Registration)';
-    const statusBox = document.getElementById('statusBox');
-    statusBox.classList.add('show','error');
-    document.getElementById('statusIcon').textContent = '✕';
-    document.getElementById('statusTitle').textContent = 'त्रुटी (Submission Failed)';
-    document.getElementById('statusMsg').textContent = 'सबमिशन पूर्ण झाले नाही. कृपया पुन्हा प्रयत्न करा.';
-    document.querySelector('form').style.display = 'block';
-    setTimeout(()=>{ statusBox.classList.remove('show','error'); }, 3500);
+    submitBtn.textContent = t("submit");
+    showFailure();
   }
-});
+}
+
+async function verifySubmission(submissionId){
+  try{
+    const response = await fetch(SCRIPT_URL + "?action=getSubmissionStatus&submissionId=" + encodeURIComponent(submissionId));
+    const payload = await response.json();
+    return Boolean(payload && payload.status === "success" && payload.data && payload.data.exists);
+  }catch(error){
+    return false;
+  }
+}
+
+function showSuccess(count, verifiedAfterRetry, submissionId){
+  document.querySelector("form").style.display = "none";
+  const statusBox = document.getElementById("statusBox");
+  statusBox.classList.add("show");
+  statusBox.classList.remove("error");
+  document.getElementById("statusIcon").textContent = "✓";
+  document.getElementById("statusTitle").textContent = t("successTitle");
+  document.getElementById("statusMsg").textContent = formatMessage(
+    verifiedAfterRetry ? t("successMessageRetry") : t("successMessage"),
+    { count: count, submissionId: submissionId }
+  );
+}
+
+function showFailure(){
+  const statusBox = document.getElementById("statusBox");
+  statusBox.classList.add("show", "error");
+  document.getElementById("statusIcon").textContent = "✕";
+  document.getElementById("statusTitle").textContent = t("failureTitle");
+  document.getElementById("statusMsg").textContent = t("failureMessage");
+  setTimeout(function(){
+    statusBox.classList.remove("show", "error");
+  }, 3500);
+}
+
+function formatMessage(template, values){
+  return template.replace(/\{(\w+)\}/g, function(_, key){
+    return values[key] !== undefined ? values[key] : "";
+  });
+}
+
+function escapeHtml(value){
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
 </script>
 </body>
 </html>
-
