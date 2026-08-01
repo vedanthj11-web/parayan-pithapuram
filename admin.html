@@ -469,7 +469,7 @@
             <select id="cityFilter"></select>
           </div>
           <div class="filter-group">
-            <label>Submission ID</label>
+            <label>Submission Number</label>
             <select id="submissionFilter"></select>
           </div>
           <div class="filter-group">
@@ -497,7 +497,7 @@
                 <th>City</th>
                 <th>Accommodation</th>
                 <th>Status</th>
-                <th>Submission ID</th>
+                <th>Submission Number</th>
               </tr>
             </thead>
             <tbody id="dataTableBody"></tbody>
@@ -519,7 +519,7 @@
       <div class="detail-card"><div class="detail-label">City</div><div class="detail-value" id="modalCity"></div></div>
       <div class="detail-card"><div class="detail-label">Accommodation</div><div class="detail-value" id="modalAccommodation"></div></div>
       <div class="detail-card"><div class="detail-label">Status</div><div class="detail-value" id="modalStatus"></div></div>
-      <div class="detail-card full"><div class="detail-label">Submission ID</div><div class="detail-value" id="modalSubmissionId"></div></div>
+      <div class="detail-card full"><div class="detail-label">Submission Number</div><div class="detail-value" id="modalSubmissionId"></div></div>
       <div class="detail-card full"><div class="detail-label">Person ID</div><div class="detail-value" id="modalPersonId"></div></div>
     </div>
     <div class="modal-actions">
@@ -637,7 +637,7 @@ async function loadTranslatedRows(){
   const response = await fetch(SCRIPT_URL + "?" + query);
   const payload = await response.json();
   if(payload.status !== "success") throw new Error(payload.message || "Could not load rows");
-  rawRows = Array.isArray(payload.data) ? payload.data : [];
+  rawRows = Array.isArray(payload.data) ? payload.data.map(normalizeRowShape) : [];
 }
 
 function setLoadingState(isLoading){
@@ -650,7 +650,7 @@ function setLoadingState(isLoading){
 
 function populateDropdowns(rows){
   setSelectOptions(cityFilter, "All Cities", uniqueSorted(rows.map(function(row){ return row["City (from PIN)"]; })));
-  setSelectOptions(submissionFilter, "All Submission IDs", uniqueSorted(rows.map(function(row){ return row["Submission ID"]; })));
+  setSelectOptions(submissionFilter, "All Submission Numbers", uniqueSorted(rows.map(function(row){ return row["Submission ID"]; })));
   setSelectOptions(accommodationFilter, "All Accommodation", uniqueSorted(rows.map(function(row){ return formatAccommodation(row["Accommodation"]); })));
   cityFilter.value = filters.city;
   submissionFilter.value = filters.submissionId;
@@ -780,7 +780,7 @@ function renderTable(rows){
   rows.forEach(function(row, index){
     const tr = document.createElement("tr");
     tr.innerHTML =
-      "<td>" + safeCell(index + 1) + "</td>" +
+      "<td>" + safeCell(row["_serial"] || index + 1) + "</td>" +
       "<td>" + safeCell(row["Name"]) + "</td>" +
       "<td>" + safeCell(formatGender(row["Type"])) + "</td>" +
       "<td>" + safeCell(row["Age"]) + "</td>" +
@@ -814,7 +814,7 @@ function closeUserModal(){
 }
 
 async function updateSelectedStatus(nextStatus){
-  if(!selectedRow || !selectedRow["Person ID"]) return;
+  if(!selectedRow) return;
   try{
     const response = await fetch(SCRIPT_URL, {
       method: "POST",
@@ -822,6 +822,7 @@ async function updateSelectedStatus(nextStatus){
       body: JSON.stringify({
         action: "updateStatus",
         personId: selectedRow["Person ID"],
+        rowNumber: selectedRow["_rowNumber"],
         nextStatus: nextStatus
       })
     });
@@ -839,10 +840,10 @@ function downloadExcel(){
     alert("No data available for export.");
     return;
   }
-  const header = ["Sr. No.","Name","Gender","Age","Mobile Number","City","Accommodation","Status","Submission ID"];
+  const header = ["Sr. No.","Name","Gender","Age","Mobile Number","City","Accommodation","Status","Submission Number"];
   const htmlRows = displayedRows.map(function(row, index){
     const cells = [
-      index + 1,
+      row["_serial"] || index + 1,
       row["Name"],
       formatGender(row["Type"]),
       row["Age"],
@@ -884,6 +885,44 @@ function uniqueSorted(values){
   });
 }
 
+function normalizeRowShape(row){
+  const normalized = Object.assign({}, row);
+  if(
+    !String(normalized["Submission ID"] || "").trim() &&
+    looksLikeSubmissionNumber(normalized["Accommodation"]) &&
+    looksLikeAccommodation(normalized["Mobile Number"])
+  ){
+    normalized["Submission ID"] = String(normalized["Accommodation"] || "");
+    normalized["Accommodation"] = String(normalized["Mobile Number"] || "");
+    normalized["Mobile Number"] = String(normalized["Age"] || "");
+    normalized["Age"] = String(normalized["Name"] || "");
+    normalized["Name"] = String(normalized["Person ID"] || "");
+    normalized["Person ID"] = buildPersonId(normalized);
+  }
+  if(!looksLikePersonId(normalized["Person ID"]) && String(normalized["Submission ID"] || "").trim()){
+    normalized["Person ID"] = buildPersonId(normalized);
+  }
+  return normalized;
+}
+
+function buildPersonId(row){
+  return String(row["Submission ID"] || "") + "_" + String(row["Type"] || "") + "_" + String(row["Person No."] || "");
+}
+
+function looksLikeSubmissionNumber(value){
+  const text = String(value || "").trim();
+  return /^sub_/i.test(text) || /^\d{4}-\d{2}-\d{2}t/i.test(text.toLowerCase()) || /_/.test(text);
+}
+
+function looksLikePersonId(value){
+  return /_(Gent|Lady)_/i.test(String(value || "").trim());
+}
+
+function looksLikeAccommodation(value){
+  const text = String(value || "").trim().toLowerCase();
+  return text === "free" || text === "own";
+}
+
 function normalizeStatus(value){
   return String(value || "").toLowerCase() === "inactive" ? "inactive" : "active";
 }
@@ -911,6 +950,9 @@ function safeCell(value){
     .replace(/'/g, "&#39;");
 }
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
