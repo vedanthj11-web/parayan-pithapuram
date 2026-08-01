@@ -738,6 +738,17 @@ function splitParticipantsByGender(participants){
   return result;
 }
 
+function currentResolvedLocationFor(pincode){
+  if(resolvedLocation && resolvedLocation._pincode === pincode){
+    return {
+      city: resolvedLocation.city || "",
+      district: resolvedLocation.district || "",
+      state: resolvedLocation.state || ""
+    };
+  }
+  return { city: "", district: "", state: "" };
+}
+
 async function handleSubmit(event){
   event.preventDefault();
   if(!validate()) return;
@@ -750,7 +761,6 @@ async function handleSubmit(event){
   const grouped = splitParticipantsByGender(participants);
   const submissionId = "sub_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
   const pincode = document.getElementById("pincode").value.trim();
-  await prefetchLocation(pincode);
   const requestTimestamp = new Date().toISOString();
   const payload = {
     participants: participants,
@@ -763,7 +773,7 @@ async function handleSubmit(event){
     timestamp: requestTimestamp,
     submissionId: submissionId,
     formLanguage: currentLanguage,
-    location: resolvedLocation
+    location: currentResolvedLocationFor(pincode)
   };
 
   try{
@@ -778,11 +788,12 @@ async function handleSubmit(event){
     clearTimeout(timeoutId);
     const result = await response.json();
     if(result.status !== "success") throw new Error(result.message || "Submission failed");
-    showSuccess(participants.length, false, submissionId);
+    const bookingId = await resolveBookingId_(result, payload);
+    showSuccess(participants.length, false, bookingId || result.submissionNumber || submissionId);
   }catch(error){
-    const verified = await verifySubmission(submissionId, payload);
-    if(verified){
-      showSuccess(participants.length, true, submissionId);
+    const verification = await verifySubmission(submissionId, payload);
+    if(verification.confirmed){
+      showSuccess(participants.length, true, verification.bookingId || submissionId);
       return;
     }
     submitBtn.disabled = false;
@@ -799,7 +810,7 @@ async function prefetchLocation(pincode){
     const payload = await response.json();
     const office = payload && payload[0] && payload[0].Status === "Success" && payload[0].PostOffice && payload[0].PostOffice[0];
     resolvedLocation = office ? {
-      city: office.Block || office.Name || "",
+      city: office.District || office.Block || office.Name || "",
       district: office.District || "",
       state: office.State || "",
       _pincode: pincode
@@ -814,26 +825,28 @@ async function verifySubmission(submissionId, payload){
   for(let attempt = 0; attempt < 4; attempt++){
     try{
       const response = await fetch(SCRIPT_URL + "?action=getSubmissionStatus&submissionId=" + encodeURIComponent(submissionId));
-      const payload = await response.json();
-      if(Boolean(payload && payload.status === "success" && payload.data && payload.data.exists)) return true;
-      if(Boolean(payload && payload.status === "ok")) {
+      const result = await response.json();
+      if(Boolean(result && result.status === "success" && result.data && result.data.exists)) {
+        return { confirmed: true, bookingId: result.data.submissionNumber || "" };
+      }
+      if(Boolean(result && result.status === "ok")) {
         const fallback = await verifySubmissionFromAllData(submissionId, payload);
-        if(fallback) return true;
+        if(fallback.confirmed) return fallback;
       }
     }catch(error){
       const fallback = await verifySubmissionFromAllData(submissionId, payload);
-      if(fallback) return true;
+      if(fallback.confirmed) return fallback;
     }
     await wait(1200);
   }
-  return false;
+  return { confirmed: false, bookingId: "" };
 }
 
 async function verifySubmissionFromAllData(submissionId, payload){
   try{
     const response = await fetch(SCRIPT_URL + "?action=getAllData");
     const result = await response.json();
-    if(!result || result.status !== "success" || !Array.isArray(result.data)) return false;
+    if(!result || result.status !== "success" || !Array.isArray(result.data)) return { confirmed: false, bookingId: "" };
 
     const expectedTimestamp = String(payload && payload.timestamp || "");
     const expectedPincode = String(payload && payload.pincode || "");
@@ -842,9 +855,12 @@ async function verifySubmissionFromAllData(submissionId, payload){
     const firstName = String(firstPerson.name || "").trim().toLowerCase();
     const firstMobile = String(firstPerson.mobile || "").trim();
 
-    if(result.data.some(function(row){
+    const directMatch = result.data.find(function(row){
       return String(row["Submission ID"] || "") === String(submissionId);
-    })) return true;
+    });
+    if(directMatch) {
+      return { confirmed: true, bookingId: String(directMatch["Submission Number"] || "") };
+    }
 
     const matchedRows = result.data.filter(function(row){
       const rowTimestamp = String(row["Timestamp"] || "");
@@ -854,10 +870,20 @@ async function verifySubmissionFromAllData(submissionId, payload){
       return rowTimestamp === expectedTimestamp && rowPincode === expectedPincode && rowName === firstName && rowMobile === firstMobile;
     });
 
-    return matchedRows.length >= expectedPeople.length && expectedPeople.length > 0;
+    if(matchedRows.length >= expectedPeople.length && expectedPeople.length > 0) {
+      return { confirmed: true, bookingId: String(matchedRows[0]["Submission Number"] || "") };
+    }
+    return { confirmed: false, bookingId: "" };
   }catch(error){
-    return false;
+    return { confirmed: false, bookingId: "" };
   }
+}
+
+async function resolveBookingId_(result, payload){
+  if(result && result.submissionNumber) return String(result.submissionNumber);
+  const serverSubmissionId = String(result && result.submissionId || "");
+  const verification = await verifySubmission(serverSubmissionId || payload.submissionId, payload);
+  return verification.bookingId || "";
 }
 
 function showSuccess(count, verifiedAfterRetry, submissionId){
