@@ -883,8 +883,6 @@ function validate(){
     }
   });
 
-  if(errors.length && participantCount > 0) participantError.classList.add("show");
-
   const pinField = document.getElementById("field-pincode");
   const pinValue = document.getElementById("pincode").value.trim();
   if(!pinValue){
@@ -938,6 +936,7 @@ async function handleSubmit(event){
   event.preventDefault();
   const validation = validate();
   if(!validation.isValid){
+    participantError.classList.toggle("show", participantCount < 1);
     showValidationModal(validation.errors, validation.firstInvalidField);
     return;
   }
@@ -1091,3 +1090,4 @@ function escapeHtml(value){
 </script>
 </body>
 </html>
+
