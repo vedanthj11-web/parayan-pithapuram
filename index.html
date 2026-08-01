@@ -410,7 +410,7 @@
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTkXBHASxYiSdqjy1eyYQASuqgDY-qvABIwISYEyOaKg8Bvg8H1WsVAOT7CWo78dat/exec";
-const REQUEST_TIMEOUT_MS = 25000;
+const REQUEST_TIMEOUT_MS = 60000;
 const MAX_PARTICIPANTS = 6;
 let currentLanguage = "";
 let participantCount = 0;
@@ -751,6 +751,7 @@ async function handleSubmit(event){
   const submissionId = "sub_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
   const pincode = document.getElementById("pincode").value.trim();
   await prefetchLocation(pincode);
+  const requestTimestamp = new Date().toISOString();
   const payload = {
     participants: participants,
     gents: grouped.gents,
@@ -759,7 +760,7 @@ async function handleSubmit(event){
     ladiesCount: grouped.ladies.length,
     pincode: pincode,
     accommodation: document.querySelector('input[name="accom"]:checked').value,
-    timestamp: new Date().toISOString(),
+    timestamp: requestTimestamp,
     submissionId: submissionId,
     formLanguage: currentLanguage,
     location: resolvedLocation
@@ -779,7 +780,7 @@ async function handleSubmit(event){
     if(result.status !== "success") throw new Error(result.message || "Submission failed");
     showSuccess(participants.length, false, submissionId);
   }catch(error){
-    const verified = await verifySubmission(submissionId);
+    const verified = await verifySubmission(submissionId, payload);
     if(verified){
       showSuccess(participants.length, true, submissionId);
       return;
@@ -809,30 +810,51 @@ async function prefetchLocation(pincode){
   return resolvedLocation;
 }
 
-async function verifySubmission(submissionId){
+async function verifySubmission(submissionId, payload){
   for(let attempt = 0; attempt < 4; attempt++){
     try{
       const response = await fetch(SCRIPT_URL + "?action=getSubmissionStatus&submissionId=" + encodeURIComponent(submissionId));
       const payload = await response.json();
       if(Boolean(payload && payload.status === "success" && payload.data && payload.data.exists)) return true;
       if(Boolean(payload && payload.status === "ok")) {
-        const fallback = await verifySubmissionFromAllData(submissionId);
+        const fallback = await verifySubmissionFromAllData(submissionId, payload);
         if(fallback) return true;
       }
-    }catch(error){}
+    }catch(error){
+      const fallback = await verifySubmissionFromAllData(submissionId, payload);
+      if(fallback) return true;
+    }
     await wait(1200);
   }
   return false;
 }
 
-async function verifySubmissionFromAllData(submissionId){
+async function verifySubmissionFromAllData(submissionId, payload){
   try{
     const response = await fetch(SCRIPT_URL + "?action=getAllData");
-    const payload = await response.json();
-    if(!payload || payload.status !== "success" || !Array.isArray(payload.data)) return false;
-    return payload.data.some(function(row){
+    const result = await response.json();
+    if(!result || result.status !== "success" || !Array.isArray(result.data)) return false;
+
+    const expectedTimestamp = String(payload && payload.timestamp || "");
+    const expectedPincode = String(payload && payload.pincode || "");
+    const expectedPeople = Array.isArray(payload && payload.participants) ? payload.participants : [];
+    const firstPerson = expectedPeople[0] || {};
+    const firstName = String(firstPerson.name || "").trim().toLowerCase();
+    const firstMobile = String(firstPerson.mobile || "").trim();
+
+    if(result.data.some(function(row){
       return String(row["Submission ID"] || "") === String(submissionId);
+    })) return true;
+
+    const matchedRows = result.data.filter(function(row){
+      const rowTimestamp = String(row["Timestamp"] || "");
+      const rowPincode = String(row["PIN Code"] || "");
+      const rowName = String(row["Name"] || "").trim().toLowerCase();
+      const rowMobile = String(row["Mobile Number"] || "").trim();
+      return rowTimestamp === expectedTimestamp && rowPincode === expectedPincode && rowName === firstName && rowMobile === firstMobile;
     });
+
+    return matchedRows.length >= expectedPeople.length && expectedPeople.length > 0;
   }catch(error){
     return false;
   }
@@ -884,3 +906,4 @@ function escapeHtml(value){
 </script>
 </body>
 </html>
+
