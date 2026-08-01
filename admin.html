@@ -647,7 +647,7 @@ function setLoadingState(isLoading){
 
 function populateDropdowns(rows){
   setSelectOptions(cityFilter, "All Cities", uniqueSorted(rows.map(function(row){ return row["City (from PIN)"]; })));
-  setSelectOptions(submissionFilter, "All Submission Numbers", uniqueSorted(rows.map(function(row){ return row["Submission ID"]; })));
+  setSelectOptions(submissionFilter, "All Submission Numbers", uniqueSorted(rows.map(function(row){ return row["Submission Number"] || row["_submissionNumber"]; })));
   setSelectOptions(accommodationFilter, "All Accommodation", uniqueSorted(rows.map(function(row){ return formatAccommodation(row["Accommodation"]); })));
   cityFilter.value = filters.city;
   submissionFilter.value = filters.submissionId;
@@ -677,7 +677,7 @@ function applyCurrentFilters(){
   displayedRows = rawRows.filter(function(row){
     const status = normalizeStatus(row["Status"]);
     const city = String(row["City (from PIN)"] || "");
-    const submissionId = String(row["Submission ID"] || "");
+    const submissionId = String(row["Submission Number"] || row["_submissionNumber"] || "");
     const accommodation = formatAccommodation(row["Accommodation"]);
     const formLanguage = String(row["Form Language"] || "en").toLowerCase();
     if(filters.status !== "all" && status !== filters.status) return false;
@@ -801,7 +801,7 @@ function openUserModal(row){
   document.getElementById("modalCity").textContent = row["City (from PIN)"] || "-";
   document.getElementById("modalAccommodation").textContent = formatAccommodation(row["Accommodation"]);
   document.getElementById("modalStatus").textContent = capitalize(normalizeStatus(row["Status"]));
-  document.getElementById("modalSubmissionId").textContent = row["Submission ID"] || "-";
+  document.getElementById("modalSubmissionId").textContent = row["Submission Number"] || row["_submissionNumber"] || "-";
   document.getElementById("modalPersonId").textContent = row["Person ID"] || "-";
   document.getElementById("userModal").classList.add("show");
 }
@@ -883,6 +883,9 @@ function uniqueSorted(values){
 
 function normalizeRowShape(row){
   const normalized = Object.assign({}, row);
+  if(normalized["Submission Number"]) {
+    normalized["_submissionNumber"] = normalized["Submission Number"];
+  }
   if(
     !String(normalized["Submission ID"] || "").trim() &&
     looksLikeSubmissionNumber(normalized["Accommodation"]) &&
@@ -906,8 +909,14 @@ function annotateSubmissionNumbers(rows){
   const submissionMap = {};
   let counter = 0;
   rows.slice().reverse().forEach(function(row){
+    const explicitNumber = Number(row["Submission Number"] || row["_submissionNumber"] || 0);
     const submissionId = String(row["Submission ID"] || "").trim();
     if(!submissionId) return;
+    if(explicitNumber){
+      submissionMap[submissionId] = explicitNumber;
+      if(explicitNumber > counter) counter = explicitNumber;
+      return;
+    }
     if(!submissionMap[submissionId]){
       counter += 1;
       submissionMap[submissionId] = counter;
@@ -968,4 +977,3 @@ function safeCell(value){
 
 </body>
 </html>
-
