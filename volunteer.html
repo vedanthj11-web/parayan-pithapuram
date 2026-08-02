@@ -8,23 +8,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Serif:wght@600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --primary:#1f5f74;
-    --primary-dark:#15495a;
-    --accent:#e18d2f;
-    --bg:#eef7fa;
+    --primary:#8c3a14;
+    --primary-dark:#67280d;
+    --accent:#d9822b;
+    --bg:#fff5ea;
     --card:#ffffff;
-    --ink:#20323a;
-    --border:#cfe2ea;
+    --ink:#2f241d;
+    --border:#edd4bc;
     --error:#b33a30;
     --success:#2f7d4f;
   }
   *{box-sizing:border-box;}
-  body{margin:0;font-family:'Poppins','Noto Sans Devanagari',sans-serif;background:linear-gradient(180deg,#eef7fa 0%,#dcedf4 100%);color:var(--ink);}
+  body{margin:0;font-family:'Poppins','Noto Sans Devanagari',sans-serif;background:linear-gradient(180deg,#fff7ef 0%,#f8e3cf 100%);color:var(--ink);}
   .shell{min-height:100vh;padding:20px;}
-  .gate,.panel{width:min(100%,780px);margin:0 auto;background:rgba(255,255,255,.96);border:1px solid var(--border);border-radius:24px;box-shadow:0 20px 48px rgba(21,73,90,.14);}
+  .gate,.panel{width:min(100%,780px);margin:0 auto;background:rgba(255,255,255,.98);border:1px solid var(--border);border-radius:24px;box-shadow:0 20px 48px rgba(103,40,13,.12);}
   .gate{max-width:460px;margin-top:60px;padding:28px;}
   .lang-switch{display:flex;gap:8px;justify-content:flex-end;margin-bottom:14px;}
-  .lang-btn{padding:8px 12px;border-radius:999px;background:#e8f2f6;color:var(--primary-dark);font-weight:700;}
+  .lang-btn{padding:8px 12px;border-radius:999px;background:#f7eadb;color:var(--primary-dark);font-weight:700;}
   .lang-btn.active{background:var(--primary);color:#fff;}
   .gate h1,.header h1{font-family:'Noto Serif','Noto Sans Devanagari',serif;margin:0 0 10px;color:var(--primary-dark);}
   .sub{color:#5b7380;font-size:14px;margin-bottom:18px;}
@@ -32,7 +32,7 @@
   input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(31,95,116,.12);}
   button{font:inherit;border:none;cursor:pointer;}
   .btn{width:100%;padding:14px 16px;border-radius:12px;background:linear-gradient(120deg,var(--primary),var(--primary-dark));color:#fff;font-weight:700;}
-  .btn.secondary{background:#e8f2f6;color:var(--primary-dark);}
+  .btn.secondary{background:#f6e7d7;color:var(--primary-dark);}
   .row{display:flex;gap:12px;flex-wrap:wrap;}
   .panel{display:none;margin-top:20px;overflow:hidden;}
   .header{background:linear-gradient(120deg,var(--primary-dark),var(--primary));padding:24px 24px 28px;color:#eef8fb;text-align:center;}
@@ -44,14 +44,14 @@
   .count-pill{min-height:48px;border-radius:12px;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;cursor:pointer;}
   .count-pill.selected{background:var(--primary);border-color:var(--primary);color:#fff;}
   .person-blocks{display:flex;flex-direction:column;gap:14px;margin-top:16px;}
-  .person-card{padding:14px;border:1.5px solid var(--border);border-radius:14px;background:#f8fcfd;}
-  .person-card.primary{background:linear-gradient(180deg,#ecf7fa 0%,#f8fcfd 100%);border-color:#8ab5c6;}
+  .person-card{padding:14px;border:1.5px solid var(--border);border-radius:14px;background:#fffaf5;}
+  .person-card.primary{background:linear-gradient(180deg,#fff0de 0%,#fffaf5 100%);border-color:#d9a36c;}
   .p-title{font-weight:700;color:var(--primary-dark);margin-bottom:10px;}
   .p-note{display:block;margin-top:4px;font-size:12px;color:#5b7380;font-weight:500;}
   .person-grid{display:grid;grid-template-columns:1fr;gap:10px;}
   .gender-group,.radio-group{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
   .choice{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;background:#fff;cursor:pointer;}
-  .choice.selected{border-color:var(--primary);background:#edf7fa;}
+  .choice.selected{border-color:var(--primary);background:#fff1e1;}
   .choice input{margin-top:2px;accent-color:var(--primary);}
   .choice small{display:block;color:#6c828d;}
   .field{margin-bottom:18px;position:relative;}
@@ -64,11 +64,11 @@
   .suggestion{padding:11px 14px;border-bottom:1px solid #ebf2f6;cursor:pointer;}
   .suggestion:last-child{border-bottom:none;}
   .suggestion.active,.suggestion:hover{background:#edf7fa;}
-  .manual{display:none;padding:14px;border:1px dashed var(--border);border-radius:12px;background:#f9fdfe;margin-top:12px;}
+  .manual{display:none;padding:14px;border:1px dashed var(--border);border-radius:12px;background:#fff8f1;margin-top:12px;}
   .manual.show{display:block;}
   .manual-grid{display:grid;grid-template-columns:1fr;gap:10px;}
   .link-btn{border:none;background:none;padding:0;color:var(--primary);font:inherit;font-weight:600;cursor:pointer;}
-  .footer{width:min(100%,780px);margin:20px auto 0;background:#f7fbfc;border:1px solid var(--border);border-radius:16px;padding:18px;}
+  .footer{width:min(100%,780px);margin:20px auto 0;background:#fff9f3;border:1px solid var(--border);border-radius:16px;padding:18px;}
   .footer h2{margin:0 0 12px;font-size:15px;color:var(--primary-dark);}
   .contact-grid{display:grid;grid-template-columns:1fr;gap:10px 18px;}
   .contact-item a{color:var(--primary-dark);font-weight:700;text-decoration:none;}
@@ -113,7 +113,7 @@
       <p id="agentGreeting" style="margin-top:10px;font-weight:600;"></p>
     </div>
     <div class="content">
-      <form id="regForm" novalidate>
+      <form id="regForm" novalidate autocomplete="off">
         <div class="section">
           <div class="section-title" id="countSectionTitle"></div>
           <label id="countLabel"></label>
@@ -125,7 +125,7 @@
           <div class="section-title" id="locationSectionTitle"></div>
           <div class="field" id="field-location">
             <label id="locationLabel" for="locationSearch"></label>
-            <input type="text" id="locationSearch" autocomplete="off">
+            <input type="text" id="locationSearch" autocomplete="off" autocapitalize="words" spellcheck="false">
             <div id="locationSuggestions" class="suggestions"></div>
             <div class="hint" id="locationHint"></div>
             <div class="meta" id="locationMeta"></div>
@@ -133,11 +133,11 @@
             <div class="error-text" id="locationError"></div>
             <div class="manual" id="manualLocationFields">
               <div class="manual-grid">
-                <div class="field"><label id="manualAreaLabel" for="manualArea"></label><input type="text" id="manualArea"></div>
-                <div class="field"><label id="manualCityLabel" for="manualCity"></label><input type="text" id="manualCity"></div>
-                <div class="field"><label id="manualDistrictLabel" for="manualDistrict"></label><input type="text" id="manualDistrict"></div>
-                <div class="field"><label id="manualStateLabel" for="manualState"></label><input type="text" id="manualState"></div>
-                <div class="field"><label id="manualPostcodeLabel" for="manualPostcode"></label><input type="text" id="manualPostcode" maxlength="6"></div>
+                <div class="field"><label id="manualAreaLabel" for="manualArea"></label><input type="text" id="manualArea" autocomplete="off"></div>
+                <div class="field"><label id="manualCityLabel" for="manualCity"></label><input type="text" id="manualCity" autocomplete="off"></div>
+                <div class="field"><label id="manualDistrictLabel" for="manualDistrict"></label><input type="text" id="manualDistrict" autocomplete="off"></div>
+                <div class="field"><label id="manualStateLabel" for="manualState"></label><input type="text" id="manualState" autocomplete="off"></div>
+                <div class="field"><label id="manualPostcodeLabel" for="manualPostcode"></label><input type="text" id="manualPostcode" maxlength="6" autocomplete="off"></div>
               </div>
             </div>
             <div class="hint" id="locationAttribution"></div>
@@ -221,8 +221,7 @@ const TEXTS = {
     headerSubtitle: "Shripad Shrivallabh Charitamrut Samohik Parayan- 2 · Pithapuram",
     availabilityFreeTitle: "Free accommodation",
     availabilityOwnTitle: "Own/Paid accommodation",
-    accomFreeTitleWithSeats: "Yes, free accommodation from Devasthanam (only {remaining} seats remaining out of {capacity})",
-    accomOwnTitleWithSeats: "No, own/paid accommodation (only {remaining} seats remaining out of {capacity})",
+    accomSeatsLine: "Seats remaining: {remaining} out of {capacity}",
     availabilityFull: "Full",
     availabilityError: "Live availability could not be loaded. Final seat validation will happen at the server.",
     countSectionTitle: "Participants",
@@ -238,7 +237,7 @@ const TEXTS = {
     locationLabel: "Area / City *",
     locationPlaceholder: "Enter your village/town/city name",
     locationHint: "",
-    locationSelected: "Selected: {city}, {state}",
+    locationSelected: "Selected city: {city}",
     manualLocation: "",
     locationSearchError: "Location search is unavailable right now. Please enter the location manually.",
     locationLoading: "Searching locations...",
@@ -266,12 +265,12 @@ const TEXTS = {
     validationTitle: "Please complete the following",
     validationIntro: "Some required details are missing or invalid.",
     validationClose: "Go to first missing field",
-    errorNameRequired: "Participant {index}: Name is required",
-    errorAgeRequired: "Participant {index}: Age is required",
-    errorAgeInvalid: "Participant {index}: Age must be between 1 and 120",
-    errorMobileRequired: "Participant {index}: Mobile number is required",
-    errorMobileInvalid: "Participant {index}: Mobile number must be 10 digits",
-    errorGenderRequired: "Participant {index}: Please select gender",
+    errorNameRequired: "You did not enter the name for Participant {index}",
+    errorAgeRequired: "You did not enter the age for Participant {index}",
+    errorAgeInvalid: "The age for Participant {index} must be between 1 and 120",
+    errorMobileRequired: "You did not enter the mobile number for Participant {index}",
+    errorMobileInvalid: "The mobile number for Participant {index} must be exactly 10 digits",
+    errorGenderRequired: "You did not select the gender for Participant {index}",
     errorLocationRequired: "Please select a location or enter it manually",
     errorManualAreaRequired: "Area / Locality is required",
     errorManualCityRequired: "City is required",
@@ -291,8 +290,7 @@ const TEXTS = {
     headerSubtitle: "श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण - २ · पिठापूरम",
     availabilityFreeTitle: "मोफत निवास",
     availabilityOwnTitle: "स्वतःचा / सशुल्क निवास",
-    accomFreeTitleWithSeats: "हो, देवस्थानकडून मोफत निवास हवा आहे (एकूण {capacity} पैकी फक्त {remaining} जागा शिल्लक)",
-    accomOwnTitleWithSeats: "नाही, स्वतःचा / सशुल्क निवास (एकूण {capacity} पैकी फक्त {remaining} जागा शिल्लक)",
+    accomSeatsLine: "शिल्लक जागा: {capacity} पैकी {remaining}",
     availabilityFull: "पूर्ण",
     availabilityError: "सध्या उपलब्धता मिळाली नाही. अंतिम तपासणी सर्व्हरवर होईल.",
     countSectionTitle: "सहभागी",
@@ -308,7 +306,7 @@ const TEXTS = {
     locationLabel: "Area / City *",
     locationPlaceholder: "तुमचे गाव / शहर / टाउन नाव टाका",
     locationHint: "",
-    locationSelected: "निवडलेले स्थान: {city}, {state}",
+    locationSelected: "निवडलेले शहर: {city}",
     manualLocation: "",
     locationSearchError: "सध्या स्थान शोध सेवा उपलब्ध नाही. कृपया स्थान हाताने भरा.",
     locationLoading: "स्थान शोधत आहोत...",
@@ -336,12 +334,12 @@ const TEXTS = {
     validationTitle: "कृपया पुढील माहिती पूर्ण करा",
     validationIntro: "काही आवश्यक माहिती अपूर्ण किंवा चुकीची आहे.",
     validationClose: "पहिल्या चुकीच्या फील्डकडे जा",
-    errorNameRequired: "सहभागी {index}: नाव आवश्यक आहे",
-    errorAgeRequired: "सहभागी {index}: वय आवश्यक आहे",
-    errorAgeInvalid: "सहभागी {index}: वय 1 ते 120 दरम्यान असावे",
-    errorMobileRequired: "सहभागी {index}: मोबाईल क्रमांक आवश्यक आहे",
-    errorMobileInvalid: "सहभागी {index}: मोबाईल क्रमांक 10 अंकी असावा",
-    errorGenderRequired: "सहभागी {index}: लिंग निवडा",
+    errorNameRequired: "सहभागी {index} साठी नाव भरलेले नाही",
+    errorAgeRequired: "सहभागी {index} साठी वय भरलेले नाही",
+    errorAgeInvalid: "सहभागी {index} साठी वय 1 ते 120 दरम्यान असावे",
+    errorMobileRequired: "सहभागी {index} साठी मोबाईल क्रमांक भरलेला नाही",
+    errorMobileInvalid: "सहभागी {index} साठी मोबाईल क्रमांक 10 अंकी असावा",
+    errorGenderRequired: "सहभागी {index} साठी लिंग निवडलेले नाही",
     errorLocationRequired: "कृपया स्थान निवडा किंवा हाताने भरा",
     errorManualAreaRequired: "एरिया / परिसर आवश्यक आहे",
     errorManualCityRequired: "शहर आवश्यक आहे",
@@ -442,6 +440,7 @@ async function verifyAgent(){
   document.getElementById("agentGreeting").textContent = formatMessage(t("greeting"), { name: validatedAgent.name });
   document.getElementById("gate").style.display = "none";
   document.getElementById("panel").style.display = "block";
+  window.scrollTo({ top: 0, behavior: "smooth" });
   await loadAvailability();
 }
 
@@ -481,9 +480,9 @@ function renderParticipantBlocks(){
     card.innerHTML =
       '<div class="p-title">' + escapeHtml(t("personTitle")) + " " + (i + 1) + (i === 0 ? '<span class="p-note">' + escapeHtml(t("primaryNote")) + "</span>" : "") + "</div>" +
       '<div class="person-grid">' +
-      '<input type="text" class="p-name" placeholder="' + escapeHtml(t("namePlaceholder")) + '" value="' + escapeHtml(value.name) + '">' +
-      '<input type="number" class="p-age" placeholder="' + escapeHtml(t("agePlaceholder")) + '" value="' + escapeHtml(value.age) + '" min="1" max="120">' +
-      '<input type="tel" class="p-mobile" placeholder="' + escapeHtml(t("mobilePlaceholder")) + '" value="' + escapeHtml(value.mobile) + '">' +
+      '<input type="text" class="p-name" placeholder="' + escapeHtml(t("namePlaceholder")) + '" value="' + escapeHtml(value.name) + '" autocomplete="off">' +
+      '<input type="number" class="p-age" placeholder="' + escapeHtml(t("agePlaceholder")) + '" value="' + escapeHtml(value.age) + '" min="1" max="120" autocomplete="off">' +
+      '<input type="tel" class="p-mobile" placeholder="' + escapeHtml(t("mobilePlaceholder")) + '" value="' + escapeHtml(value.mobile) + '" autocomplete="off" inputmode="numeric">' +
       "</div>" +
       '<div class="gender-group">' +
       renderGenderOption(i, "male", t("male"), value.gender === "male") +
@@ -526,14 +525,14 @@ function renderAccommodationOptions(){
 function renderAccommodationOption(value, selected){
   const availability = availabilityData && availabilityData[value];
   const isFull = availability && availability.remaining <= 0;
-  const titleWithSeatsKey = value === "free" ? "accomFreeTitleWithSeats" : "accomOwnTitleWithSeats";
   const fallbackTitleKey = value === "free" ? "accomFreeTitle" : "accomOwnTitle";
   const hintKey = value === "free" ? "accomFreeHint" : "accomOwnHint";
-  const title = availability ? formatMessage(t(titleWithSeatsKey), availability) : t(fallbackTitleKey);
+  const title = t(fallbackTitleKey);
+  const seatsText = availability ? formatMessage(t("accomSeatsLine"), availability) : "";
   const hint = isFull ? t("availabilityFull") : t(hintKey);
   return '<label class="choice' + (selected ? " selected" : "") + '" data-disabled="' + (isFull ? "true" : "false") + '">' +
     '<input type="radio" name="accom" value="' + value + '"' + (selected ? " checked" : "") + (isFull ? " disabled" : "") + ">" +
-    "<span><strong>" + escapeHtml(title) + "</strong><small>" + escapeHtml(isFull ? t("availabilityFull") : hint) + "</small></span>" +
+    "<span><strong>" + escapeHtml(title) + '</strong><small style="display:block;font-weight:700;color:#8c3a14;margin-top:4px;">' + escapeHtml(seatsText || hint) + "</small><small>" + escapeHtml(hint) + "</small></span>" +
     "</label>";
 }
 
@@ -897,3 +896,4 @@ function escapeHtml(value){
 </script>
 </body>
 </html>
+
