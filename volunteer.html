@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agent Registration - Shripad Shrivallabh Charitamrut Samohik Parayan- 2</title>
+<title>Volunteer Registration - Shripad Shrivallabh Charitamrut Samohik Parayan- 2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Serif:wght@600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -40,9 +40,6 @@
   .content{padding:24px;}
   .section{margin-bottom:28px;}
   .section-title{font-size:16px;font-weight:700;color:var(--primary-dark);margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--border);}
-  .availability{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:18px;}
-  .availability-card{border:1px solid var(--border);border-radius:14px;padding:14px;background:#f8fcfd;}
-  .availability-card.full{background:#fff4f4;border-color:#e3c3c1;}
   .count-pills{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;}
   .count-pill{min-height:48px;border-radius:12px;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;cursor:pointer;}
   .count-pill.selected{background:var(--primary);border-color:var(--primary);color:#fff;}
@@ -83,7 +80,7 @@
   .validation-card{width:min(100%,520px);max-height:min(80vh,640px);overflow:auto;background:#fff;border-radius:18px;padding:20px;box-shadow:0 18px 46px rgba(0,0,0,.24);}
   .validation-list{padding-left:18px;}
   @media (min-width:640px){
-    .availability,.contact-grid,.manual-grid{grid-template-columns:1fr 1fr;}
+    .contact-grid,.manual-grid{grid-template-columns:1fr 1fr;}
     .person-grid{grid-template-columns:2fr 1fr 1.3fr;}
   }
   @media (max-width:520px){
@@ -117,15 +114,6 @@
     </div>
     <div class="content">
       <form id="regForm" novalidate>
-        <div class="section">
-          <div class="section-title" id="availabilityTitle"></div>
-          <div class="availability">
-            <div class="availability-card" id="availabilityFree"><strong id="availabilityFreeTitle"></strong><div class="meta" id="availabilityFreeText"></div></div>
-            <div class="availability-card" id="availabilityOwn"><strong id="availabilityOwnTitle"></strong><div class="meta" id="availabilityOwnText"></div></div>
-          </div>
-          <div class="meta" id="availabilityStatus"></div>
-        </div>
-
         <div class="section">
           <div class="section-title" id="countSectionTitle"></div>
           <label id="countLabel"></label>
@@ -223,18 +211,18 @@ let validationFocusTarget = null;
 
 const TEXTS = {
   en: {
-    gateTitle: "Agent Registration Access",
+    gateTitle: "Volunteer Registration Access",
     gateSubtitle: "Enter your approved 10-digit mobile number to continue.",
-    agentMobileLabel: "Agent Mobile Number",
+    agentMobileLabel: "Volunteer Mobile Number",
     agentMobileError: "Please enter a valid approved 10-digit mobile number.",
-    verifyButton: "Verify Agent",
+    verifyButton: "Verify Volunteer",
     greeting: "Hi, {name}",
-    headerTitle: "Agent Registration Form",
+    headerTitle: "Volunteer Registration Form",
     headerSubtitle: "Shripad Shrivallabh Charitamrut Samohik Parayan- 2 · Pithapuram",
-    availabilityTitle: "Accommodation Availability",
     availabilityFreeTitle: "Free accommodation",
     availabilityOwnTitle: "Own/Paid accommodation",
-    availabilityPattern: "{remaining} of {capacity} seats remaining",
+    accomFreeTitleWithSeats: "Yes, free accommodation from Devasthanam (only {remaining} seats remaining out of {capacity})",
+    accomOwnTitleWithSeats: "No, own/paid accommodation (only {remaining} seats remaining out of {capacity})",
     availabilityFull: "Full",
     availabilityError: "Live availability could not be loaded. Final seat validation will happen at the server.",
     countSectionTitle: "Participants",
@@ -248,14 +236,14 @@ const TEXTS = {
     female: "Female",
     locationSectionTitle: "Location",
     locationLabel: "Area / City *",
-    locationPlaceholder: "Type at least 3 letters, e.g. Uppal",
-    locationHint: "Choose from the list, or enter location manually if search is unavailable.",
-    locationSelected: "Selected: {area}, {city}, {state}",
-    manualLocation: "Enter location manually",
+    locationPlaceholder: "Enter your village/town/city name",
+    locationHint: "",
+    locationSelected: "Selected: {city}, {state}",
+    manualLocation: "",
     locationSearchError: "Location search is unavailable right now. Please enter the location manually.",
     locationLoading: "Searching locations...",
     locationNoResults: "No matching Indian locations found.",
-    locationAttribution: "Location search powered by OpenStreetMap/Photon",
+    locationAttribution: "",
     manualAreaLabel: "Area / Locality *",
     manualCityLabel: "City *",
     manualDistrictLabel: "District",
@@ -267,7 +255,7 @@ const TEXTS = {
     accomOwnTitle: "No, own/paid accommodation",
     accomOwnHint: "No Devasthanam accommodation needed",
     accomError: "Please select an accommodation option.",
-    submit: "Submit Agent Registration",
+    submit: "Submit Volunteer Registration",
     submitting: "Submitting...",
     successTitle: "Registration Successful",
     successMessage: "Registration completed for {count} participant(s). Booking ID: {bookingId}. Registered by {agent}.",
@@ -293,18 +281,18 @@ const TEXTS = {
     errorCapacityExceeded: "Only {remaining} seat(s) remain for {accommodation}. Please reduce participants or choose another accommodation."
   },
   mr: {
-    gateTitle: "एजंट नोंदणी प्रवेश",
+    gateTitle: "स्वयंसेवक नोंदणी प्रवेश",
     gateSubtitle: "पुढे जाण्यासाठी तुमचा मंजूर 10 अंकी मोबाईल क्रमांक टाका.",
-    agentMobileLabel: "एजंट मोबाईल क्रमांक",
+    agentMobileLabel: "स्वयंसेवक मोबाईल क्रमांक",
     agentMobileError: "कृपया मंजूर 10 अंकी मोबाईल क्रमांक टाका.",
-    verifyButton: "एजंट पडताळा",
+    verifyButton: "स्वयंसेवक पडताळा",
     greeting: "नमस्कार, {name}",
-    headerTitle: "एजंट नोंदणी फॉर्म",
+    headerTitle: "स्वयंसेवक नोंदणी फॉर्म",
     headerSubtitle: "श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण - २ · पिठापूरम",
-    availabilityTitle: "निवास उपलब्धता",
     availabilityFreeTitle: "मोफत निवास",
     availabilityOwnTitle: "स्वतःचा / सशुल्क निवास",
-    availabilityPattern: "{capacity} पैकी {remaining} जागा शिल्लक",
+    accomFreeTitleWithSeats: "हो, देवस्थानकडून मोफत निवास हवा आहे (एकूण {capacity} पैकी फक्त {remaining} जागा शिल्लक)",
+    accomOwnTitleWithSeats: "नाही, स्वतःचा / सशुल्क निवास (एकूण {capacity} पैकी फक्त {remaining} जागा शिल्लक)",
     availabilityFull: "पूर्ण",
     availabilityError: "सध्या उपलब्धता मिळाली नाही. अंतिम तपासणी सर्व्हरवर होईल.",
     countSectionTitle: "सहभागी",
@@ -317,15 +305,15 @@ const TEXTS = {
     male: "पुरुष",
     female: "स्त्री",
     locationSectionTitle: "स्थान",
-    locationLabel: "एरिया / शहर *",
-    locationPlaceholder: "किमान 3 अक्षरे टाइप करा, उदा. Uppal",
-    locationHint: "यादीतून निवडा किंवा सेवा बंद असल्यास स्थान हाताने भरा.",
-    locationSelected: "निवडलेले स्थान: {area}, {city}, {state}",
-    manualLocation: "स्थान हाताने भरा",
+    locationLabel: "Area / City *",
+    locationPlaceholder: "तुमचे गाव / शहर / टाउन नाव टाका",
+    locationHint: "",
+    locationSelected: "निवडलेले स्थान: {city}, {state}",
+    manualLocation: "",
     locationSearchError: "सध्या स्थान शोध सेवा उपलब्ध नाही. कृपया स्थान हाताने भरा.",
     locationLoading: "स्थान शोधत आहोत...",
     locationNoResults: "भारतातील जुळणारे स्थान मिळाले नाही.",
-    locationAttribution: "Location search powered by OpenStreetMap/Photon",
+    locationAttribution: "",
     manualAreaLabel: "एरिया / परिसर *",
     manualCityLabel: "शहर *",
     manualDistrictLabel: "जिल्हा",
@@ -337,7 +325,7 @@ const TEXTS = {
     accomOwnTitle: "नाही, स्वतःचा / सशुल्क निवास",
     accomOwnHint: "देवस्थानकडून निवास नको",
     accomError: "कृपया निवास पर्याय निवडा.",
-    submit: "एजंट नोंदणी पाठवा",
+    submit: "स्वयंसेवक नोंदणी पाठवा",
     submitting: "पाठवत आहोत...",
     successTitle: "नोंदणी यशस्वी",
     successMessage: "{count} सहभागींसाठी नोंदणी पूर्ण झाली. बुकिंग आयडी: {bookingId}. नोंदणी: {agent}.",
@@ -405,9 +393,6 @@ function applyLanguage(){
   document.getElementById("agentVerifyBtn").textContent = t("verifyButton");
   document.getElementById("headerTitle").textContent = t("headerTitle");
   document.getElementById("headerSubtitle").textContent = t("headerSubtitle");
-  document.getElementById("availabilityTitle").textContent = t("availabilityTitle");
-  document.getElementById("availabilityFreeTitle").textContent = t("availabilityFreeTitle");
-  document.getElementById("availabilityOwnTitle").textContent = t("availabilityOwnTitle");
   document.getElementById("countSectionTitle").textContent = t("countSectionTitle");
   document.getElementById("countLabel").textContent = t("countLabel");
   document.getElementById("locationSectionTitle").textContent = t("locationSectionTitle");
@@ -525,8 +510,8 @@ function renderAccommodationOptions(){
   const current = document.querySelector('input[name="accom"]:checked');
   const currentValue = current ? current.value : "";
   document.getElementById("accomGroup").innerHTML =
-    renderAccommodationOption("free", t("accomFreeTitle"), t("accomFreeHint"), currentValue === "free") +
-    renderAccommodationOption("own", t("accomOwnTitle"), t("accomOwnHint"), currentValue === "own");
+    renderAccommodationOption("free", currentValue === "free") +
+    renderAccommodationOption("own", currentValue === "own");
   document.querySelectorAll('#accomGroup .choice').forEach(function(choice){
     choice.addEventListener("click", function(){
       if (choice.dataset.disabled === "true") return;
@@ -538,9 +523,14 @@ function renderAccommodationOptions(){
   });
 }
 
-function renderAccommodationOption(value, title, hint, selected){
+function renderAccommodationOption(value, selected){
   const availability = availabilityData && availabilityData[value];
   const isFull = availability && availability.remaining <= 0;
+  const titleWithSeatsKey = value === "free" ? "accomFreeTitleWithSeats" : "accomOwnTitleWithSeats";
+  const fallbackTitleKey = value === "free" ? "accomFreeTitle" : "accomOwnTitle";
+  const hintKey = value === "free" ? "accomFreeHint" : "accomOwnHint";
+  const title = availability ? formatMessage(t(titleWithSeatsKey), availability) : t(fallbackTitleKey);
+  const hint = isFull ? t("availabilityFull") : t(hintKey);
   return '<label class="choice' + (selected ? " selected" : "") + '" data-disabled="' + (isFull ? "true" : "false") + '">' +
     '<input type="radio" name="accom" value="' + value + '"' + (selected ? " checked" : "") + (isFull ? " disabled" : "") + ">" +
     "<span><strong>" + escapeHtml(title) + "</strong><small>" + escapeHtml(isFull ? t("availabilityFull") : hint) + "</small></span>" +
@@ -558,30 +548,23 @@ async function loadAvailability(){
   } catch (error) {
     availabilityData = null;
     renderAvailability();
-    document.getElementById("availabilityStatus").textContent = t("availabilityError");
   }
 }
 
 function renderAvailability(){
-  if (!availabilityData) {
-    document.getElementById("availabilityFreeText").textContent = "-";
-    document.getElementById("availabilityOwnText").textContent = "-";
-    return;
-  }
-  ["free", "own"].forEach(function(key){
-    const item = availabilityData[key];
-    document.getElementById(key === "free" ? "availabilityFreeText" : "availabilityOwnText").textContent =
-      item.remaining <= 0 ? t("availabilityFull") : formatMessage(t("availabilityPattern"), item);
-    document.getElementById(key === "free" ? "availabilityFree" : "availabilityOwn").classList.toggle("full", item.remaining <= 0);
-  });
+  if (!availabilityData) return;
   const selectedAccommodation = document.querySelector('input[name="accom"]:checked');
   if (selectedAccommodation && availabilityData[selectedAccommodation.value] && participantCount > availabilityData[selectedAccommodation.value].remaining) {
-    document.getElementById("availabilityStatus").textContent = formatMessage(t("errorCapacityExceeded"), {
+    document.getElementById("field-accom").classList.add("invalid");
+    document.getElementById("accomError").textContent = formatMessage(t("errorCapacityExceeded"), {
       remaining: availabilityData[selectedAccommodation.value].remaining,
       accommodation: selectedAccommodation.value === "free" ? t("availabilityFreeTitle") : t("availabilityOwnTitle")
     });
+    document.getElementById("accomError").style.display = "block";
   } else {
-    document.getElementById("availabilityStatus").textContent = "";
+    document.getElementById("field-accom").classList.remove("invalid");
+    document.getElementById("accomError").textContent = t("accomError");
+    document.getElementById("accomError").style.display = "none";
   }
 }
 
@@ -656,16 +639,16 @@ function normalizePhotonResults(features){
     const countryCode = String(props.countrycode || "").toLowerCase();
     const country = String(props.country || "").toLowerCase();
     if (countryCode !== "in" && country !== "india") return null;
-    const area = firstNonEmpty([props.name, props.suburb, props.locality, props.district]);
-    const city = firstNonEmpty([props.city, props.town, props.county, props.state_district, props.district, props.village]);
-    const district = firstNonEmpty([props.district, props.county, props.state_district, city]);
+    const city = firstNonEmpty([props.city, props.town, props.village]);
     const state = firstNonEmpty([props.state]);
-    if (!area || !city || !state) return null;
+    if (!city || !state) return null;
+    if (/subdistrict/i.test(city)) return null;
+    const district = firstNonEmpty([props.district, props.county, props.state_district, city]);
     const postcode = String(props.postcode || "").trim();
-    const key = [area, city, district, state, postcode].join("|").toLowerCase();
+    const key = [city, state, postcode].join("|").toLowerCase();
     if (seen.has(key)) return null;
     seen.add(key);
-    return { area: area, city: city, district: district, state: state, postcode: postcode, label: area + ", " + city + ", " + state };
+    return { area: city, city: city, district: district, state: state, postcode: postcode, label: city + ", " + state };
   }).filter(Boolean);
 }
 
@@ -673,7 +656,7 @@ function renderSuggestions(){
   const box = document.getElementById("locationSuggestions");
   if (!currentSuggestions.length) { hideSuggestions(); return; }
   box.innerHTML = currentSuggestions.map(function(item, index){
-    return '<div class="suggestion' + (index === activeSuggestionIndex ? " active" : "") + '" data-index="' + index + '"><strong>' + escapeHtml(item.area) + '</strong><span>' + escapeHtml(item.city + ", " + item.state + (item.postcode ? " " + item.postcode : "")) + "</span></div>";
+    return '<div class="suggestion' + (index === activeSuggestionIndex ? " active" : "") + '" data-index="' + index + '"><strong>' + escapeHtml(item.city) + '</strong><span>' + escapeHtml(item.state + (item.postcode ? " " + item.postcode : "")) + "</span></div>";
   }).join("");
   box.classList.add("show");
   box.querySelectorAll(".suggestion").forEach(function(item){
