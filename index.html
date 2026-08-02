@@ -70,13 +70,14 @@
   .inline-error,.error-text{color:var(--error);font-size:12.5px;margin-top:8px;display:none;}
   .inline-error.show,.error-text.show{display:block;}
   .field.invalid input,.field.invalid .gender-option,.field.invalid .radio-option{border-color:var(--error);}
-  .suggestions{position:absolute;top:100%;left:0;right:0;z-index:10;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 26px rgba(0,0,0,.12);max-height:280px;overflow:auto;display:none;}
+  .location-search-wrap{position:relative;}
+  .suggestions{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:10;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 26px rgba(0,0,0,.12);max-height:280px;overflow:auto;display:none;}
   .suggestions.show{display:block;}
   .suggestion{padding:11px 14px;border-bottom:1px solid #f1e4cf;cursor:pointer;}
   .suggestion:last-child{border-bottom:none;}
   .suggestion.active,.suggestion:hover{background:#fff4e5;}
   .suggestion strong{display:block;font-size:14px;color:var(--ink);}
-  .suggestion span{font-size:12px;color:#7a6a55;}
+  .suggestion span{display:none;}
   .location-meta{margin-top:8px;font-size:12.5px;color:#6b5a45;}
   .location-meta strong{color:var(--success);}
   .location-actions{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:8px;}
@@ -94,11 +95,11 @@
   .spinner{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px;}
   @keyframes spin{to{transform:rotate(360deg);}}
   .page-footer{width:min(100%,760px);margin:24px auto 0;padding:0 16px;}
-  .footer-card{background:#fffaf3;border:1px solid var(--border);border-radius:16px;padding:18px;color:#7a6a55;}
+  .footer-card{background:#fffaf3;border:1px solid var(--border);border-radius:16px;padding:18px;color:#5a4737;}
   .footer-note{text-align:center;font-size:12px;margin-top:14px;}
   .contact-title{margin:0 0 12px;font-size:15px;font-weight:700;color:var(--maroon);}
   .contact-grid{display:grid;grid-template-columns:1fr;gap:10px 18px;}
-  .contact-item{font-size:13.5px;color:var(--ink);}
+  .contact-item{font-size:13.5px;color:#3f3026;}
   .contact-item a{color:var(--saffron-dark);text-decoration:none;font-weight:600;}
   .contact-item a:hover{text-decoration:underline;}
   .validation-modal{position:fixed;inset:0;background:rgba(0,0,0,.42);display:none;align-items:center;justify-content:center;padding:16px;z-index:20;}
@@ -164,8 +165,10 @@
           <div class="section-title" id="locationSectionTitle"></div>
           <div class="field" id="field-location">
             <label id="locationLabel" for="locationSearch"></label>
-            <input type="text" id="locationSearch" autocomplete="off" autocapitalize="words" spellcheck="false">
-            <div class="suggestions" id="locationSuggestions"></div>
+            <div class="location-search-wrap">
+              <input type="text" id="locationSearch" autocomplete="off" autocapitalize="words" spellcheck="false">
+              <div class="suggestions" id="locationSuggestions"></div>
+            </div>
             <div class="hint" id="locationHint"></div>
             <div class="location-meta" id="locationMeta"></div>
             <div class="location-actions">
@@ -222,14 +225,14 @@
 <div class="page-footer">
   <div class="footer-card">
     <h2 class="contact-title" id="contactTitle"></h2>
-    <div class="contact-grid">
-      <div class="contact-item">Prasad Bhivre - <a href="tel:9673462498">9673462498</a></div>
-      <div class="contact-item">Priyanka Tai Patil - <a href="tel:9552192169">9552192169</a></div>
-      <div class="contact-item">Devendra Kamod - <a href="tel:7249506691">7249506691</a></div>
-      <div class="contact-item">Gnaneshwar Kamod - <a href="tel:9850055906">9850055906</a></div>
-      <div class="contact-item">Jitendra Patil - <a href="tel:8668423639">8668423639</a></div>
-      <div class="contact-item">Rupali Joshi - <a href="tel:9422070342">9422070342</a></div>
-      <div class="contact-item">B.D. Wani - <a href="tel:7447542324">7447542324</a></div>
+    <div class="contact-grid" translate="no">
+      <div class="contact-item" id="contact1"></div>
+      <div class="contact-item" id="contact2"></div>
+      <div class="contact-item" id="contact3"></div>
+      <div class="contact-item" id="contact4"></div>
+      <div class="contact-item" id="contact5"></div>
+      <div class="contact-item" id="contact6"></div>
+      <div class="contact-item" id="contact7"></div>
     </div>
     <div class="footer-note" id="footerText"></div>
   </div>
@@ -257,6 +260,26 @@ const VERIFY_WAIT_MS = 700;
 const MAX_PARTICIPANTS = 10;
 const PHOTON_URL = "https://photon.komoot.io/api/";
 const PHOTON_BBOX = [68.1, 6.5, 97.5, 37.5];
+const CONTACTS = {
+  en: [
+    ["Prasad Bhivre", "9673462498"],
+    ["Priyanka Tai Patil", "9552192169"],
+    ["Devendra Kamod", "7249506691"],
+    ["Gnaneshwar Kamod", "9850055906"],
+    ["Jitendra Patil", "8668423639"],
+    ["Rupali Joshi", "9422070342"],
+    ["B.D. Wani", "7447542324"]
+  ],
+  mr: [
+    ["प्रसाद भिवरे", "9673462498"],
+    ["प्रियंका ताई पाटील", "9552192169"],
+    ["देवेंद्र कामोड", "7249506691"],
+    ["ज्ञानेश्वर कामोड", "9850055906"],
+    ["जितेंद्र पाटील", "8668423639"],
+    ["रुपाली जोशी", "9422070342"],
+    ["बी.डी. वाणी", "7447542324"]
+  ]
+};
 let currentLanguage = "";
 let participantCount = 1;
 let validationFocusTarget = null;
@@ -298,7 +321,7 @@ const TEXTS = {
     genderFemale: "Female",
     participantError: "Please add at least 1 participant and complete all details.",
     locationSectionTitle: "Location",
-    locationLabel: "Area / City *",
+    locationLabel: "City *",
     locationPlaceholder: "Enter your village/town/city name",
     locationHint: "",
     locationSelected: "Selected city: {city}",
@@ -373,7 +396,7 @@ const TEXTS = {
     genderFemale: "स्त्री",
     participantError: "कृपया किमान १ सहभागी जोडा आणि सर्व तपशील पूर्ण करा.",
     locationSectionTitle: "स्थान",
-    locationLabel: "एरिया / शहर *",
+    locationLabel: "शहर *",
     locationPlaceholder: "तुमचे गाव / शहर / टाउन नाव टाका",
     locationHint: "",
     locationSelected: "निवडलेले शहर: {city}",
@@ -457,6 +480,7 @@ function renderLanguageChooser(){
   document.getElementById("validationTitle").textContent = TEXTS.en.validationTitle;
   document.getElementById("validationIntro").textContent = TEXTS.en.validationIntro;
   document.getElementById("closeValidationBtn").textContent = TEXTS.en.validationClose;
+  renderContacts("en");
 }
 
 function selectLanguage(language){
@@ -501,10 +525,20 @@ function applyLanguage(){
   document.getElementById("validationTitle").textContent = t("validationTitle");
   document.getElementById("validationIntro").textContent = t("validationIntro");
   document.getElementById("closeValidationBtn").textContent = t("validationClose");
+  renderContacts(currentLanguage);
   renderAccommodationOptions();
   renderManualLocation();
   renderAvailability();
   updateLocationMeta();
+}
+
+function renderContacts(language){
+  const contacts = CONTACTS[language] || CONTACTS.en;
+  contacts.forEach(function(contact, index){
+    const target = document.getElementById("contact" + (index + 1));
+    if (!target) return;
+    target.innerHTML = escapeHtml(contact[0]) + ' - <a href="tel:' + escapeHtml(contact[1]) + '">' + escapeHtml(contact[1]) + "</a>";
+  });
 }
 
 function renderCountPills(){
@@ -652,7 +686,7 @@ function handleLocationInput(event){
   }
   locationDebounceId = setTimeout(function(){
     searchLocationSuggestions(query);
-  }, 450);
+  }, 180);
 }
 
 function handleLocationKeydown(event){
@@ -748,7 +782,7 @@ function renderSuggestions(){
   box.innerHTML = currentSuggestions.map(function(item, index){
     return '<div class="suggestion' + (index === activeSuggestionIndex ? " active" : "") + '" data-index="' + index + '">' +
       "<strong>" + escapeHtml(item.city) + "</strong>" +
-      "<span>" + escapeHtml(item.state + (item.postcode ? " " + item.postcode : "")) + "</span>" +
+      "<span></span>" +
       "</div>";
   }).join("");
   box.classList.add("show");
