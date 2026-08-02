@@ -27,7 +27,7 @@
   .lang-btn{padding:8px 12px;border-radius:999px;background:#f7eadb;color:var(--primary-dark);font-weight:700;}
   .lang-btn.active{background:var(--primary);color:#fff;}
   .gate h1,.header h1{font-family:'Noto Serif','Noto Sans Devanagari',serif;margin:0 0 10px;color:var(--primary-dark);}
-  .sub{color:#5b7380;font-size:14px;margin-bottom:18px;}
+  .sub{color:#4b3a2f;font-size:14px;margin-bottom:18px;}
   input[type="text"],input[type="tel"],input[type="number"]{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font:inherit;background:#fbfeff;color:var(--ink);}
   input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(31,95,116,.12);}
   button{font:inherit;border:none;cursor:pointer;}
@@ -55,15 +55,18 @@
   .choice input{margin-top:2px;accent-color:var(--primary);}
   .choice small{display:block;color:#6c828d;}
   .field{margin-bottom:18px;position:relative;}
-  .hint,.meta,.error-text{font-size:12.5px;color:#6c828d;margin-top:6px;}
+  .hint,.meta,.error-text{font-size:12.5px;color:#5b4638;margin-top:6px;}
   .error-text{color:var(--error);display:none;}
   .field.invalid .error-text{display:block;}
   .field.invalid input,.field.invalid .choice{border-color:var(--error);}
-  .suggestions{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 26px rgba(0,0,0,.12);display:none;max-height:280px;overflow:auto;z-index:10;}
+  .location-search-wrap{position:relative;}
+  .suggestions{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 26px rgba(0,0,0,.12);display:none;max-height:280px;overflow:auto;z-index:10;}
   .suggestions.show{display:block;}
   .suggestion{padding:11px 14px;border-bottom:1px solid #ebf2f6;cursor:pointer;}
   .suggestion:last-child{border-bottom:none;}
-  .suggestion.active,.suggestion:hover{background:#edf7fa;}
+  .suggestion.active,.suggestion:hover{background:#fff1e1;}
+  .suggestion strong{color:#2f241d;}
+  .suggestion span{color:#5b4638;}
   .manual{display:none;padding:14px;border:1px dashed var(--border);border-radius:12px;background:#fff8f1;margin-top:12px;}
   .manual.show{display:block;}
   .manual-grid{display:grid;grid-template-columns:1fr;gap:10px;}
@@ -71,7 +74,9 @@
   .footer{width:min(100%,780px);margin:20px auto 0;background:#fff9f3;border:1px solid var(--border);border-radius:16px;padding:18px;}
   .footer h2{margin:0 0 12px;font-size:15px;color:var(--primary-dark);}
   .contact-grid{display:grid;grid-template-columns:1fr;gap:10px 18px;}
+  .contact-item{color:#3f3026;}
   .contact-item a{color:var(--primary-dark);font-weight:700;text-decoration:none;}
+  .suggestion span{display:none;}
   .status-box{display:none;text-align:center;padding:20px 0 0;}
   .status-box.show{display:block;}
   .status-box.error h2{color:var(--error);}
@@ -99,7 +104,7 @@
     <p class="sub" id="gateSubtitle"></p>
     <div class="field" id="field-agent-mobile">
       <label id="agentMobileLabel" for="agentMobile"></label>
-      <input type="tel" id="agentMobile" inputmode="numeric" maxlength="10">
+      <input type="tel" id="agentMobile" inputmode="numeric" maxlength="10" autocomplete="off">
       <div class="error-text" id="agentMobileError"></div>
     </div>
     <button type="button" class="btn" id="agentVerifyBtn"></button>
@@ -125,8 +130,10 @@
           <div class="section-title" id="locationSectionTitle"></div>
           <div class="field" id="field-location">
             <label id="locationLabel" for="locationSearch"></label>
-            <input type="text" id="locationSearch" autocomplete="off" autocapitalize="words" spellcheck="false">
-            <div id="locationSuggestions" class="suggestions"></div>
+            <div class="location-search-wrap">
+              <input type="text" id="locationSearch" autocomplete="off" autocapitalize="words" spellcheck="false">
+              <div id="locationSuggestions" class="suggestions"></div>
+            </div>
             <div class="hint" id="locationHint"></div>
             <div class="meta" id="locationMeta"></div>
             <button type="button" class="link-btn" id="manualLocationBtn"></button>
@@ -164,14 +171,14 @@
 
   <div class="footer">
     <h2 id="contactTitle"></h2>
-    <div class="contact-grid">
-      <div class="contact-item">Prasad Bhivre - <a href="tel:9673462498">9673462498</a></div>
-      <div class="contact-item">Priyanka Tai Patil - <a href="tel:9552192169">9552192169</a></div>
-      <div class="contact-item">Devendra Kamod - <a href="tel:7249506691">7249506691</a></div>
-      <div class="contact-item">Gnaneshwar Kamod - <a href="tel:9850055906">9850055906</a></div>
-      <div class="contact-item">Jitendra Patil - <a href="tel:8668423639">8668423639</a></div>
-      <div class="contact-item">Rupali Joshi - <a href="tel:9422070342">9422070342</a></div>
-      <div class="contact-item">B.D. Wani - <a href="tel:7447542324">7447542324</a></div>
+    <div class="contact-grid" translate="no">
+      <div class="contact-item" id="contact1"></div>
+      <div class="contact-item" id="contact2"></div>
+      <div class="contact-item" id="contact3"></div>
+      <div class="contact-item" id="contact4"></div>
+      <div class="contact-item" id="contact5"></div>
+      <div class="contact-item" id="contact6"></div>
+      <div class="contact-item" id="contact7"></div>
     </div>
   </div>
 </div>
@@ -196,6 +203,26 @@ const VERIFY_ATTEMPTS = 2;
 const VERIFY_WAIT_MS = 700;
 const PHOTON_URL = "https://photon.komoot.io/api/";
 const PHOTON_BBOX = [68.1, 6.5, 97.5, 37.5];
+const CONTACTS = {
+  en: [
+    ["Prasad Bhivre", "9673462498"],
+    ["Priyanka Tai Patil", "9552192169"],
+    ["Devendra Kamod", "7249506691"],
+    ["Gnaneshwar Kamod", "9850055906"],
+    ["Jitendra Patil", "8668423639"],
+    ["Rupali Joshi", "9422070342"],
+    ["B.D. Wani", "7447542324"]
+  ],
+  mr: [
+    ["प्रसाद भिवरे", "9673462498"],
+    ["प्रियंका ताई पाटील", "9552192169"],
+    ["देवेंद्र कामोड", "7249506691"],
+    ["ज्ञानेश्वर कामोड", "9850055906"],
+    ["जितेंद्र पाटील", "8668423639"],
+    ["रुपाली जोशी", "9422070342"],
+    ["बी.डी. वाणी", "7447542324"]
+  ]
+};
 let currentLanguage = "en";
 let participantCount = 1;
 let availabilityData = null;
@@ -234,7 +261,7 @@ const TEXTS = {
     male: "Male",
     female: "Female",
     locationSectionTitle: "Location",
-    locationLabel: "Area / City *",
+    locationLabel: "City *",
     locationPlaceholder: "Enter your village/town/city name",
     locationHint: "",
     locationSelected: "Selected city: {city}",
@@ -303,7 +330,7 @@ const TEXTS = {
     male: "पुरुष",
     female: "स्त्री",
     locationSectionTitle: "स्थान",
-    locationLabel: "Area / City *",
+    locationLabel: "शहर *",
     locationPlaceholder: "तुमचे गाव / शहर / टाउन नाव टाका",
     locationHint: "",
     locationSelected: "निवडलेले शहर: {city}",
@@ -411,8 +438,18 @@ function applyLanguage(){
   document.getElementById("validationTitle").textContent = t("validationTitle");
   document.getElementById("validationIntro").textContent = t("validationIntro");
   document.getElementById("closeValidationBtn").textContent = t("validationClose");
+  renderContacts(currentLanguage);
   renderAccommodationOptions();
   renderAvailability();
+}
+
+function renderContacts(language){
+  const contacts = CONTACTS[language] || CONTACTS.en;
+  contacts.forEach(function(contact, index){
+    const target = document.getElementById("contact" + (index + 1));
+    if (!target) return;
+    target.innerHTML = escapeHtml(contact[0]) + ' - <a href="tel:' + escapeHtml(contact[1]) + '">' + escapeHtml(contact[1]) + "</a>";
+  });
 }
 
 async function verifyAgent(){
@@ -577,7 +614,7 @@ function handleLocationInput(event){
     hideSuggestions();
     return;
   }
-  locationDebounceId = setTimeout(function(){ searchLocationSuggestions(query); }, 450);
+  locationDebounceId = setTimeout(function(){ searchLocationSuggestions(query); }, 180);
 }
 
 function handleLocationKeydown(event){
@@ -655,7 +692,7 @@ function renderSuggestions(){
   const box = document.getElementById("locationSuggestions");
   if (!currentSuggestions.length) { hideSuggestions(); return; }
   box.innerHTML = currentSuggestions.map(function(item, index){
-    return '<div class="suggestion' + (index === activeSuggestionIndex ? " active" : "") + '" data-index="' + index + '"><strong>' + escapeHtml(item.city) + '</strong><span>' + escapeHtml(item.state + (item.postcode ? " " + item.postcode : "")) + "</span></div>";
+    return '<div class="suggestion' + (index === activeSuggestionIndex ? " active" : "") + '" data-index="' + index + '"><strong>' + escapeHtml(item.city) + '</strong><span></span></div>';
   }).join("");
   box.classList.add("show");
   box.querySelectorAll(".suggestion").forEach(function(item){
@@ -896,4 +933,3 @@ function escapeHtml(value){
 </script>
 </body>
 </html>
-
