@@ -38,6 +38,7 @@
   .panel{display:none;margin-top:20px;overflow:hidden;}
   .header{background:linear-gradient(120deg,#6b1f12,#a3471c);padding:24px 24px 28px;color:#ffe072;text-align:center;}
   .header p{margin:0;color:#ffe9a8;}
+  .header-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px;}
   .content{padding:24px;}
   .section{margin-bottom:28px;}
   .section-title{font-size:16px;font-weight:700;color:var(--primary-dark);margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--border);}
@@ -82,6 +83,19 @@
   .status-box.show{display:block;}
   .status-box.error h2{color:var(--error);}
   .booking-id{display:inline-block;margin-top:10px;font-size:28px;font-weight:800;color:var(--primary-dark);letter-spacing:.6px;}
+  .bookings-panel{display:none;margin-top:18px;border:1px solid var(--border);border-radius:16px;padding:16px;background:#fffaf5;}
+  .bookings-panel.show{display:block;}
+  .bookings-table-wrap{overflow:auto;border:1px solid var(--border);border-radius:12px;background:#fff;}
+  .bookings-table{width:100%;min-width:820px;border-collapse:collapse;}
+  .bookings-table th,.bookings-table td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;font-size:13px;}
+  .bookings-table th{background:#fff1e1;color:#6a4d39;}
+  .bookings-table tr{cursor:pointer;}
+  .bookings-table tbody tr:hover td{background:#fff1df;}
+  .edit-modal-card{width:min(100%,880px);max-height:min(88vh,900px);overflow:auto;background:#fff;border-radius:18px;padding:20px;box-shadow:0 18px 46px rgba(0,0,0,.24);}
+  .edit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:16px;}
+  .booking-participant{border:1px solid var(--border);border-radius:12px;padding:14px;background:#fffaf3;margin-bottom:12px;}
+  .booking-participant h4{margin:0 0 10px;color:var(--primary-dark);}
+  .participant-edit-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
   .validation-modal{position:fixed;inset:0;background:rgba(0,0,0,.42);display:none;align-items:center;justify-content:center;padding:16px;}
   .validation-modal.show{display:flex;}
   .validation-card{width:min(100%,520px);max-height:min(80vh,640px);overflow:auto;background:#fff;border-radius:18px;padding:20px;box-shadow:0 18px 46px rgba(0,0,0,.24);}
@@ -90,6 +104,7 @@
     .contact-grid,.manual-grid{grid-template-columns:1fr 1fr;}
     .person-grid{grid-template-columns:2fr 1fr 1.3fr;}
   }
+  @media (max-width:760px){.edit-grid,.participant-edit-grid{grid-template-columns:1fr;}}
   @media (max-width:520px){
     .count-pills{grid-template-columns:repeat(2,minmax(0,1fr));}
   }
@@ -118,6 +133,10 @@
       <h1 id="headerTitle"></h1>
       <p id="headerSubtitle"></p>
       <p id="agentGreeting" style="margin-top:10px;font-weight:600;"></p>
+      <div class="header-actions">
+        <button type="button" class="btn secondary" id="toggleBookingsBtn" style="width:auto;display:none;"></button>
+        <button type="button" class="btn secondary" id="refreshBookingsBtn" style="width:auto;display:none;"></button>
+      </div>
     </div>
     <div class="content">
       <form id="regForm" novalidate autocomplete="off">
@@ -171,6 +190,28 @@
         <p id="statusMsg"></p>
         <div id="bookingIdDisplay" class="booking-id"></div>
       </div>
+
+      <div id="bookingsPanel" class="bookings-panel">
+        <h3 id="bookingsTitle"></h3>
+        <div class="bookings-table-wrap">
+          <table class="bookings-table">
+            <thead>
+              <tr>
+                <th id="bookingsHeadBooking"></th>
+                <th id="bookingsHeadName"></th>
+                <th id="bookingsHeadMobile"></th>
+                <th id="bookingsHeadAge"></th>
+                <th id="bookingsHeadGender"></th>
+                <th id="bookingsHeadCity"></th>
+                <th id="bookingsHeadAccommodation"></th>
+                <th id="bookingsHeadStatus"></th>
+              </tr>
+            </thead>
+            <tbody id="bookingsTableBody"></tbody>
+          </table>
+        </div>
+        <div class="meta" id="bookingsEmpty" style="margin-top:10px;display:none;"></div>
+      </div>
     </div>
   </div>
 
@@ -194,6 +235,28 @@
     <p id="validationIntro"></p>
     <ul id="validationList" class="validation-list"></ul>
     <button type="button" class="btn secondary" id="closeValidationBtn" style="margin-top:16px;"></button>
+  </div>
+</div>
+
+<div id="editBookingModal" class="validation-modal" role="dialog" aria-modal="true">
+  <div class="edit-modal-card">
+    <h3 id="editBookingTitle"></h3>
+    <div class="edit-grid">
+      <div><label for="editBookingNumber"></label><input id="editBookingNumber" type="text" readonly></div>
+      <div><label for="editAccommodation"></label><select id="editAccommodation"><option value="free">Free</option><option value="own">Own/Paid</option></select></div>
+      <div><label for="editCity"></label><input id="editCity" type="text" autocomplete="off"></div>
+      <div><label for="editState"></label><input id="editState" type="text" autocomplete="off"></div>
+      <div><label for="editArea"></label><input id="editArea" type="text" autocomplete="off"></div>
+      <div><label for="editPostcode"></label><input id="editPostcode" type="text" maxlength="6" autocomplete="off"></div>
+    </div>
+    <div id="editBookingParticipants"></div>
+    <div class="row">
+      <div class="error-text" id="editBookingError" style="display:none;"></div>
+    </div>
+    <div class="row">
+      <button type="button" class="btn" id="saveBookingBtn" style="flex:1;"></button>
+      <button type="button" class="btn secondary" id="cancelBookingBtn" style="flex:1;"></button>
+    </div>
   </div>
 </div>
 
@@ -240,6 +303,9 @@ let activeSuggestionIndex = -1;
 let currentSuggestions = [];
 const locationCache = new Map();
 let validationFocusTarget = null;
+let volunteerBookings = [];
+let bookingsVisible = false;
+let editingSubmissionId = "";
 
 const TEXTS = {
   en: {
@@ -384,9 +450,16 @@ const TEXTS = {
 
 document.getElementById("agentVerifyBtn").addEventListener("click", verifyAgent);
 document.getElementById("regForm").addEventListener("submit", handleSubmit);
+document.getElementById("toggleBookingsBtn").addEventListener("click", toggleBookingsPanel);
+document.getElementById("refreshBookingsBtn").addEventListener("click", loadVolunteerBookings);
+document.getElementById("saveBookingBtn").addEventListener("click", saveBookingEdit);
+document.getElementById("cancelBookingBtn").addEventListener("click", closeBookingEditor);
 document.getElementById("closeValidationBtn").addEventListener("click", closeValidationModal);
 document.getElementById("validationModal").addEventListener("click", function(event){
   if (event.target.id === "validationModal") closeValidationModal();
+});
+document.getElementById("editBookingModal").addEventListener("click", function(event){
+  if (event.target.id === "editBookingModal") closeBookingEditor();
 });
 document.getElementById("manualLocationBtn").addEventListener("click", function(){
   manualLocationVisible = true;
@@ -444,9 +517,30 @@ function applyLanguage(){
   document.getElementById("validationTitle").textContent = t("validationTitle");
   document.getElementById("validationIntro").textContent = t("validationIntro");
   document.getElementById("closeValidationBtn").textContent = t("validationClose");
+  document.getElementById("toggleBookingsBtn").textContent = currentLanguage === "mr" ? "माझी बुकिंग पहा" : "View My Bookings";
+  document.getElementById("refreshBookingsBtn").textContent = currentLanguage === "mr" ? "बुकिंग रिफ्रेश" : "Refresh My Bookings";
+  document.getElementById("bookingsTitle").textContent = currentLanguage === "mr" ? "माझ्या बुकिंग" : "My Bookings";
+  document.getElementById("bookingsHeadBooking").textContent = currentLanguage === "mr" ? "बुकिंग आयडी" : "Booking ID";
+  document.getElementById("bookingsHeadName").textContent = currentLanguage === "mr" ? "नाव" : "Name";
+  document.getElementById("bookingsHeadMobile").textContent = currentLanguage === "mr" ? "मोबाईल" : "Mobile";
+  document.getElementById("bookingsHeadAge").textContent = currentLanguage === "mr" ? "वय" : "Age";
+  document.getElementById("bookingsHeadGender").textContent = currentLanguage === "mr" ? "लिंग" : "Gender";
+  document.getElementById("bookingsHeadCity").textContent = currentLanguage === "mr" ? "शहर" : "City";
+  document.getElementById("bookingsHeadAccommodation").textContent = currentLanguage === "mr" ? "निवास" : "Accommodation";
+  document.getElementById("bookingsHeadStatus").textContent = currentLanguage === "mr" ? "स्थिती" : "Status";
+  document.getElementById("editBookingTitle").textContent = currentLanguage === "mr" ? "बुकिंग संपादित करा" : "Edit Booking";
+  document.getElementById("saveBookingBtn").textContent = currentLanguage === "mr" ? "बदल जतन करा" : "Save Booking";
+  document.getElementById("cancelBookingBtn").textContent = currentLanguage === "mr" ? "रद्द करा" : "Cancel";
+  document.querySelector("label[for='editBookingNumber']").textContent = currentLanguage === "mr" ? "बुकिंग आयडी" : "Booking ID";
+  document.querySelector("label[for='editAccommodation']").textContent = currentLanguage === "mr" ? "निवास" : "Accommodation";
+  document.querySelector("label[for='editCity']").textContent = currentLanguage === "mr" ? "शहर" : "City";
+  document.querySelector("label[for='editState']").textContent = currentLanguage === "mr" ? "राज्य" : "State";
+  document.querySelector("label[for='editArea']").textContent = currentLanguage === "mr" ? "एरिया / परिसर" : "Area / Locality";
+  document.querySelector("label[for='editPostcode']").textContent = currentLanguage === "mr" ? "पोस्टकोड" : "Postcode";
   renderContacts(currentLanguage);
   renderAccommodationOptions();
   renderAvailability();
+  renderVolunteerBookings();
 }
 
 function hardenAutofill(){
@@ -505,8 +599,11 @@ async function verifyAgent(){
   document.getElementById("agentGreeting").textContent = formatMessage(t("greeting"), { name: validatedAgent.name });
   document.getElementById("gate").style.display = "none";
   document.getElementById("panel").style.display = "block";
+  document.getElementById("toggleBookingsBtn").style.display = "inline-block";
+  document.getElementById("refreshBookingsBtn").style.display = "inline-block";
   window.scrollTo({ top: 0, behavior: "smooth" });
   await loadAvailability();
+  await loadVolunteerBookings();
 }
 
 function renderCountPills(){
@@ -832,6 +929,153 @@ function collectParticipants(){
   });
 }
 
+function toggleBookingsPanel(){
+  bookingsVisible = !bookingsVisible;
+  document.getElementById("bookingsPanel").classList.toggle("show", bookingsVisible);
+  if (bookingsVisible) {
+    renderVolunteerBookings();
+    window.scrollTo({ top: document.getElementById("bookingsPanel").offsetTop - 24, behavior: "smooth" });
+  }
+}
+
+async function loadVolunteerBookings(){
+  if (!validatedAgent) return;
+  const response = await fetch(SCRIPT_URL + "?action=getVolunteerBookings&agentMobile=" + encodeURIComponent(validatedAgent.mobile) + "&_=" + Date.now());
+  const payload = await response.json();
+  if (payload.status !== "success") throw new Error(payload.message || "Could not load bookings");
+  volunteerBookings = Array.isArray(payload.data) ? payload.data : [];
+  renderVolunteerBookings();
+}
+
+function renderVolunteerBookings(){
+  const body = document.getElementById("bookingsTableBody");
+  const empty = document.getElementById("bookingsEmpty");
+  body.innerHTML = "";
+  if (!volunteerBookings.length) {
+    empty.style.display = "block";
+    empty.textContent = currentLanguage === "mr" ? "अद्याप तुमची कोणतीही बुकिंग नाही." : "You do not have any bookings yet.";
+    return;
+  }
+  empty.style.display = "none";
+  volunteerBookings.slice().sort(function(a, b){
+    return Number(b["Submission Number"] || 0) - Number(a["Submission Number"] || 0);
+  }).forEach(function(row){
+    const tr = document.createElement("tr");
+    tr.innerHTML =
+      "<td>" + escapeHtml(row["Submission Number"]) + "</td>" +
+      "<td>" + escapeHtml(row["Name"]) + "</td>" +
+      "<td>" + escapeHtml(row["Mobile Number"]) + "</td>" +
+      "<td>" + escapeHtml(row["Age"]) + "</td>" +
+      "<td>" + escapeHtml(translateGenderValue(row["Type"])) + "</td>" +
+      "<td>" + escapeHtml(row["City"]) + "</td>" +
+      "<td>" + escapeHtml(translateAccommodationValue(row["Accommodation"])) + "</td>" +
+      "<td>" + escapeHtml(translateStatusValue(row["Status"])) + "</td>";
+    tr.addEventListener("click", function(){ openBookingEditor(row["Submission ID"]); });
+    body.appendChild(tr);
+  });
+}
+
+function getBookingRows(submissionId){
+  return volunteerBookings.filter(function(row){
+    return String(row["Submission ID"] || "") === String(submissionId || "");
+  }).slice().sort(function(a, b){
+    return Number(a["Person No."] || 0) - Number(b["Person No."] || 0);
+  });
+}
+
+function openBookingEditor(submissionId){
+  const rows = getBookingRows(submissionId);
+  if (!rows.length) return;
+  editingSubmissionId = submissionId;
+  document.getElementById("editBookingNumber").value = rows[0]["Submission Number"] || "";
+  document.getElementById("editAccommodation").value = rows[0]["Accommodation"] || "free";
+  document.getElementById("editCity").value = rows[0]["City"] || "";
+  document.getElementById("editState").value = rows[0]["State"] || "";
+  document.getElementById("editArea").value = rows[0]["Area/Locality"] || rows[0]["City"] || "";
+  document.getElementById("editPostcode").value = rows[0]["Postcode"] || "";
+  document.getElementById("editBookingError").style.display = "none";
+  const container = document.getElementById("editBookingParticipants");
+  container.innerHTML = "";
+  rows.forEach(function(row, index){
+    const card = document.createElement("div");
+    card.className = "booking-participant";
+    card.innerHTML =
+      "<h4>" + escapeHtml((currentLanguage === "mr" ? "सहभागी " : "Participant ") + (index + 1)) + "</h4>" +
+      '<div class="participant-edit-grid">' +
+      '<input type="text" class="edit-name" value="' + escapeHtml(row["Name"] || "") + '" autocomplete="off">' +
+      '<input type="number" class="edit-age" value="' + escapeHtml(row["Age"] || "") + '" min="1" max="120" autocomplete="off">' +
+      '<input type="tel" class="edit-mobile" value="' + escapeHtml(row["Mobile Number"] || "") + '" autocomplete="off">' +
+      '<select class="edit-gender"><option value="male"' + (row["Type"] === "Gent" ? " selected" : "") + '>' + escapeHtml(currentLanguage === "mr" ? "पुरुष" : "Male") + '</option><option value="female"' + (row["Type"] === "Lady" ? " selected" : "") + '>' + escapeHtml(currentLanguage === "mr" ? "स्त्री" : "Female") + "</option></select>" +
+      "</div>";
+    container.appendChild(card);
+  });
+  document.getElementById("editBookingModal").classList.add("show");
+}
+
+function closeBookingEditor(){
+  editingSubmissionId = "";
+  document.getElementById("editBookingModal").classList.remove("show");
+}
+
+async function saveBookingEdit(){
+  if (!validatedAgent || !editingSubmissionId) return;
+  const participants = Array.from(document.querySelectorAll("#editBookingParticipants .booking-participant")).map(function(card){
+    return {
+      name: card.querySelector(".edit-name").value.trim(),
+      age: card.querySelector(".edit-age").value.trim(),
+      mobile: card.querySelector(".edit-mobile").value.trim(),
+      gender: card.querySelector(".edit-gender").value
+    };
+  });
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        action: "updateBooking",
+        agentMobile: validatedAgent.mobile,
+        submissionId: editingSubmissionId,
+        accommodation: document.getElementById("editAccommodation").value,
+        location: {
+          area: document.getElementById("editArea").value.trim() || document.getElementById("editCity").value.trim(),
+          city: document.getElementById("editCity").value.trim(),
+          district: document.getElementById("editCity").value.trim(),
+          state: document.getElementById("editState").value.trim(),
+          postcode: document.getElementById("editPostcode").value.trim()
+        },
+        participants: participants
+      })
+    });
+    const result = await response.json();
+    if (result.status !== "success") throw new Error(result.message || "Could not save booking");
+    closeBookingEditor();
+    await loadAvailability();
+    await loadVolunteerBookings();
+    bookingsVisible = true;
+    document.getElementById("bookingsPanel").classList.add("show");
+  } catch (error) {
+    const target = document.getElementById("editBookingError");
+    target.textContent = error && error.message ? error.message : "Could not save booking";
+    target.style.display = "block";
+  }
+}
+
+function translateAccommodationValue(value){
+  if (currentLanguage === "mr") return String(value || "").toLowerCase() === "free" ? "मोफत" : "स्वतःचे / सशुल्क";
+  return String(value || "").toLowerCase() === "free" ? "Free" : "Own/Paid";
+}
+
+function translateStatusValue(value){
+  const normalized = String(value || "").toLowerCase() === "inactive" ? "inactive" : "active";
+  if (currentLanguage === "mr") return normalized === "active" ? "सक्रिय" : "निष्क्रिय";
+  return normalized === "active" ? "Active" : "Inactive";
+}
+
+function translateGenderValue(value){
+  if (currentLanguage === "mr") return value === "Lady" ? "स्त्री" : "पुरुष";
+  return value === "Lady" ? "Female" : "Male";
+}
+
 async function handleSubmit(event){
   event.preventDefault();
   if (!validatedAgent) return;
@@ -873,11 +1117,13 @@ async function handleSubmit(event){
     const result = await response.json();
     if (result.status !== "success") throw new Error(result.message || "Submission failed");
     await loadAvailability();
+    await loadVolunteerBookings();
     showSuccess(participants.length, false, String(result.submissionNumber || ""));
   } catch (error) {
     const verification = await verifySubmission(submissionId);
     if (verification.confirmed) {
       await loadAvailability();
+      await loadVolunteerBookings();
       showSuccess(participants.length, true, verification.bookingId);
       return;
     }
@@ -962,3 +1208,4 @@ function escapeHtml(value){
 </script>
 </body>
 </html>
+
