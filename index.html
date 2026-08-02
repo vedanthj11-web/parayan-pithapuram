@@ -219,6 +219,7 @@
       <div id="statusIcon">✓</div>
       <h2 id="statusTitle"></h2>
       <p id="statusMsg"></p>
+      <div id="bookingIdDisplay" class="booking-id"></div>
     </div>
   </div>
 </div>
@@ -467,6 +468,7 @@ document.addEventListener("click", function(event){
 });
 
 renderLanguageChooser();
+hardenAutofill();
 
 function renderLanguageChooser(){
   document.title = TEXTS.en.pageTitle;
@@ -482,6 +484,28 @@ function renderLanguageChooser(){
   document.getElementById("validationIntro").textContent = TEXTS.en.validationIntro;
   document.getElementById("closeValidationBtn").textContent = TEXTS.en.validationClose;
   renderContacts("en");
+}
+
+function hardenAutofill(){
+  document.querySelectorAll("input").forEach(function(input, index){
+    input.setAttribute("autocomplete", "off");
+    input.setAttribute("autocorrect", "off");
+    input.setAttribute("autocapitalize", input.id === "locationSearch" ? "words" : "off");
+    input.setAttribute("spellcheck", "false");
+    input.setAttribute("data-form-type", "other");
+    input.setAttribute("data-lpignore", "true");
+    if (!input.name) input.name = "field_" + index + "_" + Math.random().toString(36).slice(2, 8);
+    if (input.type !== "radio") {
+      input.readOnly = true;
+      const unlock = function(){
+        input.readOnly = false;
+        input.removeEventListener("focus", unlock);
+        input.removeEventListener("pointerdown", unlock);
+      };
+      input.addEventListener("focus", unlock);
+      input.addEventListener("pointerdown", unlock);
+    }
+  });
 }
 
 function selectLanguage(language){
@@ -1029,11 +1053,11 @@ function showSuccess(count, verifiedAfterRetry, bookingId){
   statusBox.classList.remove("error");
   document.getElementById("statusIcon").textContent = "✓";
   document.getElementById("statusTitle").textContent = t("successTitle");
-  document.getElementById("statusMsg").innerHTML =
-    escapeHtml(formatMessage(
-      verifiedAfterRetry ? t("successMessageRetry") : t("successMessage"),
-      { count: count, bookingId: "" }
-    )) + '<div class="booking-id">' + escapeHtml(bookingId) + "</div>";
+  document.getElementById("statusMsg").textContent = formatMessage(
+    verifiedAfterRetry ? t("successMessageRetry") : t("successMessage"),
+    { count: count, bookingId: "" }
+  );
+  document.getElementById("bookingIdDisplay").textContent = bookingId;
 }
 
 function showFailure(message){
