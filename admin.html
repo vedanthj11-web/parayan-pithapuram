@@ -26,6 +26,7 @@
   #dashboard{display:none;max-width:1380px;margin:0 auto;}
   .top-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;}
   .top-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .top-actions select{min-width:220px;}
   #lastUpdated{font-size:12px;color:var(--muted);}
   #loadingMsg,#errorMsg{text-align:center;padding:42px 18px;color:var(--muted);}
   #errorMsg{display:none;color:#c0392b;}
@@ -85,6 +86,14 @@
   .detail-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.35px;margin-bottom:4px;}
   .detail-value{font-size:14px;color:var(--ink);word-break:break-word;}
   .modal-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .edit-modal-card{width:min(100%,880px);max-height:min(88vh,900px);overflow:auto;background:#fff;border-radius:16px;padding:20px;box-shadow:0 18px 46px rgba(0,0,0,.24);}
+  .edit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:16px;}
+  .booking-participant{border:1px solid var(--border);border-radius:12px;padding:14px;background:#fffaf3;margin-bottom:12px;}
+  .booking-participant h4{margin:0 0 10px;color:var(--maroon);}
+  .participant-edit-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
+  .capacity-note{font-size:13px;color:var(--muted);}
+  .modal-actions.spread{justify-content:space-between;align-items:center;}
+  @media(max-width:760px){.edit-grid,.participant-edit-grid{grid-template-columns:1fr;}}
   @media(max-width:640px){body{padding:14px;}.panel,.card,#lockScreen{padding:16px;}.detail-grid{grid-template-columns:1fr;}.accom-grid{grid-template-columns:1fr;}}
 </style>
 </head>
@@ -103,6 +112,11 @@
   <div class="top-row">
     <div id="lastUpdated"></div>
     <div class="top-actions">
+      <select id="languageMode">
+        <option value="original">Original</option>
+        <option value="en">Complete English</option>
+        <option value="mr">Complete Marathi</option>
+      </select>
       <button type="button" class="action-btn secondary" id="downloadBtn">Download Excel</button>
       <button type="button" class="action-btn" id="refreshBtn">Refresh</button>
     </div>
@@ -128,8 +142,8 @@
       <div class="panel">
         <h2>Accommodation</h2>
         <div class="accom-grid">
-          <div class="accom-card free"><div class="num" id="accomFree">0</div><div class="lbl">Free by Devasthanam</div></div>
-          <div class="accom-card own"><div class="num" id="accomOwn">0</div><div class="lbl">Own Arrangement</div></div>
+          <div class="accom-card free"><div class="lbl" id="accomFreeTitle">Devasthanam Free</div><div class="num" id="accomFree">0/400</div><div class="lbl" id="accomFreeMeta">0 remaining</div></div>
+          <div class="accom-card own"><div class="lbl" id="accomOwnTitle">Own/Paid</div><div class="num" id="accomOwn">0/300</div><div class="lbl" id="accomOwnMeta">0 remaining</div></div>
         </div>
       </div>
 
@@ -157,7 +171,7 @@
           <div class="filter-group"><label>Gender</label><select id="genderFilter"><option value="all">All</option><option value="Gent">Gents</option><option value="Lady">Ladies</option></select></div>
           <div class="filter-group"><label>Accommodation</label><select id="accommodationFilter"></select></div>
           <div class="filter-group"><label>Language</label><select id="languageFilter"><option value="all">All</option><option value="en">English</option><option value="mr">Marathi</option></select></div>
-          <div class="filter-group"><label>Registered By</label><select id="sourceFilter"><option value="all">All</option><option value="self">Self</option><option value="volunteer">Volunteer</option></select></div>
+          <div class="filter-group"><label>Registered By</label><select id="sourceFilter"></select></div>
         </div>
 
         <div class="table-wrap">
@@ -201,6 +215,7 @@
       <div class="detail-card full"><div class="detail-label">Person ID</div><div class="detail-value" id="modalPersonId"></div></div>
     </div>
     <div class="modal-actions">
+      <button type="button" class="action-btn secondary" id="editBookingBtn">Edit Booking</button>
       <button type="button" class="action-btn" id="activateBtn">Mark Active</button>
       <button type="button" class="action-btn danger" id="deactivateBtn">Mark Inactive</button>
       <button type="button" class="action-btn secondary" id="closeModalBtn">Close</button>
@@ -208,14 +223,157 @@
   </div>
 </div>
 
+<div id="editModal" class="modal-backdrop" role="dialog" aria-modal="true">
+  <div class="edit-modal-card">
+    <h3 class="modal-title" id="editModalTitle">Edit Booking</h3>
+    <div class="edit-grid">
+      <div>
+        <label for="editBookingNumber">Booking ID</label>
+        <input id="editBookingNumber" type="text" readonly>
+      </div>
+      <div>
+        <label for="editAccommodation">Accommodation</label>
+        <select id="editAccommodation">
+          <option value="free">Free</option>
+          <option value="own">Own/Paid</option>
+        </select>
+      </div>
+      <div>
+        <label for="editCity">City</label>
+        <input id="editCity" type="text" autocomplete="off">
+      </div>
+      <div>
+        <label for="editState">State</label>
+        <input id="editState" type="text" autocomplete="off">
+      </div>
+      <div>
+        <label for="editArea">Area / Locality</label>
+        <input id="editArea" type="text" autocomplete="off">
+      </div>
+      <div>
+        <label for="editPostcode">Postcode</label>
+        <input id="editPostcode" type="text" maxlength="6" autocomplete="off">
+      </div>
+    </div>
+    <div id="editParticipants"></div>
+    <div class="modal-actions spread">
+      <div class="capacity-note" id="editError" style="display:none;color:#b33a30;"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button type="button" class="action-btn" id="saveBookingBtn">Save Booking</button>
+        <button type="button" class="action-btn secondary" id="cancelEditBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTkXBHASxYiSdqjy1eyYQASuqgDY-qvABIwISYEyOaKg8Bvg8H1WsVAOT7CWo78dat/exec";
 const ADMIN_KEY = "Admin@1";
+const VOLUNTEERS = [
+  "Prasad Bhivre",
+  "Priyanka Tai Patil",
+  "Devendra Kamod",
+  "Gnaneshwar Kamod",
+  "Jitendra Patil",
+  "Rupali Joshi",
+  "B.D. Wani"
+];
 const filters = { status: "active", city: "", gender: "all", accommodation: "", formLanguage: "all", source: "all" };
+const UI_TEXTS = {
+  original: {
+    pageTitle: "Admin Dashboard - Parayan Registrations",
+    dashboardTitle: "Registration Dashboard",
+    dashboardSub: "Shripad Shrivallabh Charitamrut Samohik Parayan · Pithapuram",
+    tabs: ["Analytics", "All Submissions"],
+    statLabels: ["People", "Gents", "Ladies", "Cities"],
+    accommodationPanel: "Accommodation",
+    accommodationCards: ["Devasthanam Free", "Own/Paid"],
+    cityBreakdown: "City Breakdown",
+    ageDistribution: "Age Distribution",
+    submittedPeople: "Submitted People",
+    rowsWord: "rows",
+    filterLabels: ["Status", "City", "Gender", "Accommodation", "Language", "Registered By"],
+    statusLabels: { active: "Active", all: "All", inactive: "Inactive" },
+    genderOptions: { all: "All", Gent: "Gents", Lady: "Ladies" },
+    languageOptions: { all: "All", en: "English", mr: "Marathi" },
+    sourceAll: "All",
+    sourceSelf: "Self",
+    cityPlaceholder: "All Cities",
+    accommodationPlaceholder: "All Accommodation",
+    tableHeaders: ["Sr. No.", "Submission Number", "Name", "Mobile Number", "Age", "Gender", "City", "Accommodation", "Registered By", "Status"],
+    empty: "No data for the selected filter.",
+    loading: "Loading data...",
+    loadError: "Could not load data. Check the Apps Script deployment and latest published version.",
+    lastUpdated: "Last updated:",
+    refresh: "Refresh",
+    download: "Download Excel",
+    languageModes: ["Original", "Complete English", "Complete Marathi"],
+    modalLabels: ["Gender", "Age", "Mobile", "City", "Postcode", "Accommodation", "Registered By", "Status", "Submission Number", "Person ID"],
+    modalTitle: "Person Details",
+    editBooking: "Edit Booking",
+    markActive: "Mark Active",
+    markInactive: "Mark Inactive",
+    close: "Close",
+    saveBooking: "Save Booking",
+    cancel: "Cancel",
+    editFields: ["Booking ID", "Accommodation", "City", "State", "Area / Locality", "Postcode"],
+    editParticipant: "Participant",
+    noBars: "No data for the selected filter.",
+    remaining: "remaining",
+    filled: "filled"
+  },
+  en: {},
+  mr: {
+    pageTitle: "प्रशासक डॅशबोर्ड - पारायण नोंदणी",
+    dashboardTitle: "नोंदणी डॅशबोर्ड",
+    dashboardSub: "श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण · पिठापूरम",
+    tabs: ["विश्लेषण", "सर्व नोंदी"],
+    statLabels: ["व्यक्ती", "पुरुष", "स्त्रिया", "शहरे"],
+    accommodationPanel: "निवास क्षमता",
+    accommodationCards: ["देवस्थान मोफत", "स्वतःचे / सशुल्क"],
+    cityBreakdown: "शहरनिहाय संख्या",
+    ageDistribution: "वयोगटानुसार संख्या",
+    submittedPeople: "नोंदवलेले सहभागी",
+    rowsWord: "ओळी",
+    filterLabels: ["स्थिती", "शहर", "लिंग", "निवास", "भाषा", "नोंदणी करणारे"],
+    statusLabels: { active: "सक्रिय", all: "सर्व", inactive: "निष्क्रिय" },
+    genderOptions: { all: "सर्व", Gent: "पुरुष", Lady: "स्त्रिया" },
+    languageOptions: { all: "सर्व", en: "इंग्रजी", mr: "मराठी" },
+    sourceAll: "सर्व",
+    sourceSelf: "स्वतः",
+    cityPlaceholder: "सर्व शहरे",
+    accommodationPlaceholder: "सर्व निवास",
+    tableHeaders: ["क्र.", "बुकिंग क्रमांक", "नाव", "मोबाईल क्रमांक", "वय", "लिंग", "शहर", "निवास", "नोंदणी करणारे", "स्थिती"],
+    empty: "निवडलेल्या फिल्टरसाठी माहिती नाही.",
+    loading: "माहिती लोड होत आहे...",
+    loadError: "माहिती मिळाली नाही. कृपया Apps Script चे नवीन deployment तपासा.",
+    lastUpdated: "शेवटचे अद्यतन:",
+    refresh: "रिफ्रेश",
+    download: "एक्सेल डाउनलोड",
+    languageModes: ["मूळ", "पूर्ण इंग्रजी", "पूर्ण मराठी"],
+    modalLabels: ["लिंग", "वय", "मोबाईल", "शहर", "पोस्टकोड", "निवास", "नोंदणी करणारे", "स्थिती", "बुकिंग क्रमांक", "पर्सन आयडी"],
+    modalTitle: "सहभागी तपशील",
+    editBooking: "बुकिंग संपादित करा",
+    markActive: "सक्रिय करा",
+    markInactive: "निष्क्रिय करा",
+    close: "बंद करा",
+    saveBooking: "बदल जतन करा",
+    cancel: "रद्द करा",
+    editFields: ["बुकिंग आयडी", "निवास", "शहर", "राज्य", "एरिया / परिसर", "पोस्टकोड"],
+    editParticipant: "सहभागी",
+    noBars: "निवडलेल्या फिल्टरसाठी माहिती नाही.",
+    remaining: "शिल्लक",
+    filled: "भरले"
+  }
+};
+UI_TEXTS.en = Object.assign({}, UI_TEXTS.original);
+
 let rawRows = [];
 let displayedRows = [];
 let selectedRow = null;
+let editingSubmissionId = "";
 let currentRequestId = 0;
+let displayMode = "original";
 
 const adminKeyInput = document.getElementById("adminKey");
 const cityFilter = document.getElementById("cityFilter");
@@ -223,6 +381,7 @@ const genderFilter = document.getElementById("genderFilter");
 const accommodationFilter = document.getElementById("accommodationFilter");
 const languageFilter = document.getElementById("languageFilter");
 const sourceFilter = document.getElementById("sourceFilter");
+const languageMode = document.getElementById("languageMode");
 
 document.getElementById("loginBtn").addEventListener("click", tryUnlock);
 adminKeyInput.addEventListener("keydown", function(event){ if (event.key === "Enter") { event.preventDefault(); tryUnlock(); } });
@@ -231,7 +390,17 @@ document.getElementById("downloadBtn").addEventListener("click", downloadExcel);
 document.getElementById("activateBtn").addEventListener("click", function(){ updateSelectedStatus("active"); });
 document.getElementById("deactivateBtn").addEventListener("click", function(){ updateSelectedStatus("inactive"); });
 document.getElementById("closeModalBtn").addEventListener("click", closeUserModal);
+document.getElementById("editBookingBtn").addEventListener("click", openEditFromSelected);
+document.getElementById("saveBookingBtn").addEventListener("click", saveBookingEdit);
+document.getElementById("cancelEditBtn").addEventListener("click", closeEditModal);
 document.getElementById("userModal").addEventListener("click", function(event){ if (event.target.id === "userModal") closeUserModal(); });
+document.getElementById("editModal").addEventListener("click", function(event){ if (event.target.id === "editModal") closeEditModal(); });
+languageMode.addEventListener("change", function(){
+  displayMode = languageMode.value;
+  applyUiLanguage();
+  populateDropdowns(rawRows);
+  applyCurrentFilters();
+});
 
 document.querySelectorAll(".tab-btn").forEach(function(button){
   button.addEventListener("click", function(){
@@ -255,6 +424,12 @@ accommodationFilter.addEventListener("change", function(){ filters.accommodation
 languageFilter.addEventListener("change", function(){ filters.formLanguage = languageFilter.value; applyCurrentFilters(); });
 sourceFilter.addEventListener("change", function(){ filters.source = sourceFilter.value; applyCurrentFilters(); });
 
+applyUiLanguage();
+
+function t(){
+  return UI_TEXTS[displayMode] || UI_TEXTS.original;
+}
+
 function tryUnlock(){
   if (adminKeyInput.value !== ADMIN_KEY) { alert("Incorrect key."); return; }
   document.getElementById("lockScreen").style.display = "none";
@@ -267,14 +442,14 @@ async function loadData(){
   const requestId = currentRequestId;
   setLoadingState(true);
   try {
-    const response = await fetch(SCRIPT_URL + "?action=getAllData&_=" + Date.now());
+    const response = await fetch(SCRIPT_URL + "?action=getAllData&adminKey=" + encodeURIComponent(ADMIN_KEY) + "&_=" + Date.now());
     const payload = await response.json();
     if (payload.status !== "success") throw new Error(payload.message || "Could not load rows");
     if (requestId !== currentRequestId) return;
     rawRows = Array.isArray(payload.data) ? payload.data : [];
     populateDropdowns(rawRows);
     applyCurrentFilters();
-    document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleString();
+    document.getElementById("lastUpdated").textContent = t().lastUpdated + " " + new Date().toLocaleString();
     document.getElementById("content").style.display = "block";
     document.getElementById("errorMsg").style.display = "none";
   } catch (error) {
@@ -289,15 +464,65 @@ async function loadData(){
 
 function setLoadingState(isLoading){
   document.getElementById("loadingMsg").style.display = isLoading ? "block" : "none";
+  document.getElementById("loadingMsg").textContent = t().loading;
+  document.getElementById("errorMsg").textContent = t().loadError;
   if (isLoading) {
     document.getElementById("content").style.display = "none";
     document.getElementById("errorMsg").style.display = "none";
   }
 }
 
+function applyUiLanguage(){
+  document.title = t().pageTitle;
+  document.querySelector("#dashboard > h1").textContent = t().dashboardTitle;
+  document.querySelector("#dashboard > .sub").textContent = t().dashboardSub;
+  document.querySelectorAll(".tab-btn")[0].textContent = t().tabs[0];
+  document.querySelectorAll(".tab-btn")[1].textContent = t().tabs[1];
+  document.querySelectorAll(".stat-card .lbl")[0].textContent = t().statLabels[0];
+  document.querySelectorAll(".stat-card .lbl")[1].textContent = t().statLabels[1];
+  document.querySelectorAll(".stat-card .lbl")[2].textContent = t().statLabels[2];
+  document.querySelectorAll(".stat-card .lbl")[3].textContent = t().statLabels[3];
+  document.querySelector("#analyticsTab .panel h2").textContent = t().accommodationPanel;
+  document.getElementById("accomFreeTitle").textContent = t().accommodationCards[0];
+  document.getElementById("accomOwnTitle").textContent = t().accommodationCards[1];
+  document.querySelectorAll("#analyticsTab .panel h2")[1].textContent = t().cityBreakdown;
+  document.querySelectorAll("#analyticsTab .panel h2")[2].textContent = t().ageDistribution;
+  document.querySelector("#dataTab .panel h2").textContent = t().submittedPeople;
+  document.querySelectorAll(".filter-group label").forEach(function(label, index){ label.textContent = t().filterLabels[index]; });
+  document.querySelectorAll(".status-btn")[0].textContent = t().statusLabels.active;
+  document.querySelectorAll(".status-btn")[1].textContent = t().statusLabels.all;
+  document.querySelectorAll(".status-btn")[2].textContent = t().statusLabels.inactive;
+  document.querySelector("#genderFilter option[value='all']").textContent = t().genderOptions.all;
+  document.querySelector("#genderFilter option[value='Gent']").textContent = t().genderOptions.Gent;
+  document.querySelector("#genderFilter option[value='Lady']").textContent = t().genderOptions.Lady;
+  document.querySelector("#languageFilter option[value='all']").textContent = t().languageOptions.all;
+  document.querySelector("#languageFilter option[value='en']").textContent = t().languageOptions.en;
+  document.querySelector("#languageFilter option[value='mr']").textContent = t().languageOptions.mr;
+  document.querySelectorAll("thead th").forEach(function(th, index){ th.textContent = t().tableHeaders[index]; });
+  document.getElementById("dataEmpty").textContent = t().empty;
+  document.getElementById("downloadBtn").textContent = t().download;
+  document.getElementById("refreshBtn").textContent = t().refresh;
+  Array.from(languageMode.options).forEach(function(option, index){ option.textContent = t().languageModes[index]; });
+  document.getElementById("modalName").textContent = selectedRow ? displayText(selectedRow["Name"]) : t().modalTitle;
+  document.querySelectorAll(".detail-label").forEach(function(label, index){ label.textContent = t().modalLabels[index]; });
+  document.getElementById("editBookingBtn").textContent = t().editBooking;
+  document.getElementById("activateBtn").textContent = t().markActive;
+  document.getElementById("deactivateBtn").textContent = t().markInactive;
+  document.getElementById("closeModalBtn").textContent = t().close;
+  document.getElementById("saveBookingBtn").textContent = t().saveBooking;
+  document.getElementById("cancelEditBtn").textContent = t().cancel;
+  document.querySelector("label[for='editBookingNumber']").textContent = t().editFields[0];
+  document.querySelector("label[for='editAccommodation']").textContent = t().editFields[1];
+  document.querySelector("label[for='editCity']").textContent = t().editFields[2];
+  document.querySelector("label[for='editState']").textContent = t().editFields[3];
+  document.querySelector("label[for='editArea']").textContent = t().editFields[4];
+  document.querySelector("label[for='editPostcode']").textContent = t().editFields[5];
+}
+
 function populateDropdowns(rows){
-  setSelectOptions(cityFilter, "All Cities", uniqueSorted(rows.map(function(row){ return row["City"]; })));
-  setSelectOptions(accommodationFilter, "All Accommodation", uniqueSorted(rows.map(function(row){ return formatAccommodation(row["Accommodation"]); })));
+  setSelectOptions(cityFilter, t().cityPlaceholder, uniqueSorted(rows.map(function(row){ return row["City"]; })), function(value){ return displayText(value); });
+  setSelectOptions(accommodationFilter, t().accommodationPlaceholder, ["free", "own"], function(value){ return translateAccommodation(value); });
+  populateSourceFilter();
   cityFilter.value = filters.city;
   genderFilter.value = filters.gender;
   accommodationFilter.value = filters.accommodation;
@@ -305,7 +530,22 @@ function populateDropdowns(rows){
   sourceFilter.value = filters.source;
 }
 
-function setSelectOptions(select, placeholder, values){
+function populateSourceFilter(){
+  const values = ["all", "Self"].concat(VOLUNTEERS.map(function(name){ return "Volunteer - " + name; }));
+  const previous = sourceFilter.value;
+  sourceFilter.innerHTML = "";
+  values.forEach(function(value){
+    const option = document.createElement("option");
+    option.value = value === "all" ? "all" : value;
+    if (value === "all") option.textContent = t().sourceAll;
+    else if (value === "Self") option.textContent = t().sourceSelf;
+    else option.textContent = translateRegisteredBy(value);
+    sourceFilter.appendChild(option);
+  });
+  if (values.indexOf(previous) !== -1) sourceFilter.value = previous;
+}
+
+function setSelectOptions(select, placeholder, values, formatter){
   const previous = select.value;
   select.innerHTML = "";
   const defaultOption = document.createElement("option");
@@ -315,7 +555,7 @@ function setSelectOptions(select, placeholder, values){
   values.forEach(function(value){
     const option = document.createElement("option");
     option.value = value;
-    option.textContent = value;
+    option.textContent = formatter ? formatter(value) : value;
     select.appendChild(option);
   });
   if (Array.from(select.options).some(function(option){ return option.value === previous; })) select.value = previous;
@@ -326,10 +566,9 @@ function applyCurrentFilters(){
     if (filters.status !== "all" && normalizeStatus(row["Status"]) !== filters.status) return false;
     if (filters.city && String(row["City"] || "") !== filters.city) return false;
     if (filters.gender !== "all" && String(row["Type"] || "") !== filters.gender) return false;
-    if (filters.accommodation && formatAccommodation(row["Accommodation"]) !== filters.accommodation) return false;
+    if (filters.accommodation && String(row["Accommodation"] || "") !== filters.accommodation) return false;
     if (filters.formLanguage !== "all" && String(row["Form Language"] || "en") !== filters.formLanguage) return false;
-    if (filters.source === "self" && normalizeRegisteredBy(row["Registered By"]) !== "Self") return false;
-    if (filters.source === "volunteer" && !isVolunteerRow(row)) return false;
+    if (filters.source !== "all" && normalizeRegisteredBy(row["Registered By"]) !== filters.source) return false;
     return true;
   });
   renderAnalytics(displayedRows);
@@ -338,12 +577,15 @@ function applyCurrentFilters(){
 
 function renderAnalytics(rows){
   const stats = buildAnalytics(rows);
+  const activeCapacity = buildAnalytics(rawRows.filter(function(row){ return normalizeStatus(row["Status"]) === "active"; }));
   document.getElementById("statTotal").textContent = stats.totalPeople;
   document.getElementById("statGents").textContent = stats.totalGents;
   document.getElementById("statLadies").textContent = stats.totalLadies;
   document.getElementById("statCities").textContent = stats.cityCount;
-  document.getElementById("accomFree").textContent = stats.accomFree;
-  document.getElementById("accomOwn").textContent = stats.accomOwn;
+  document.getElementById("accomFree").textContent = activeCapacity.accomFree + "/400";
+  document.getElementById("accomOwn").textContent = activeCapacity.accomOwn + "/300";
+  document.getElementById("accomFreeMeta").textContent = (400 - activeCapacity.accomFree) + " " + t().remaining + " · " + activeCapacity.accomFree + " " + t().filled;
+  document.getElementById("accomOwnMeta").textContent = (300 - activeCapacity.accomOwn) + " " + t().remaining + " · " + activeCapacity.accomOwn + " " + t().filled;
   renderBars("cityBars", stats.cityBreakdown, "city");
   renderBars("ageBars", stats.ageBreakdown, "range");
 }
@@ -379,14 +621,15 @@ function renderBars(targetId, items, labelKey){
   const target = document.getElementById(targetId);
   target.innerHTML = "";
   if (!items.length || items.every(function(item){ return Number(item.count || 0) === 0; })) {
-    target.innerHTML = '<p class="empty-note">No data for the selected filter.</p>';
+    target.innerHTML = '<p class="empty-note">' + safeCell(t().noBars) + '</p>';
     return;
   }
   const maxCount = Math.max.apply(null, items.map(function(item){ return item.count; }));
   items.slice().sort(function(a, b){ return b.count - a.count; }).forEach(function(item){
     const row = document.createElement("div");
     row.className = "bar-row";
-    row.innerHTML = '<div class="bar-label">' + safeCell(item[labelKey]) + '</div><div class="bar-track"><div class="bar-fill" style="width:' + ((item.count / Math.max(maxCount, 1)) * 100) + '%"></div></div><div class="bar-count">' + safeCell(item.count) + '</div>';
+    const label = labelKey === "city" ? displayText(item[labelKey]) : translateAgeRange(item[labelKey]);
+    row.innerHTML = '<div class="bar-label">' + safeCell(label) + '</div><div class="bar-track"><div class="bar-fill" style="width:' + ((item.count / Math.max(maxCount, 1)) * 100) + '%"></div></div><div class="bar-count">' + safeCell(item.count) + '</div>';
     target.appendChild(row);
   });
 }
@@ -396,7 +639,7 @@ function renderTable(rows){
   const empty = document.getElementById("dataEmpty");
   const summary = document.getElementById("tableSummary");
   body.innerHTML = "";
-  summary.textContent = rows.length + " row" + (rows.length === 1 ? "" : "s");
+  summary.textContent = rows.length + " " + t().rowsWord;
   if (!rows.length) { empty.style.display = "block"; return; }
   empty.style.display = "none";
   let previousSubmissionNumber = null;
@@ -411,14 +654,14 @@ function renderTable(rows){
     tr.innerHTML =
       "<td>" + safeCell(index + 1) + "</td>" +
       "<td>" + safeCell(row["Submission Number"]) + "</td>" +
-      "<td>" + safeCell(row["Name"]) + "</td>" +
+      "<td>" + safeCell(displayText(row["Name"])) + "</td>" +
       "<td>" + safeCell(row["Mobile Number"]) + "</td>" +
       "<td>" + safeCell(row["Age"]) + "</td>" +
-      "<td>" + safeCell(row["Type"]) + "</td>" +
-      "<td>" + safeCell(row["City"]) + "</td>" +
-      "<td>" + safeCell(formatAccommodation(row["Accommodation"])) + "</td>" +
-      "<td>" + safeCell(normalizeRegisteredBy(row["Registered By"])) + "</td>" +
-      "<td>" + safeCell(capitalize(normalizeStatus(row["Status"]))) + "</td>";
+      "<td>" + safeCell(translateType(row["Type"])) + "</td>" +
+      "<td>" + safeCell(displayText(row["City"])) + "</td>" +
+      "<td>" + safeCell(translateAccommodation(row["Accommodation"])) + "</td>" +
+      "<td>" + safeCell(translateRegisteredBy(row["Registered By"])) + "</td>" +
+      "<td>" + safeCell(translateStatus(row["Status"])) + "</td>";
     tr.addEventListener("click", function(){ openUserModal(row); });
     body.appendChild(tr);
   });
@@ -426,15 +669,15 @@ function renderTable(rows){
 
 function openUserModal(row){
   selectedRow = row;
-  document.getElementById("modalName").textContent = row["Name"] || "Person Details";
-  document.getElementById("modalGender").textContent = row["Type"] || "-";
+  document.getElementById("modalName").textContent = displayText(row["Name"]) || t().modalTitle;
+  document.getElementById("modalGender").textContent = translateType(row["Type"]) || "-";
   document.getElementById("modalAge").textContent = row["Age"] || "-";
   document.getElementById("modalMobile").textContent = row["Mobile Number"] || "-";
-  document.getElementById("modalCity").textContent = row["City"] || "-";
+  document.getElementById("modalCity").textContent = displayText(row["City"]) || "-";
   document.getElementById("modalPostcode").textContent = row["Postcode"] || "-";
-  document.getElementById("modalAccommodation").textContent = formatAccommodation(row["Accommodation"]);
-  document.getElementById("modalRegisteredBy").textContent = normalizeRegisteredBy(row["Registered By"]);
-  document.getElementById("modalStatus").textContent = capitalize(normalizeStatus(row["Status"]));
+  document.getElementById("modalAccommodation").textContent = translateAccommodation(row["Accommodation"]);
+  document.getElementById("modalRegisteredBy").textContent = translateRegisteredBy(row["Registered By"]);
+  document.getElementById("modalStatus").textContent = translateStatus(row["Status"]);
   document.getElementById("modalSubmissionNumber").textContent = row["Submission Number"] || "-";
   document.getElementById("modalPersonId").textContent = row["Person ID"] || "-";
   document.getElementById("userModal").classList.add("show");
@@ -445,13 +688,96 @@ function closeUserModal(){
   document.getElementById("userModal").classList.remove("show");
 }
 
+function openEditFromSelected(){
+  if (!selectedRow) return;
+  const submissionId = String(selectedRow["Submission ID"] || "");
+  const bookingRows = getBookingRows(submissionId);
+  if (!bookingRows.length) return;
+  editingSubmissionId = submissionId;
+  document.getElementById("editModalTitle").textContent = t().editBooking + " #" + bookingRows[0]["Submission Number"];
+  document.getElementById("editBookingNumber").value = bookingRows[0]["Submission Number"] || "";
+  document.getElementById("editAccommodation").value = bookingRows[0]["Accommodation"] || "free";
+  document.getElementById("editCity").value = bookingRows[0]["City"] || "";
+  document.getElementById("editState").value = bookingRows[0]["State"] || "";
+  document.getElementById("editArea").value = bookingRows[0]["Area/Locality"] || bookingRows[0]["City"] || "";
+  document.getElementById("editPostcode").value = bookingRows[0]["Postcode"] || "";
+  document.getElementById("editError").style.display = "none";
+  renderEditParticipants(bookingRows);
+  document.getElementById("editModal").classList.add("show");
+}
+
+function closeEditModal(){
+  editingSubmissionId = "";
+  document.getElementById("editModal").classList.remove("show");
+}
+
+function renderEditParticipants(rows){
+  const container = document.getElementById("editParticipants");
+  container.innerHTML = "";
+  rows.forEach(function(row, index){
+    const block = document.createElement("div");
+    block.className = "booking-participant";
+    block.innerHTML =
+      "<h4>" + safeCell(t().editParticipant + " " + (index + 1)) + "</h4>" +
+      '<div class="participant-edit-grid">' +
+      '<input type="text" class="edit-name" value="' + safeCell(row["Name"] || "") + '" autocomplete="off">' +
+      '<input type="number" class="edit-age" value="' + safeCell(row["Age"] || "") + '" min="1" max="120" autocomplete="off">' +
+      '<input type="tel" class="edit-mobile" value="' + safeCell(row["Mobile Number"] || "") + '" autocomplete="off">' +
+      '<select class="edit-gender"><option value="male"' + (row["Type"] === "Gent" ? " selected" : "") + '>' + safeCell(translateType("Gent")) + '</option><option value="female"' + (row["Type"] === "Lady" ? " selected" : "") + '>' + safeCell(translateType("Lady")) + '</option></select>' +
+      "</div>";
+    container.appendChild(block);
+  });
+}
+
+async function saveBookingEdit(){
+  if (!editingSubmissionId) return;
+  const participants = Array.from(document.querySelectorAll("#editParticipants .booking-participant")).map(function(card){
+    return {
+      name: card.querySelector(".edit-name").value.trim(),
+      age: card.querySelector(".edit-age").value.trim(),
+      mobile: card.querySelector(".edit-mobile").value.trim(),
+      gender: card.querySelector(".edit-gender").value
+    };
+  });
+  const payload = {
+    action: "updateBooking",
+    adminKey: ADMIN_KEY,
+    submissionId: editingSubmissionId,
+    accommodation: document.getElementById("editAccommodation").value,
+    location: {
+      area: document.getElementById("editArea").value.trim() || document.getElementById("editCity").value.trim(),
+      city: document.getElementById("editCity").value.trim(),
+      district: document.getElementById("editCity").value.trim(),
+      state: document.getElementById("editState").value.trim(),
+      postcode: document.getElementById("editPostcode").value.trim()
+    },
+    participants: participants
+  };
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json();
+    if (result.status !== "success") throw new Error(result.message || "Could not save booking");
+    closeEditModal();
+    closeUserModal();
+    await loadData();
+  } catch (error) {
+    const errorBox = document.getElementById("editError");
+    errorBox.textContent = error && error.message ? error.message : "Could not save booking";
+    errorBox.style.display = "block";
+  }
+}
+
 async function updateSelectedStatus(nextStatus){
   if (!selectedRow) return;
   try {
     const response = await fetch(SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action:"updateStatus", personId:selectedRow["Person ID"], nextStatus:nextStatus })
+      body: JSON.stringify({ action:"updateStatus", adminKey: ADMIN_KEY, personId:selectedRow["Person ID"], nextStatus:nextStatus })
     });
     const payload = await response.json();
     if (payload.status !== "success") throw new Error(payload.message || "Status update failed");
@@ -466,19 +792,20 @@ async function updateSelectedStatus(nextStatus){
 function downloadExcel(){
   if (!displayedRows.length) { alert("No data available for export."); return; }
   if (typeof XLSX === "undefined") { alert("Excel export library failed to load. Please refresh and try again."); return; }
+  const labels = t().tableHeaders;
   const data = displayedRows.map(function(row, index){
-    return {
-      "Serial Number": index + 1,
-      "Submission/Booking Number": row["Submission Number"],
-      "Name": row["Name"],
-      "Mobile Number": row["Mobile Number"],
-      "Age": row["Age"],
-      "Gender": row["Type"],
-      "City": row["City"],
-      "Accommodation": formatAccommodation(row["Accommodation"]),
-      "Registered By": normalizeRegisteredBy(row["Registered By"]),
-      "Status": capitalize(normalizeStatus(row["Status"]))
-    };
+    const item = {};
+    item[labels[0]] = index + 1;
+    item[labels[1]] = row["Submission Number"];
+    item[labels[2]] = displayText(row["Name"]);
+    item[labels[3]] = row["Mobile Number"];
+    item[labels[4]] = row["Age"];
+    item[labels[5]] = translateType(row["Type"]);
+    item[labels[6]] = displayText(row["City"]);
+    item[labels[7]] = translateAccommodation(row["Accommodation"]);
+    item[labels[8]] = translateRegisteredBy(row["Registered By"]);
+    item[labels[9]] = translateStatus(row["Status"]);
+    return item;
   });
   const worksheet = XLSX.utils.json_to_sheet(data);
   worksheet["!cols"] = [
@@ -489,6 +816,120 @@ function downloadExcel(){
   XLSX.utils.book_append_sheet(workbook, worksheet, "Registrations");
   const datePart = new Date().toISOString().slice(0, 10);
   XLSX.writeFile(workbook, "parayan-registrations-" + filters.status + "-" + datePart + ".xlsx");
+}
+
+function getBookingRows(submissionId){
+  return rawRows.filter(function(row){
+    return String(row["Submission ID"] || "") === String(submissionId || "");
+  }).slice().sort(function(a, b){
+    return Number(a["Person No."] || 0) - Number(b["Person No."] || 0);
+  });
+}
+
+function displayText(value){
+  const text = String(value || "");
+  if (!text) return "";
+  if (displayMode === "original") return text;
+  if (displayMode === "en") return hasDevanagari(text) ? transliterateToLatin(text) : text;
+  return hasDevanagari(text) ? text : transliterateToDevanagari(text);
+}
+
+function translateAccommodation(value){
+  const normalized = String(value || "").toLowerCase();
+  if (displayMode === "mr") return normalized === "free" ? "मोफत" : normalized === "own" ? "स्वतःचे / सशुल्क" : value;
+  return normalized === "free" ? "Free" : normalized === "own" ? "Own/Paid" : value;
+}
+
+function translateStatus(value){
+  const normalized = normalizeStatus(value);
+  if (displayMode === "mr") return normalized === "active" ? "सक्रिय" : "निष्क्रिय";
+  return normalized === "active" ? "Active" : "Inactive";
+}
+
+function translateType(value){
+  const normalized = String(value || "");
+  if (displayMode === "mr") return normalized === "Lady" ? "स्त्री" : normalized === "Gent" ? "पुरुष" : normalized;
+  return normalized === "Lady" ? "Female" : normalized === "Gent" ? "Male" : normalized;
+}
+
+function translateRegisteredBy(value){
+  const normalized = normalizeRegisteredBy(value);
+  if (normalized === "Self") return displayMode === "mr" ? "स्वतः" : "Self";
+  const volunteerName = normalized.replace(/^Volunteer - /, "");
+  const translatedName = displayText(volunteerName);
+  return displayMode === "mr" ? "स्वयंसेवक - " + translatedName : "Volunteer - " + translatedName;
+}
+
+function translateAgeRange(value){
+  if (displayMode !== "mr") return value;
+  const map = { "0-12": "०-१२", "13-25": "१३-२५", "26-40": "२६-४०", "41-60": "४१-६०", "60+": "६०+" };
+  return map[value] || value;
+}
+
+function hasDevanagari(text){
+  return /[\u0900-\u097F]/.test(text);
+}
+
+function transliterateToLatin(input){
+  const independentVowels = { "अ":"a","आ":"aa","इ":"i","ई":"ee","उ":"u","ऊ":"oo","ए":"e","ऐ":"ai","ओ":"o","औ":"au","ऋ":"ri" };
+  const matras = { "ा":"aa","ि":"i","ी":"ee","ु":"u","ू":"oo","े":"e","ै":"ai","ो":"o","ौ":"au","ृ":"ri" };
+  const consonants = { "क":"k","ख":"kh","ग":"g","घ":"gh","ङ":"ng","च":"ch","छ":"chh","ज":"j","झ":"jh","ञ":"ny","ट":"t","ठ":"th","ड":"d","ढ":"dh","ण":"n","त":"t","थ":"th","द":"d","ध":"dh","न":"n","प":"p","फ":"ph","ब":"b","भ":"bh","म":"m","य":"y","र":"r","ल":"l","व":"v","श":"sh","ष":"sh","स":"s","ह":"h","ळ":"l","ज्ञ":"gya" };
+  let result = "";
+  for (let i = 0; i < input.length; i++) {
+    const char = input[i];
+    const next = input[i + 1] || "";
+    if (independentVowels[char]) {
+      result += independentVowels[char];
+      continue;
+    }
+    if (consonants[char]) {
+      let sound = consonants[char];
+      if (next === "्") {
+        result += sound;
+        i += 1;
+        continue;
+      }
+      if (matras[next]) {
+        result += sound + matras[next];
+        i += 1;
+        continue;
+      }
+      result += sound + "a";
+      continue;
+    }
+    if (char === "ं") { result += "n"; continue; }
+    if (char === "ः") { result += "h"; continue; }
+    result += char;
+  }
+  return result.replace(/aa/g, "a").replace(/\s+/g, " ").trim();
+}
+
+function transliterateToDevanagari(input){
+  const tokens = [
+    ["ksh","क्ष"],["gya","ज्ञ"],["chh","छ"],["sh","श"],["kh","ख"],["gh","घ"],["jh","झ"],["th","थ"],["dh","ध"],["ph","फ"],["bh","भ"],["aa","आ"],["ee","ई"],["ii","ई"],["oo","ऊ"],["ou","औ"],["ai","ऐ"],["au","औ"],
+    ["a","अ"],["i","इ"],["u","उ"],["e","ए"],["o","ओ"],["k","क"],["g","ग"],["c","क"],["j","ज"],["t","ट"],["d","ड"],["n","न"],["p","प"],["b","ब"],["m","म"],["y","य"],["r","र"],["l","ल"],["v","व"],["w","व"],["s","स"],["h","ह"],["f","फ"]
+  ];
+  return String(input || "").split(/(\s+)/).map(function(part){
+    if (/^\s+$/.test(part) || hasDevanagari(part)) return part;
+    let word = part.toLowerCase();
+    let out = "";
+    while (word.length) {
+      let matched = false;
+      for (let i = 0; i < tokens.length; i++) {
+        if (word.indexOf(tokens[i][0]) === 0) {
+          out += tokens[i][1];
+          word = word.slice(tokens[i][0].length);
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        out += word.charAt(0);
+        word = word.slice(1);
+      }
+    }
+    return out;
+  }).join("");
 }
 
 function uniqueSorted(values){
@@ -502,20 +943,6 @@ function normalizeStatus(value){
 function normalizeRegisteredBy(value){
   const text = String(value || "").trim() || "Self";
   return text.startsWith("Agent - ") ? text.replace(/^Agent - /, "Volunteer - ") : text;
-}
-
-function isVolunteerRow(row){
-  const registeredBy = String(row["Registered By"] || "").trim();
-  return registeredBy.startsWith("Volunteer - ") || registeredBy.startsWith("Agent - ");
-}
-
-function formatAccommodation(value){
-  return String(value || "").toLowerCase() === "free" ? "Free" : String(value || "").toLowerCase() === "own" ? "Own/Paid" : String(value || "");
-}
-
-function capitalize(value){
-  const text = String(value || "");
-  return text ? text.charAt(0).toUpperCase() + text.slice(1) : "";
 }
 
 function safeCell(value){
