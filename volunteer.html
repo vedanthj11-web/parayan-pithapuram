@@ -6,6 +6,7 @@
 <title>Volunteer Registration - Shripad Shrivallabh Charitamrut Samohik Parayan- 2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Serif:wght@600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <style>
   :root{
     --primary:#8c3a14;
@@ -196,6 +197,10 @@
 
       <div id="bookingsPanel" class="bookings-panel">
         <h3 id="bookingsTitle"></h3>
+        <div class="row" style="margin-bottom:12px;">
+          <input type="text" id="bookingsSearch" style="flex:1;" autocomplete="off">
+          <button type="button" class="btn secondary" id="downloadBookingsBtn" style="width:auto;"></button>
+        </div>
         <div class="bookings-table-wrap">
           <table class="bookings-table">
             <thead>
@@ -455,6 +460,8 @@ document.getElementById("agentVerifyBtn").addEventListener("click", verifyAgent)
 document.getElementById("regForm").addEventListener("submit", handleSubmit);
 document.getElementById("toggleBookingsBtn").addEventListener("click", toggleBookingsPanel);
 document.getElementById("refreshBookingsBtn").addEventListener("click", loadVolunteerBookings);
+document.getElementById("bookingsSearch").addEventListener("input", renderVolunteerBookings);
+document.getElementById("downloadBookingsBtn").addEventListener("click", downloadVolunteerBookings);
 document.getElementById("saveBookingBtn").addEventListener("click", saveBookingEdit);
 document.getElementById("cancelBookingBtn").addEventListener("click", closeBookingEditor);
 document.getElementById("closeValidationBtn").addEventListener("click", closeValidationModal);
@@ -531,6 +538,8 @@ function applyLanguage(){
   document.getElementById("bookingsHeadCity").textContent = currentLanguage === "mr" ? "शहर" : "City";
   document.getElementById("bookingsHeadAccommodation").textContent = currentLanguage === "mr" ? "निवास" : "Accommodation";
   document.getElementById("bookingsHeadStatus").textContent = currentLanguage === "mr" ? "स्थिती" : "Status";
+  document.getElementById("bookingsSearch").placeholder = currentLanguage === "mr" ? "नाव, शहर, मोबाईल, बुकिंग शोधा" : "Search name, city, mobile, booking ID";
+  document.getElementById("downloadBookingsBtn").textContent = currentLanguage === "mr" ? "डाउनलोड डेटा" : "Download Data";
   document.getElementById("editBookingTitle").textContent = currentLanguage === "mr" ? "बुकिंग संपादित करा" : "Edit Booking";
   document.getElementById("saveBookingBtn").textContent = currentLanguage === "mr" ? "बदल जतन करा" : "Save Booking";
   document.getElementById("cancelBookingBtn").textContent = currentLanguage === "mr" ? "रद्द करा" : "Cancel";
@@ -951,14 +960,28 @@ async function loadVolunteerBookings(){
 function renderVolunteerBookings(){
   const body = document.getElementById("bookingsTableBody");
   const empty = document.getElementById("bookingsEmpty");
+  const query = String(document.getElementById("bookingsSearch").value || "").trim().toLowerCase();
   body.innerHTML = "";
-  if (!volunteerBookings.length) {
+  const filteredRows = volunteerBookings.filter(function(row){
+    if (!query) return true;
+    const haystack = [
+      row["Submission Number"],
+      row["Name"],
+      row["Mobile Number"],
+      row["Age"],
+      row["City"],
+      row["Accommodation"],
+      row["Status"]
+    ].join(" ").toLowerCase();
+    return haystack.indexOf(query) !== -1;
+  });
+  if (!filteredRows.length) {
     empty.style.display = "block";
-    empty.textContent = currentLanguage === "mr" ? "अद्याप तुमची कोणतीही बुकिंग नाही." : "You do not have any bookings yet.";
+    empty.textContent = currentLanguage === "mr" ? "नोंदी सापडल्या नाहीत." : "No matching bookings found.";
     return;
   }
   empty.style.display = "none";
-  volunteerBookings.slice().sort(function(a, b){
+  filteredRows.slice().sort(function(a, b){
     return Number(b["Submission Number"] || 0) - Number(a["Submission Number"] || 0);
   }).forEach(function(row){
     const tr = document.createElement("tr");
@@ -974,6 +997,33 @@ function renderVolunteerBookings(){
     tr.addEventListener("click", function(){ openBookingEditor(row["Submission ID"]); });
     body.appendChild(tr);
   });
+}
+
+function downloadVolunteerBookings(){
+  if (!volunteerBookings.length || typeof XLSX === "undefined") return;
+  const query = String(document.getElementById("bookingsSearch").value || "").trim().toLowerCase();
+  const rows = volunteerBookings.filter(function(row){
+    if (!query) return true;
+    const haystack = [row["Submission Number"], row["Name"], row["Mobile Number"], row["Age"], row["City"], row["Accommodation"], row["Status"]].join(" ").toLowerCase();
+    return haystack.indexOf(query) !== -1;
+  });
+  const labels = currentLanguage === "mr"
+    ? ["बुकिंग आयडी","नाव","मोबाईल","वय","लिंग","शहर","निवास","स्थिती"]
+    : ["Booking ID","Name","Mobile","Age","Gender","City","Accommodation","Status"];
+  const data = rows.map(function(row){
+    const item = {};
+    item[labels[0]] = row["Submission Number"];
+    item[labels[1]] = row["Name"];
+    item[labels[2]] = row["Mobile Number"];
+    item[labels[3]] = row["Age"];
+    item[labels[4]] = translateGenderValue(row["Type"]);
+    item[labels[5]] = row["City"];
+    item[labels[6]] = translateAccommodationValue(row["Accommodation"]);
+    item[labels[7]] = translateStatusValue(row["Status"]);
+    return item;
+  });
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  XLSX.writeFile(XLSX.utils.book_new({ Sheets: { Bookings: worksheet }, SheetNames: ["Bookings"] }), "volunteer-bookings.xlsx");
 }
 
 function getBookingRows(submissionId){
