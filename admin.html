@@ -62,6 +62,9 @@
   @media(min-width:700px){.toolbar{grid-template-columns:repeat(3,minmax(0,1fr));}}
   @media(min-width:1100px){.toolbar{grid-template-columns:1.1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;}}
   .filter-group label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px;}
+  .checkbox-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+  .check-option{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:#fffaf3;font-size:13px;}
+  .check-option input{width:auto;min-width:auto;margin:0;}
   .status-switch{display:flex;gap:8px;flex-wrap:wrap;}
   .status-btn{background:#fff8ee;border:1px solid var(--border);color:var(--maroon);padding:10px 12px;}
   .status-btn.active{background:var(--saffron);border-color:var(--saffron);color:#fff;}
@@ -173,7 +176,15 @@
           <div class="filter-group"><label>Language</label><select id="languageFilter"><option value="all">All</option><option value="en">English</option><option value="mr">Marathi</option></select></div>
           <div class="filter-group"><label>Registered By</label><select id="sourceFilter"></select></div>
           <div class="filter-group"><label>Registration Date</label><select id="dateFilter"></select></div>
-          <div class="filter-group"><label>Duplicate Data</label><select id="duplicateFilter"><option value="all">All</option><option value="name">Name</option><option value="age">Age</option><option value="mobile">Mobile Number</option><option value="city">City</option><option value="name_age">Name + Age</option><option value="name_mobile">Name + Mobile</option><option value="name_city">Name + City</option><option value="age_mobile">Age + Mobile</option><option value="age_city">Age + City</option><option value="mobile_city">Mobile + City</option><option value="name_age_mobile">Name + Age + Mobile</option><option value="name_age_city">Name + Age + City</option><option value="name_mobile_city">Name + Mobile + City</option><option value="age_mobile_city">Age + Mobile + City</option><option value="all_fields">Name + Age + Mobile + City</option></select></div>
+          <div class="filter-group">
+            <label>Duplicate Data</label>
+            <div id="duplicateFilter" class="checkbox-grid">
+              <label class="check-option"><input type="checkbox" value="name"> <span>Name</span></label>
+              <label class="check-option"><input type="checkbox" value="age"> <span>Age</span></label>
+              <label class="check-option"><input type="checkbox" value="mobile"> <span>Mobile</span></label>
+              <label class="check-option"><input type="checkbox" value="city"> <span>City</span></label>
+            </div>
+          </div>
           <div class="filter-group"><label>Search</label><input id="searchFilter" type="text" placeholder="Search table" autocomplete="off"></div>
         </div>
 
@@ -281,7 +292,7 @@ const VOLUNTEERS = [
   "Rupali Joshi",
   "B.D. Wani"
 ];
-const filters = { status: "active", city: "", gender: "all", accommodation: "", formLanguage: "all", source: "all", registrationDate: "", duplicates: "all", search: "" };
+const filters = { status: "active", city: "", gender: "all", accommodation: "", formLanguage: "all", source: "all", registrationDate: "", duplicates: [], search: "" };
 const UI_TEXTS = {
   original: {
     pageTitle: "Admin Dashboard - Parayan Registrations",
@@ -452,7 +463,10 @@ accommodationFilter.addEventListener("change", function(){ filters.accommodation
 languageFilter.addEventListener("change", function(){ filters.formLanguage = languageFilter.value; applyCurrentFilters(); });
 sourceFilter.addEventListener("change", function(){ filters.source = sourceFilter.value; applyCurrentFilters(); });
 dateFilter.addEventListener("change", function(){ filters.registrationDate = dateFilter.value; applyCurrentFilters(); });
-duplicateFilter.addEventListener("change", function(){ filters.duplicates = duplicateFilter.value; applyCurrentFilters(); });
+duplicateFilter.addEventListener("change", function(){
+  filters.duplicates = Array.from(duplicateFilter.querySelectorAll('input[type="checkbox"]:checked')).map(function(input){ return input.value; });
+  applyCurrentFilters();
+});
 searchFilter.addEventListener("input", function(){ filters.search = searchFilter.value.trim().toLowerCase(); applyCurrentFilters(); });
 
 applyUiLanguage();
@@ -529,9 +543,11 @@ function applyUiLanguage(){
   document.querySelector("#languageFilter option[value='all']").textContent = t().languageOptions.all;
   document.querySelector("#languageFilter option[value='en']").textContent = t().languageOptions.en;
   document.querySelector("#languageFilter option[value='mr']").textContent = t().languageOptions.mr;
-  document.querySelector("#duplicateFilter option[value='all']").textContent = t().duplicateOptions.all;
-  document.querySelector("#duplicateFilter option[value='duplicates']").textContent = t().duplicateOptions.duplicates;
-  document.querySelector("#duplicateFilter option[value='unique']").textContent = t().duplicateOptions.unique;
+  Array.from(document.querySelectorAll("#duplicateFilter .check-option")).forEach(function(label){
+    const input = label.querySelector('input[type="checkbox"]');
+    const span = label.querySelector("span");
+    if (input && span && t().duplicateOptions[input.value]) span.textContent = t().duplicateOptions[input.value];
+  });
   document.querySelectorAll("thead th").forEach(function(th, index){ th.textContent = t().tableHeaders[index]; });
   document.getElementById("dataEmpty").textContent = t().empty;
   document.getElementById("downloadBtn").textContent = t().download;
@@ -558,8 +574,8 @@ function populateDropdowns(rows){
   setSelectOptions(accommodationFilter, t().accommodationPlaceholder, ["free", "own"], function(value){ return translateAccommodation(value); });
   setSelectOptions(dateFilter, t().datePlaceholder, uniqueSorted(rows.map(function(row){ return getRegistrationDate(row["Timestamp"]); }).filter(Boolean)));
   populateSourceFilter();
-  Array.from(document.querySelectorAll("#duplicateFilter option")).forEach(function(option){
-    if (t().duplicateOptions[option.value]) option.textContent = t().duplicateOptions[option.value];
+  Array.from(document.querySelectorAll('#duplicateFilter input[type="checkbox"]')).forEach(function(input){
+    input.checked = filters.duplicates.indexOf(input.value) !== -1;
   });
   cityFilter.value = filters.city;
   genderFilter.value = filters.gender;
@@ -567,7 +583,6 @@ function populateDropdowns(rows){
   languageFilter.value = filters.formLanguage;
   sourceFilter.value = filters.source;
   dateFilter.value = filters.registrationDate;
-  duplicateFilter.value = filters.duplicates;
   searchFilter.value = filters.search;
   searchFilter.placeholder = t().searchPlaceholder;
 }
@@ -613,7 +628,7 @@ function applyCurrentFilters(){
     if (filters.formLanguage !== "all" && String(row["Form Language"] || "en") !== filters.formLanguage) return false;
     if (filters.source !== "all" && normalizeRegisteredBy(row["Registered By"]) !== filters.source) return false;
     if (filters.registrationDate && getRegistrationDate(row["Timestamp"]) !== filters.registrationDate) return false;
-    if (filters.duplicates !== "all" && !duplicateSet.has(buildDuplicateKey(row, filters.duplicates))) return false;
+    if (filters.duplicates.length && !duplicateSet.has(buildDuplicateKey(row, filters.duplicates))) return false;
     if (filters.search) {
       const haystack = [
         row["Submission Number"],
@@ -920,16 +935,17 @@ function normalizeMobile(value){
 }
 
 function buildDuplicateKey(row, mode){
+  const selected = Array.isArray(mode) ? mode : (mode ? [mode] : []);
   const parts = [];
-  if (mode === "name" || mode.indexOf("name") !== -1 || mode === "all_fields") parts.push(String(row["Name"] || "").trim().toLowerCase());
-  if (mode === "age" || mode.indexOf("age") !== -1 || mode === "all_fields") parts.push(String(row["Age"] || "").trim());
-  if (mode === "mobile" || mode.indexOf("mobile") !== -1 || mode === "all_fields") parts.push(normalizeMobile(row["Mobile Number"]));
-  if (mode === "city" || mode.indexOf("city") !== -1 || mode === "all_fields") parts.push(String(row["City"] || "").trim().toLowerCase());
+  if (selected.indexOf("name") !== -1) parts.push(String(row["Name"] || "").trim().toLowerCase());
+  if (selected.indexOf("age") !== -1) parts.push(String(row["Age"] || "").trim());
+  if (selected.indexOf("mobile") !== -1) parts.push(normalizeMobile(row["Mobile Number"]));
+  if (selected.indexOf("city") !== -1) parts.push(String(row["City"] || "").trim().toLowerCase());
   return parts.join("|");
 }
 
 function buildDuplicateSet(rows, mode){
-  if (!mode || mode === "all") return new Set();
+  if (!mode || (Array.isArray(mode) && !mode.length) || mode === "all") return new Set();
   const counts = {};
   rows.forEach(function(row){
     const key = buildDuplicateKey(row, mode);
