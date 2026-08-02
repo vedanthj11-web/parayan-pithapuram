@@ -148,7 +148,7 @@
     <div class="dates" id="headerDates"></div>
   </header>
   <div class="container">
-    <form id="regForm" novalidate>
+    <form id="regForm" novalidate autocomplete="off">
       <div id="formBody">
         <div class="section">
           <div class="section-title" id="countSectionTitle"></div>
@@ -164,7 +164,7 @@
           <div class="section-title" id="locationSectionTitle"></div>
           <div class="field" id="field-location">
             <label id="locationLabel" for="locationSearch"></label>
-            <input type="text" id="locationSearch" autocomplete="off">
+            <input type="text" id="locationSearch" autocomplete="off" autocapitalize="words" spellcheck="false">
             <div class="suggestions" id="locationSuggestions"></div>
             <div class="hint" id="locationHint"></div>
             <div class="location-meta" id="locationMeta"></div>
@@ -176,23 +176,23 @@
               <div class="manual-grid">
                 <div class="field" id="field-manual-area">
                   <label id="manualAreaLabel" for="manualArea"></label>
-                  <input type="text" id="manualArea">
+                  <input type="text" id="manualArea" autocomplete="off">
                 </div>
                 <div class="field" id="field-manual-city">
                   <label id="manualCityLabel" for="manualCity"></label>
-                  <input type="text" id="manualCity">
+                  <input type="text" id="manualCity" autocomplete="off">
                 </div>
                 <div class="field" id="field-manual-district">
                   <label id="manualDistrictLabel" for="manualDistrict"></label>
-                  <input type="text" id="manualDistrict">
+                  <input type="text" id="manualDistrict" autocomplete="off">
                 </div>
                 <div class="field" id="field-manual-state">
                   <label id="manualStateLabel" for="manualState"></label>
-                  <input type="text" id="manualState">
+                  <input type="text" id="manualState" autocomplete="off">
                 </div>
                 <div class="field" id="field-manual-postcode">
                   <label id="manualPostcodeLabel" for="manualPostcode"></label>
-                  <input type="text" id="manualPostcode" inputmode="numeric" maxlength="6">
+                  <input type="text" id="manualPostcode" inputmode="numeric" maxlength="6" autocomplete="off">
                 </div>
               </div>
             </div>
@@ -283,8 +283,7 @@ const TEXTS = {
     headerDates: "21 - 22 - 23 November",
     availabilityFreeTitle: "Free accommodation",
     availabilityOwnTitle: "Own/Paid accommodation",
-    accomFreeTitleWithSeats: "Yes, we want free accommodation from Devasthanam (only {remaining} seats remaining out of {capacity})",
-    accomOwnTitleWithSeats: "No, we will arrange our stay ourselves (only {remaining} seats remaining out of {capacity})",
+    accomSeatsLine: "Seats remaining: {remaining} out of {capacity}",
     availabilityFull: "Full",
     availabilityLoading: "Loading availability...",
     availabilityError: "Could not load live availability right now. Submission will still be checked at the server.",
@@ -302,7 +301,7 @@ const TEXTS = {
     locationLabel: "Area / City *",
     locationPlaceholder: "Enter your village/town/city name",
     locationHint: "",
-    locationSelected: "Selected: {city}, {state}",
+    locationSelected: "Selected city: {city}",
     locationLoading: "Searching locations...",
     locationNoResults: "No matching Indian locations found.",
     locationSearchError: "Location search is unavailable right now. Please enter your location manually.",
@@ -331,12 +330,12 @@ const TEXTS = {
     validationIntro: "Your registration is missing some required details.",
     validationClose: "Go to first missing field",
     errorParticipantCount: "Please select how many participants are registering",
-    errorNameRequired: "Participant {index}: Name is required",
-    errorAgeRequired: "Participant {index}: Age is required",
-    errorAgeInvalid: "Participant {index}: Age must be between 1 and 120",
-    errorMobileRequired: "Participant {index}: Mobile number is required",
-    errorMobileInvalid: "Participant {index}: Mobile number must be 10 digits",
-    errorGenderRequired: "Participant {index}: Please select gender",
+    errorNameRequired: "You did not enter the name for Participant {index}",
+    errorAgeRequired: "You did not enter the age for Participant {index}",
+    errorAgeInvalid: "The age for Participant {index} must be between 1 and 120",
+    errorMobileRequired: "You did not enter the mobile number for Participant {index}",
+    errorMobileInvalid: "The mobile number for Participant {index} must be exactly 10 digits",
+    errorGenderRequired: "You did not select the gender for Participant {index}",
     errorLocationRequired: "Please select a location or enter it manually",
     errorManualAreaRequired: "Area / Locality is required",
     errorManualCityRequired: "City is required",
@@ -359,8 +358,7 @@ const TEXTS = {
     headerDates: "21 - 22 - 23 नोव्हेंबर",
     availabilityFreeTitle: "मोफत निवास",
     availabilityOwnTitle: "स्वतःचा / सशुल्क निवास",
-    accomFreeTitleWithSeats: "हो, आम्हाला देवस्थानकडून मोफत निवास हवा आहे (एकूण {capacity} पैकी फक्त {remaining} जागा शिल्लक)",
-    accomOwnTitleWithSeats: "नाही, आम्ही आमचा निवास स्वतः करू (एकूण {capacity} पैकी फक्त {remaining} जागा शिल्लक)",
+    accomSeatsLine: "शिल्लक जागा: {capacity} पैकी {remaining}",
     availabilityFull: "पूर्ण",
     availabilityLoading: "उपलब्धता तपासत आहोत...",
     availabilityError: "सध्या उपलब्धता आणता आली नाही. अंतिम तपासणी सर्व्हरवर होईल.",
@@ -378,7 +376,7 @@ const TEXTS = {
     locationLabel: "एरिया / शहर *",
     locationPlaceholder: "तुमचे गाव / शहर / टाउन नाव टाका",
     locationHint: "",
-    locationSelected: "निवडलेले स्थान: {city}, {state}",
+    locationSelected: "निवडलेले शहर: {city}",
     locationLoading: "स्थान शोधत आहोत...",
     locationNoResults: "भारतातील जुळणारे स्थान मिळाले नाही.",
     locationSearchError: "सध्या स्थान शोध सेवा उपलब्ध नाही. कृपया खाली स्थान हाताने भरा.",
@@ -407,12 +405,12 @@ const TEXTS = {
     validationIntro: "नोंदणीमध्ये काही आवश्यक तपशील अपूर्ण आहेत.",
     validationClose: "पहिल्या चुकीच्या फील्डकडे जा",
     errorParticipantCount: "किती सहभागी नोंदवत आहात ते निवडा",
-    errorNameRequired: "सहभागी {index}: नाव आवश्यक आहे",
-    errorAgeRequired: "सहभागी {index}: वय आवश्यक आहे",
-    errorAgeInvalid: "सहभागी {index}: वय 1 ते 120 दरम्यान असावे",
-    errorMobileRequired: "सहभागी {index}: मोबाईल क्रमांक आवश्यक आहे",
-    errorMobileInvalid: "सहभागी {index}: मोबाईल क्रमांक 10 अंकी असावा",
-    errorGenderRequired: "सहभागी {index}: लिंग निवडा",
+    errorNameRequired: "सहभागी {index} साठी नाव भरलेले नाही",
+    errorAgeRequired: "सहभागी {index} साठी वय भरलेले नाही",
+    errorAgeInvalid: "सहभागी {index} साठी वय 1 ते 120 दरम्यान असावे",
+    errorMobileRequired: "सहभागी {index} साठी मोबाईल क्रमांक भरलेला नाही",
+    errorMobileInvalid: "सहभागी {index} साठी मोबाईल क्रमांक 10 अंकी असावा",
+    errorGenderRequired: "सहभागी {index} साठी लिंग निवडलेले नाही",
     errorLocationRequired: "कृपया स्थान निवडा किंवा हाताने भरा",
     errorManualAreaRequired: "एरिया / परिसर आवश्यक आहे",
     errorManualCityRequired: "शहर आवश्यक आहे",
@@ -547,9 +545,9 @@ function renderParticipantBlocks(){
       (i === 0 ? '<span class="p-note">' + escapeHtml(t("primaryParticipantNote")) + "</span>" : "") +
       "</div>" +
       '<div class="person-grid">' +
-        '<input type="text" class="p-name" placeholder="' + escapeHtml(t("namePlaceholder")) + '" value="' + escapeHtml(value.name) + '">' +
-        '<input type="number" class="p-age" placeholder="' + escapeHtml(t("agePlaceholder")) + '" value="' + escapeHtml(value.age) + '" min="1" max="120">' +
-        '<input type="tel" class="p-mobile" placeholder="' + escapeHtml(t("mobilePlaceholder")) + '" value="' + escapeHtml(value.mobile) + '">' +
+        '<input type="text" class="p-name" placeholder="' + escapeHtml(t("namePlaceholder")) + '" value="' + escapeHtml(value.name) + '" autocomplete="off">' +
+        '<input type="number" class="p-age" placeholder="' + escapeHtml(t("agePlaceholder")) + '" value="' + escapeHtml(value.age) + '" min="1" max="120" autocomplete="off">' +
+        '<input type="tel" class="p-mobile" placeholder="' + escapeHtml(t("mobilePlaceholder")) + '" value="' + escapeHtml(value.mobile) + '" autocomplete="off" inputmode="numeric">' +
       "</div>" +
       '<div class="gender-group">' +
         renderGenderOption(i, "male", t("genderMale"), value.gender === "male") +
@@ -598,15 +596,12 @@ function renderAccommodationOptions(){
 function renderAccommodationOption(value, selected){
   const availability = availabilityData && availabilityData[value];
   const isFull = availability && availability.remaining <= 0;
-  const baseTitleKey = value === "free" ? "accomFreeTitle" : "accomOwnTitle";
-  const titleWithSeatsKey = value === "free" ? "accomFreeTitleWithSeats" : "accomOwnTitleWithSeats";
-  const titleText = availability
-    ? formatMessage(t(titleWithSeatsKey), availability)
-    : t(baseTitleKey);
+  const titleText = value === "free" ? t("accomFreeTitle") : t("accomOwnTitle");
+  const seatsText = availability ? formatMessage(t("accomSeatsLine"), availability) : "";
   const detailText = isFull ? t("availabilityFull") : (value === "free" ? t("accomFreeHint") : t("accomOwnHint"));
   return '<label class="radio-option' + (selected ? " selected" : "") + (isFull ? ' field invalid' : "") + '" data-disabled="' + (isFull ? "true" : "false") + '">' +
     '<input type="radio" name="accom" value="' + value + '"' + (selected ? " checked" : "") + (isFull ? " disabled" : "") + ">" +
-    '<span class="option-text"><strong>' + escapeHtml(titleText) + "</strong><span>" + escapeHtml(detailText) + "</span></span>" +
+    '<span class="option-text"><strong>' + escapeHtml(titleText) + '</strong><span style="display:block;font-weight:700;color:#c85a0e;margin-top:4px;">' + escapeHtml(seatsText || detailText) + '</span><span>' + escapeHtml(detailText) + "</span></span>" +
   "</label>";
 }
 
