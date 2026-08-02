@@ -170,7 +170,6 @@
                 <th>Mobile Number</th>
                 <th>Age</th>
                 <th>Gender</th>
-                <th>Area/Locality</th>
                 <th>City</th>
                 <th>Accommodation</th>
                 <th>Registered By</th>
@@ -193,10 +192,7 @@
       <div class="detail-card"><div class="detail-label">Gender</div><div class="detail-value" id="modalGender"></div></div>
       <div class="detail-card"><div class="detail-label">Age</div><div class="detail-value" id="modalAge"></div></div>
       <div class="detail-card"><div class="detail-label">Mobile</div><div class="detail-value" id="modalMobile"></div></div>
-      <div class="detail-card"><div class="detail-label">Area/Locality</div><div class="detail-value" id="modalArea"></div></div>
       <div class="detail-card"><div class="detail-label">City</div><div class="detail-value" id="modalCity"></div></div>
-      <div class="detail-card"><div class="detail-label">District</div><div class="detail-value" id="modalDistrict"></div></div>
-      <div class="detail-card"><div class="detail-label">State</div><div class="detail-value" id="modalState"></div></div>
       <div class="detail-card"><div class="detail-label">Postcode</div><div class="detail-value" id="modalPostcode"></div></div>
       <div class="detail-card"><div class="detail-label">Accommodation</div><div class="detail-value" id="modalAccommodation"></div></div>
       <div class="detail-card"><div class="detail-label">Registered By</div><div class="detail-value" id="modalRegisteredBy"></div></div>
@@ -419,7 +415,6 @@ function renderTable(rows){
       "<td>" + safeCell(row["Mobile Number"]) + "</td>" +
       "<td>" + safeCell(row["Age"]) + "</td>" +
       "<td>" + safeCell(row["Type"]) + "</td>" +
-      "<td>" + safeCell(row["Area/Locality"]) + "</td>" +
       "<td>" + safeCell(row["City"]) + "</td>" +
       "<td>" + safeCell(formatAccommodation(row["Accommodation"])) + "</td>" +
       "<td>" + safeCell(normalizeRegisteredBy(row["Registered By"])) + "</td>" +
@@ -435,10 +430,7 @@ function openUserModal(row){
   document.getElementById("modalGender").textContent = row["Type"] || "-";
   document.getElementById("modalAge").textContent = row["Age"] || "-";
   document.getElementById("modalMobile").textContent = row["Mobile Number"] || "-";
-  document.getElementById("modalArea").textContent = row["Area/Locality"] || "-";
   document.getElementById("modalCity").textContent = row["City"] || "-";
-  document.getElementById("modalDistrict").textContent = row["District"] || "-";
-  document.getElementById("modalState").textContent = row["State"] || "-";
   document.getElementById("modalPostcode").textContent = row["Postcode"] || "-";
   document.getElementById("modalAccommodation").textContent = formatAccommodation(row["Accommodation"]);
   document.getElementById("modalRegisteredBy").textContent = normalizeRegisteredBy(row["Registered By"]);
