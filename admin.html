@@ -60,7 +60,7 @@
   .bar-count{width:38px;flex-shrink:0;text-align:right;font-size:13px;font-weight:600;}
   .toolbar{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px;margin-bottom:16px;}
   @media(min-width:700px){.toolbar{grid-template-columns:repeat(3,minmax(0,1fr));}}
-  @media(min-width:1100px){.toolbar{grid-template-columns:1.1fr 1fr 1fr 1fr 1fr 1fr;}}
+  @media(min-width:1100px){.toolbar{grid-template-columns:1.1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;}}
   .filter-group label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px;}
   .status-switch{display:flex;gap:8px;flex-wrap:wrap;}
   .status-btn{background:#fff8ee;border:1px solid var(--border);color:var(--maroon);padding:10px 12px;}
@@ -172,6 +172,9 @@
           <div class="filter-group"><label>Accommodation</label><select id="accommodationFilter"></select></div>
           <div class="filter-group"><label>Language</label><select id="languageFilter"><option value="all">All</option><option value="en">English</option><option value="mr">Marathi</option></select></div>
           <div class="filter-group"><label>Registered By</label><select id="sourceFilter"></select></div>
+          <div class="filter-group"><label>Registration Date</label><select id="dateFilter"></select></div>
+          <div class="filter-group"><label>Duplicate Data</label><select id="duplicateFilter"><option value="all">All</option><option value="name">Name</option><option value="age">Age</option><option value="mobile">Mobile Number</option><option value="city">City</option><option value="name_age">Name + Age</option><option value="name_mobile">Name + Mobile</option><option value="name_city">Name + City</option><option value="age_mobile">Age + Mobile</option><option value="age_city">Age + City</option><option value="mobile_city">Mobile + City</option><option value="name_age_mobile">Name + Age + Mobile</option><option value="name_age_city">Name + Age + City</option><option value="name_mobile_city">Name + Mobile + City</option><option value="age_mobile_city">Age + Mobile + City</option><option value="all_fields">Name + Age + Mobile + City</option></select></div>
+          <div class="filter-group"><label>Search</label><input id="searchFilter" type="text" placeholder="Search table" autocomplete="off"></div>
         </div>
 
         <div class="table-wrap">
@@ -278,7 +281,7 @@ const VOLUNTEERS = [
   "Rupali Joshi",
   "B.D. Wani"
 ];
-const filters = { status: "active", city: "", gender: "all", accommodation: "", formLanguage: "all", source: "all" };
+const filters = { status: "active", city: "", gender: "all", accommodation: "", formLanguage: "all", source: "all", registrationDate: "", duplicates: "all", search: "" };
 const UI_TEXTS = {
   original: {
     pageTitle: "Admin Dashboard - Parayan Registrations",
@@ -306,7 +309,7 @@ const UI_TEXTS = {
     loadError: "Could not load data. Check the Apps Script deployment and latest published version.",
     lastUpdated: "Last updated:",
     refresh: "Refresh",
-    download: "Download Excel",
+    download: "Download Data",
     languageModes: ["Original", "Complete English", "Complete Marathi"],
     modalLabels: ["Gender", "Age", "Mobile", "City", "Postcode", "Accommodation", "Registered By", "Status", "Submission Number", "Person ID"],
     modalTitle: "Person Details",
@@ -349,7 +352,7 @@ const UI_TEXTS = {
     loadError: "माहिती मिळाली नाही. कृपया Apps Script चे नवीन deployment तपासा.",
     lastUpdated: "शेवटचे अद्यतन:",
     refresh: "रिफ्रेश",
-    download: "एक्सेल डाउनलोड",
+    download: "डाउनलोड डेटा",
     languageModes: ["मूळ", "पूर्ण इंग्रजी", "पूर्ण मराठी"],
     modalLabels: ["लिंग", "वय", "मोबाईल", "शहर", "पोस्टकोड", "निवास", "नोंदणी करणारे", "स्थिती", "बुकिंग क्रमांक", "पर्सन आयडी"],
     modalTitle: "सहभागी तपशील",
@@ -367,6 +370,28 @@ const UI_TEXTS = {
   }
 };
 UI_TEXTS.en = Object.assign({}, UI_TEXTS.original);
+UI_TEXTS.original.filterLabels = ["Status", "City", "Gender", "Accommodation", "Language", "Registered By", "Registration Date", "Duplicate Numbers"];
+UI_TEXTS.original.datePlaceholder = "All Dates";
+UI_TEXTS.original.duplicateOptions = { all: "All", duplicates: "Duplicate Only", unique: "Unique Only" };
+UI_TEXTS.en.filterLabels = UI_TEXTS.original.filterLabels.slice();
+UI_TEXTS.en.datePlaceholder = UI_TEXTS.original.datePlaceholder;
+UI_TEXTS.en.duplicateOptions = Object.assign({}, UI_TEXTS.original.duplicateOptions);
+UI_TEXTS.mr.filterLabels = ["à¤¸à¥à¤¥à¤¿à¤¤à¥€", "à¤¶à¤¹à¤°", "à¤²à¤¿à¤‚à¤—", "à¤¨à¤¿à¤µà¤¾à¤¸", "à¤­à¤¾à¤·à¤¾", "à¤¨à¥‹à¤‚à¤¦à¤£à¥€ à¤•à¤°à¤£à¤¾à¤°à¥‡", "à¤¨à¥‹à¤‚à¤¦à¤£à¥€ à¤¤à¤¾à¤°à¥€à¤–", "à¤¡à¥à¤ªà¥à¤²à¤¿à¤•à¥‡à¤Ÿ à¤¨à¤‚à¤¬à¤°"];
+UI_TEXTS.mr.datePlaceholder = "à¤¸à¤°à¥à¤µ à¤¤à¤¾à¤°à¥€à¤–";
+UI_TEXTS.mr.duplicateOptions = { all: "à¤¸à¤°à¥à¤µ", duplicates: "à¤¡à¥à¤ªà¥à¤²à¤¿à¤•à¥‡à¤Ÿ à¤«à¤•à¥à¤¤", unique: "à¤¯à¥à¤¨à¤¿à¤• à¤«à¤•à¥à¤¤" };
+
+UI_TEXTS.original.filterLabels = ["Status", "City", "Gender", "Accommodation", "Language", "Registered By", "Registration Date", "Duplicate Data", "Search"];
+UI_TEXTS.original.datePlaceholder = "All Dates";
+UI_TEXTS.original.searchPlaceholder = "Search name, city, mobile, booking ID";
+UI_TEXTS.original.duplicateOptions = { all: "All", name: "Duplicate Name", age: "Duplicate Age", mobile: "Duplicate Mobile", city: "Duplicate City", name_age: "Duplicate Name + Age", name_mobile: "Duplicate Name + Mobile", name_city: "Duplicate Name + City", age_mobile: "Duplicate Age + Mobile", age_city: "Duplicate Age + City", mobile_city: "Duplicate Mobile + City", name_age_mobile: "Duplicate Name + Age + Mobile", name_age_city: "Duplicate Name + Age + City", name_mobile_city: "Duplicate Name + Mobile + City", age_mobile_city: "Duplicate Age + Mobile + City", all_fields: "Duplicate All Four" };
+UI_TEXTS.en.filterLabels = UI_TEXTS.original.filterLabels.slice();
+UI_TEXTS.en.datePlaceholder = UI_TEXTS.original.datePlaceholder;
+UI_TEXTS.en.searchPlaceholder = UI_TEXTS.original.searchPlaceholder;
+UI_TEXTS.en.duplicateOptions = Object.assign({}, UI_TEXTS.original.duplicateOptions);
+UI_TEXTS.mr.filterLabels = ["स्थिती", "शहर", "लिंग", "निवास", "भाषा", "नोंदणी करणारे", "नोंदणी तारीख", "डुप्लिकेट डेटा", "शोध"];
+UI_TEXTS.mr.datePlaceholder = "सर्व तारीखा";
+UI_TEXTS.mr.searchPlaceholder = "नाव, शहर, मोबाईल, बुकिंग शोधा";
+UI_TEXTS.mr.duplicateOptions = { all: "सर्व", name: "डुप्लिकेट नाव", age: "डुप्लिकेट वय", mobile: "डुप्लिकेट मोबाईल", city: "डुप्लिकेट शहर", name_age: "डुप्लिकेट नाव + वय", name_mobile: "डुप्लिकेट नाव + मोबाईल", name_city: "डुप्लिकेट नाव + शहर", age_mobile: "डुप्लिकेट वय + मोबाईल", age_city: "डुप्लिकेट वय + शहर", mobile_city: "डुप्लिकेट मोबाईल + शहर", name_age_mobile: "डुप्लिकेट नाव + वय + मोबाईल", name_age_city: "डुप्लिकेट नाव + वय + शहर", name_mobile_city: "डुप्लिकेट नाव + मोबाईल + शहर", age_mobile_city: "डुप्लिकेट वय + मोबाईल + शहर", all_fields: "चारही जुळतात" };
 
 let rawRows = [];
 let displayedRows = [];
@@ -381,6 +406,9 @@ const genderFilter = document.getElementById("genderFilter");
 const accommodationFilter = document.getElementById("accommodationFilter");
 const languageFilter = document.getElementById("languageFilter");
 const sourceFilter = document.getElementById("sourceFilter");
+const dateFilter = document.getElementById("dateFilter");
+const duplicateFilter = document.getElementById("duplicateFilter");
+const searchFilter = document.getElementById("searchFilter");
 const languageMode = document.getElementById("languageMode");
 
 document.getElementById("loginBtn").addEventListener("click", tryUnlock);
@@ -423,6 +451,9 @@ genderFilter.addEventListener("change", function(){ filters.gender = genderFilte
 accommodationFilter.addEventListener("change", function(){ filters.accommodation = accommodationFilter.value; applyCurrentFilters(); });
 languageFilter.addEventListener("change", function(){ filters.formLanguage = languageFilter.value; applyCurrentFilters(); });
 sourceFilter.addEventListener("change", function(){ filters.source = sourceFilter.value; applyCurrentFilters(); });
+dateFilter.addEventListener("change", function(){ filters.registrationDate = dateFilter.value; applyCurrentFilters(); });
+duplicateFilter.addEventListener("change", function(){ filters.duplicates = duplicateFilter.value; applyCurrentFilters(); });
+searchFilter.addEventListener("input", function(){ filters.search = searchFilter.value.trim().toLowerCase(); applyCurrentFilters(); });
 
 applyUiLanguage();
 
@@ -498,6 +529,9 @@ function applyUiLanguage(){
   document.querySelector("#languageFilter option[value='all']").textContent = t().languageOptions.all;
   document.querySelector("#languageFilter option[value='en']").textContent = t().languageOptions.en;
   document.querySelector("#languageFilter option[value='mr']").textContent = t().languageOptions.mr;
+  document.querySelector("#duplicateFilter option[value='all']").textContent = t().duplicateOptions.all;
+  document.querySelector("#duplicateFilter option[value='duplicates']").textContent = t().duplicateOptions.duplicates;
+  document.querySelector("#duplicateFilter option[value='unique']").textContent = t().duplicateOptions.unique;
   document.querySelectorAll("thead th").forEach(function(th, index){ th.textContent = t().tableHeaders[index]; });
   document.getElementById("dataEmpty").textContent = t().empty;
   document.getElementById("downloadBtn").textContent = t().download;
@@ -522,12 +556,20 @@ function applyUiLanguage(){
 function populateDropdowns(rows){
   setSelectOptions(cityFilter, t().cityPlaceholder, uniqueSorted(rows.map(function(row){ return row["City"]; })), function(value){ return displayText(value); });
   setSelectOptions(accommodationFilter, t().accommodationPlaceholder, ["free", "own"], function(value){ return translateAccommodation(value); });
+  setSelectOptions(dateFilter, t().datePlaceholder, uniqueSorted(rows.map(function(row){ return getRegistrationDate(row["Timestamp"]); }).filter(Boolean)));
   populateSourceFilter();
+  Array.from(document.querySelectorAll("#duplicateFilter option")).forEach(function(option){
+    if (t().duplicateOptions[option.value]) option.textContent = t().duplicateOptions[option.value];
+  });
   cityFilter.value = filters.city;
   genderFilter.value = filters.gender;
   accommodationFilter.value = filters.accommodation;
   languageFilter.value = filters.formLanguage;
   sourceFilter.value = filters.source;
+  dateFilter.value = filters.registrationDate;
+  duplicateFilter.value = filters.duplicates;
+  searchFilter.value = filters.search;
+  searchFilter.placeholder = t().searchPlaceholder;
 }
 
 function populateSourceFilter(){
@@ -562,6 +604,7 @@ function setSelectOptions(select, placeholder, values, formatter){
 }
 
 function applyCurrentFilters(){
+  const duplicateSet = buildDuplicateSet(rawRows, filters.duplicates);
   displayedRows = rawRows.filter(function(row){
     if (filters.status !== "all" && normalizeStatus(row["Status"]) !== filters.status) return false;
     if (filters.city && String(row["City"] || "") !== filters.city) return false;
@@ -569,6 +612,19 @@ function applyCurrentFilters(){
     if (filters.accommodation && String(row["Accommodation"] || "") !== filters.accommodation) return false;
     if (filters.formLanguage !== "all" && String(row["Form Language"] || "en") !== filters.formLanguage) return false;
     if (filters.source !== "all" && normalizeRegisteredBy(row["Registered By"]) !== filters.source) return false;
+    if (filters.registrationDate && getRegistrationDate(row["Timestamp"]) !== filters.registrationDate) return false;
+    if (filters.duplicates !== "all" && !duplicateSet.has(buildDuplicateKey(row, filters.duplicates))) return false;
+    if (filters.search) {
+      const haystack = [
+        row["Submission Number"],
+        row["Name"],
+        row["Mobile Number"],
+        row["Age"],
+        row["City"],
+        row["Registered By"]
+      ].join(" ").toLowerCase();
+      if (haystack.indexOf(filters.search) === -1) return false;
+    }
     return true;
   });
   renderAnalytics(displayedRows);
@@ -808,6 +864,28 @@ function downloadExcel(){
     return item;
   });
   const worksheet = XLSX.utils.json_to_sheet(data);
+  const headerStyle = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "C85A0E" } } };
+  const bandAStyle = { fill: { fgColor: { rgb: "FFFAF3" } } };
+  const bandBStyle = { fill: { fgColor: { rgb: "FDECD8" } } };
+  const range = XLSX.utils.decode_range(worksheet["!ref"]);
+  for (let col = range.s.c; col <= range.e.c; col++) {
+    const cell = XLSX.utils.encode_cell({ r: 0, c: col });
+    if (worksheet[cell]) worksheet[cell].s = headerStyle;
+  }
+  let previousBooking = null;
+  let useBandA = true;
+  for (let rowIndex = 1; rowIndex <= range.e.r; rowIndex++) {
+    const bookingCell = XLSX.utils.encode_cell({ r: rowIndex, c: 1 });
+    const bookingValue = worksheet[bookingCell] ? String(worksheet[bookingCell].v) : "";
+    if (bookingValue !== previousBooking) {
+      useBandA = !useBandA;
+      previousBooking = bookingValue;
+    }
+    for (let col = range.s.c; col <= range.e.c; col++) {
+      const cell = XLSX.utils.encode_cell({ r: rowIndex, c: col });
+      if (worksheet[cell]) worksheet[cell].s = useBandA ? bandAStyle : bandBStyle;
+    }
+  }
   worksheet["!cols"] = [
     { wch: 12 }, { wch: 20 }, { wch: 28 }, { wch: 18 }, { wch: 8 }, { wch: 10 },
     { wch: 18 }, { wch: 18 }, { wch: 22 }, { wch: 12 }
@@ -824,6 +902,41 @@ function getBookingRows(submissionId){
   }).slice().sort(function(a, b){
     return Number(a["Person No."] || 0) - Number(b["Person No."] || 0);
   });
+}
+
+function getRegistrationDate(value){
+  const text = String(value || "").trim();
+  if (!text) return "";
+  const date = new Date(text);
+  if (!Number.isNaN(date.getTime())) {
+    return date.toISOString().slice(0, 10);
+  }
+  const match = text.match(/^(\d{4}-\d{2}-\d{2})/);
+  return match ? match[1] : "";
+}
+
+function normalizeMobile(value){
+  return String(value || "").replace(/\D/g, "").replace(/^91/, "").slice(-10);
+}
+
+function buildDuplicateKey(row, mode){
+  const parts = [];
+  if (mode === "name" || mode.indexOf("name") !== -1 || mode === "all_fields") parts.push(String(row["Name"] || "").trim().toLowerCase());
+  if (mode === "age" || mode.indexOf("age") !== -1 || mode === "all_fields") parts.push(String(row["Age"] || "").trim());
+  if (mode === "mobile" || mode.indexOf("mobile") !== -1 || mode === "all_fields") parts.push(normalizeMobile(row["Mobile Number"]));
+  if (mode === "city" || mode.indexOf("city") !== -1 || mode === "all_fields") parts.push(String(row["City"] || "").trim().toLowerCase());
+  return parts.join("|");
+}
+
+function buildDuplicateSet(rows, mode){
+  if (!mode || mode === "all") return new Set();
+  const counts = {};
+  rows.forEach(function(row){
+    const key = buildDuplicateKey(row, mode);
+    if (!key || /^\|*$/.test(key)) return;
+    counts[key] = (counts[key] || 0) + 1;
+  });
+  return new Set(Object.keys(counts).filter(function(key){ return counts[key] > 1; }));
 }
 
 function displayText(value){
@@ -930,6 +1043,145 @@ function transliterateToDevanagari(input){
     }
     return out;
   }).join("");
+}
+
+const DEVANAGARI_PHRASE_OVERRIDES = {
+  "vedanth joshi": "वेदांत जोशी",
+  "vedant joshi": "वेदांत जोशी",
+  "prasad bhivre": "प्रसाद भिवरे",
+  "priyanka tai patil": "प्रियांका ताई पाटील",
+  "devendra kamod": "देवेंद्र कामोड",
+  "gnaneshwar kamod": "ज्ञानेश्वर कामोड",
+  "jitendra patil": "जितेंद्र पाटील",
+  "rupali joshi": "रुपाली जोशी",
+  "b.d. wani": "बी.डी. वाणी",
+  "bd wani": "बी.डी. वाणी"
+};
+const DEVANAGARI_WORD_OVERRIDES = {
+  vedanth: "वेदांत",
+  vedant: "वेदांत",
+  joshi: "जोशी",
+  prasad: "प्रसाद",
+  priyanka: "प्रियांका",
+  tai: "ताई",
+  patil: "पाटील",
+  devendra: "देवेंद्र",
+  gnaneshwar: "ज्ञानेश्वर",
+  jitendra: "जितेंद्र",
+  rupali: "रुपाली",
+  wani: "वाणी",
+  kamod: "कामोड",
+  bhivre: "भिवरे",
+  pithapuram: "पिठापूरम",
+  nagpur: "नागपूर",
+  pune: "पुणे",
+  mumbai: "मुंबई",
+  hyderabad: "हैदराबाद"
+};
+
+function transliterateToDevanagari(input){
+  const source = String(input || "");
+  const normalizedPhrase = source.trim().toLowerCase().replace(/\s+/g, " ");
+  if (DEVANAGARI_PHRASE_OVERRIDES[normalizedPhrase]) return DEVANAGARI_PHRASE_OVERRIDES[normalizedPhrase];
+  return source.split(/(\s+|[-,./()]+)/).map(function(part){
+    if (!part || /^\s+$/.test(part) || /^[-,./()]+$/.test(part) || hasDevanagari(part)) return part;
+    return transliterateWordToDevanagari(part);
+  }).join("");
+}
+
+function transliterateWordToDevanagari(word){
+  const cleanWord = String(word || "").toLowerCase();
+  if (!cleanWord) return "";
+  if (DEVANAGARI_WORD_OVERRIDES[cleanWord]) return DEVANAGARI_WORD_OVERRIDES[cleanWord];
+
+  const normalized = cleanWord
+    .replace(/tion/g, "shan")
+    .replace(/sion/g, "zhan")
+    .replace(/qu/g, "kw")
+    .replace(/x/g, "ks");
+
+  const vowels = [
+    ["aa", { independent: "आ", matra: "ा" }],
+    ["ai", { independent: "ऐ", matra: "ै" }],
+    ["au", { independent: "औ", matra: "ौ" }],
+    ["ee", { independent: "ई", matra: "ी" }],
+    ["ii", { independent: "ई", matra: "ी" }],
+    ["oo", { independent: "ऊ", matra: "ू" }],
+    ["ou", { independent: "औ", matra: "ौ" }],
+    ["ea", { independent: "ई", matra: "ी" }],
+    ["oa", { independent: "ओ", matra: "ो" }],
+    ["a", { independent: "अ", matra: "" }],
+    ["e", { independent: "ए", matra: "े" }],
+    ["i", { independent: "इ", matra: "ि" }],
+    ["o", { independent: "ओ", matra: "ो" }],
+    ["u", { independent: "उ", matra: "ु" }]
+  ];
+  const consonants = [
+    ["ksh", "क्ष"], ["gny", "ज्ञ"], ["gy", "ज्ञ"], ["gn", "ज्ञ"], ["chh", "छ"], ["tch", "च"],
+    ["sh", "श"], ["kh", "ख"], ["gh", "घ"], ["jh", "झ"], ["th", "थ"], ["dh", "ध"], ["ph", "फ"], ["bh", "भ"], ["wh", "व्ह"],
+    ["ch", "च"], ["ck", "क"], ["ng", "ङ"], ["ny", "ञ"],
+    ["k", "क"], ["g", "ग"], ["c", "क"], ["j", "ज"], ["t", "त"], ["d", "द"], ["n", "न"],
+    ["p", "प"], ["b", "ब"], ["m", "म"], ["y", "य"], ["r", "र"], ["l", "ल"], ["v", "व"], ["w", "व"],
+    ["s", "स"], ["h", "ह"], ["f", "फ"], ["z", "झ"]
+  ];
+
+  let index = 0;
+  let output = "";
+  while (index < normalized.length) {
+    const current = normalized[index];
+    if (!/[a-z]/.test(current)) {
+      output += word[index] || current;
+      index += 1;
+      continue;
+    }
+
+    const vowelMatch = matchFromList(normalized, index, vowels);
+    if (vowelMatch) {
+      output += vowelMatch.value.independent;
+      index += vowelMatch.key.length;
+      continue;
+    }
+
+    const cluster = [];
+    while (index < normalized.length) {
+      const consonantMatch = matchFromList(normalized, index, consonants);
+      if (!consonantMatch) break;
+      cluster.push(consonantMatch.value);
+      index += consonantMatch.key.length;
+      const maybeVowel = matchFromList(normalized, index, vowels);
+      if (maybeVowel || index >= normalized.length) break;
+    }
+    if (!cluster.length) {
+      output += normalized[index];
+      index += 1;
+      continue;
+    }
+
+    const vowelAfter = matchFromList(normalized, index, vowels);
+    for (let i = 0; i < cluster.length - 1; i++) {
+      output += cluster[i] + "्";
+    }
+    if (vowelAfter) {
+      output += cluster[cluster.length - 1] + vowelAfter.value.matra;
+      index += vowelAfter.key.length;
+    } else {
+      output += cluster[cluster.length - 1];
+    }
+  }
+
+  return output
+    .replace(/वेदन्थ/g, "वेदांत")
+    .replace(/वेदान्त/g, "वेदांत")
+    .replace(/जोस्ही/g, "जोशी");
+}
+
+function matchFromList(source, index, list){
+  for (let i = 0; i < list.length; i++) {
+    if (source.slice(index, index + list[i][0].length) === list[i][0]) {
+      return { key: list[i][0], value: list[i][1] };
+    }
+  }
+  return null;
 }
 
 function uniqueSorted(values){
