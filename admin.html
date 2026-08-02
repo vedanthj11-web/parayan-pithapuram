@@ -6,25 +6,24 @@
 <title>Admin Dashboard - Parayan Registrations</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <style>
   :root{--saffron:#e2711d;--saffron-dark:#c85a0e;--maroon:#7a2e2e;--ink:#332218;--border:#e8d9c0;--bg:#fdf8f0;--card:#ffffff;--blue:#2f6fa8;--pink:#b5457a;--green:#2f7d4f;--red:#b33a30;--muted:#8a7454;}
   *{box-sizing:border-box;}
-  html,body{margin:0;max-width:100%;overflow-x:hidden;}
-  body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--ink);padding:18px;}
+  body{margin:0;padding:18px;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;}
   h1{margin:0 0 4px;font-size:clamp(20px,4vw,30px);color:var(--maroon);}
   .sub{color:var(--muted);font-size:13px;margin-bottom:18px;}
-  .card,.panel{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 28px rgba(122,46,46,0.08);}
+  .card,.panel{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 28px rgba(122,46,46,.08);}
   #lockScreen{width:min(100%,420px);margin:72px auto;padding:28px;text-align:center;}
   input,select,button{font:inherit;}
   input,select{width:100%;min-width:0;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;background:#fffdf9;color:var(--ink);}
-  input:focus,select:focus{outline:none;border-color:var(--saffron);box-shadow:0 0 0 3px rgba(226,113,29,0.12);}
+  input:focus,select:focus{outline:none;border-color:var(--saffron);box-shadow:0 0 0 3px rgba(226,113,29,.12);}
   button{border:none;cursor:pointer;}
   .action-btn,.tab-btn,.status-btn{border-radius:10px;padding:11px 14px;font-weight:600;}
   .action-btn{background:var(--saffron);color:#fff;}
   .action-btn.secondary{background:#f4e7d5;color:var(--maroon);}
   .action-btn.danger{background:var(--red);color:#fff;}
-  .ghost-btn{background:#f4e7d5;color:var(--maroon);}
-  #dashboard{display:none;max-width:1240px;margin:0 auto;}
+  #dashboard{display:none;max-width:1380px;margin:0 auto;}
   .top-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;}
   .top-actions{display:flex;gap:10px;flex-wrap:wrap;}
   #lastUpdated{font-size:12px;color:var(--muted);}
@@ -36,7 +35,7 @@
   .tab-panel{display:none;}
   .tab-panel.active{display:block;}
   .stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px;}
-  @media(min-width:760px){.stat-grid{grid-template-columns:repeat(5,minmax(0,1fr));}}
+  @media(min-width:760px){.stat-grid{grid-template-columns:repeat(4,minmax(0,1fr));}}
   .stat-card{padding:18px;}
   .stat-card .num{font-size:28px;font-weight:700;color:var(--saffron-dark);}
   .stat-card .lbl{margin-top:4px;font-size:12.5px;color:var(--muted);}
@@ -60,7 +59,7 @@
   .bar-count{width:38px;flex-shrink:0;text-align:right;font-size:13px;font-weight:600;}
   .toolbar{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px;margin-bottom:16px;}
   @media(min-width:700px){.toolbar{grid-template-columns:repeat(3,minmax(0,1fr));}}
-  @media(min-width:1000px){.toolbar{grid-template-columns:1.1fr 1fr 1fr 1fr 1fr;}}
+  @media(min-width:1100px){.toolbar{grid-template-columns:1.1fr 1fr 1fr 1fr 1fr 1fr;}}
   .filter-group label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px;}
   .status-switch{display:flex;gap:8px;flex-wrap:wrap;}
   .status-btn{background:#fff8ee;border:1px solid var(--border);color:var(--maroon);padding:10px 12px;}
@@ -68,7 +67,7 @@
   .meta-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
   .meta-info{font-size:13px;color:var(--muted);}
   .table-wrap{overflow:auto;border:1px solid var(--border);border-radius:12px;}
-  table{width:100%;min-width:980px;border-collapse:collapse;background:#fff;}
+  table{width:100%;min-width:1480px;border-collapse:collapse;background:#fff;}
   th,td{padding:11px 12px;border-bottom:1px solid var(--border);font-size:13.5px;text-align:left;vertical-align:top;}
   th{background:#fffaf3;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;font-size:11.5px;}
   tr.submission-band-a td{background:#fffaf3;}
@@ -76,9 +75,9 @@
   tbody tr:hover td{background:#fff1df;}
   tbody tr{cursor:pointer;}
   .empty-note{font-size:13px;color:var(--muted);margin:0;}
-  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.38);display:none;align-items:center;justify-content:center;padding:16px;}
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;padding:16px;}
   .modal-backdrop.show{display:flex;}
-  .modal-card{width:min(100%,460px);background:#fff;border-radius:16px;padding:20px;box-shadow:0 18px 46px rgba(0,0,0,0.24);}
+  .modal-card{width:min(100%,700px);background:#fff;border-radius:16px;padding:20px;box-shadow:0 18px 46px rgba(0,0,0,.24);}
   .modal-title{margin:0 0 14px;color:var(--maroon);font-size:18px;}
   .detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px;}
   .detail-card{background:#fff8ee;border:1px solid var(--border);border-radius:10px;padding:10px;}
@@ -86,13 +85,6 @@
   .detail-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.35px;margin-bottom:4px;}
   .detail-value{font-size:14px;color:var(--ink);word-break:break-word;}
   .modal-actions{display:flex;gap:10px;flex-wrap:wrap;}
-  .contact-footer{margin-top:24px;background:#fffaf3;border:1px solid var(--border);border-radius:16px;padding:18px;}
-  .contact-footer h2{margin:0 0 12px;font-size:15px;color:var(--maroon);}
-  .contact-grid{display:grid;grid-template-columns:1fr;gap:10px 18px;}
-  .contact-item{font-size:13.5px;color:var(--ink);}
-  .contact-item a{color:var(--saffron-dark);text-decoration:none;font-weight:600;}
-  .contact-item a:hover{text-decoration:underline;}
-  @media(min-width:760px){.contact-grid{grid-template-columns:1fr 1fr;}}
   @media(max-width:640px){body{padding:14px;}.panel,.card,#lockScreen{padding:16px;}.detail-grid{grid-template-columns:1fr;}.accom-grid{grid-template-columns:1fr;}}
 </style>
 </head>
@@ -162,37 +154,29 @@
             </div>
           </div>
           <div class="filter-group"><label>City</label><select id="cityFilter"></select></div>
-          <div class="filter-group">
-            <label>Gender</label>
-            <select id="genderFilter">
-              <option value="all">All</option>
-              <option value="Gent">Gents</option>
-              <option value="Lady">Ladies</option>
-            </select>
-          </div>
+          <div class="filter-group"><label>Gender</label><select id="genderFilter"><option value="all">All</option><option value="Gent">Gents</option><option value="Lady">Ladies</option></select></div>
           <div class="filter-group"><label>Accommodation</label><select id="accommodationFilter"></select></div>
-          <div class="filter-group">
-            <label>Language Opted</label>
-            <select id="languageFilter">
-              <option value="all">All</option>
-              <option value="en">English</option>
-              <option value="mr">Marathi</option>
-            </select>
-          </div>
+          <div class="filter-group"><label>Language</label><select id="languageFilter"><option value="all">All</option><option value="en">English</option><option value="mr">Marathi</option></select></div>
+          <div class="filter-group"><label>Registered By</label><select id="sourceFilter"><option value="all">All</option><option value="self">Self</option><option value="agent">Agent</option></select></div>
         </div>
 
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Submission Number</th>
                 <th>Sr. No.</th>
+                <th>Submission Number</th>
                 <th>Name</th>
                 <th>Mobile Number</th>
-                <th>Second Mobile</th>
                 <th>Age</th>
+                <th>Gender</th>
+                <th>Area/Locality</th>
                 <th>City</th>
+                <th>District</th>
+                <th>State</th>
                 <th>Accommodation</th>
+                <th>Registered By</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody id="dataTableBody"></tbody>
@@ -211,9 +195,13 @@
       <div class="detail-card"><div class="detail-label">Gender</div><div class="detail-value" id="modalGender"></div></div>
       <div class="detail-card"><div class="detail-label">Age</div><div class="detail-value" id="modalAge"></div></div>
       <div class="detail-card"><div class="detail-label">Mobile</div><div class="detail-value" id="modalMobile"></div></div>
-      <div class="detail-card"><div class="detail-label">Second Mobile</div><div class="detail-value" id="modalAlternateMobile"></div></div>
+      <div class="detail-card"><div class="detail-label">Area/Locality</div><div class="detail-value" id="modalArea"></div></div>
       <div class="detail-card"><div class="detail-label">City</div><div class="detail-value" id="modalCity"></div></div>
+      <div class="detail-card"><div class="detail-label">District</div><div class="detail-value" id="modalDistrict"></div></div>
+      <div class="detail-card"><div class="detail-label">State</div><div class="detail-value" id="modalState"></div></div>
+      <div class="detail-card"><div class="detail-label">Postcode</div><div class="detail-value" id="modalPostcode"></div></div>
       <div class="detail-card"><div class="detail-label">Accommodation</div><div class="detail-value" id="modalAccommodation"></div></div>
+      <div class="detail-card"><div class="detail-label">Registered By</div><div class="detail-value" id="modalRegisteredBy"></div></div>
       <div class="detail-card"><div class="detail-label">Status</div><div class="detail-value" id="modalStatus"></div></div>
       <div class="detail-card full"><div class="detail-label">Submission Number</div><div class="detail-value" id="modalSubmissionNumber"></div></div>
       <div class="detail-card full"><div class="detail-label">Person ID</div><div class="detail-value" id="modalPersonId"></div></div>
@@ -229,27 +217,27 @@
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTkXBHASxYiSdqjy1eyYQASuqgDY-qvABIwISYEyOaKg8Bvg8H1WsVAOT7CWo78dat/exec";
 const ADMIN_KEY = "Admin@1";
-const filters = { status: "active", city: "", gender: "all", accommodation: "", formLanguage: "all" };
+const filters = { status: "active", city: "", gender: "all", accommodation: "", formLanguage: "all", source: "all" };
 let rawRows = [];
 let displayedRows = [];
 let selectedRow = null;
 let currentRequestId = 0;
-let alternateMobileBySubmission = {};
 
 const adminKeyInput = document.getElementById("adminKey");
 const cityFilter = document.getElementById("cityFilter");
 const genderFilter = document.getElementById("genderFilter");
 const accommodationFilter = document.getElementById("accommodationFilter");
 const languageFilter = document.getElementById("languageFilter");
+const sourceFilter = document.getElementById("sourceFilter");
 
 document.getElementById("loginBtn").addEventListener("click", tryUnlock);
-adminKeyInput.addEventListener("keydown", function(event){ if(event.key === "Enter"){ event.preventDefault(); tryUnlock(); } });
+adminKeyInput.addEventListener("keydown", function(event){ if (event.key === "Enter") { event.preventDefault(); tryUnlock(); } });
 document.getElementById("refreshBtn").addEventListener("click", loadData);
 document.getElementById("downloadBtn").addEventListener("click", downloadExcel);
 document.getElementById("activateBtn").addEventListener("click", function(){ updateSelectedStatus("active"); });
 document.getElementById("deactivateBtn").addEventListener("click", function(){ updateSelectedStatus("inactive"); });
 document.getElementById("closeModalBtn").addEventListener("click", closeUserModal);
-document.getElementById("userModal").addEventListener("click", function(event){ if(event.target.id === "userModal") closeUserModal(); });
+document.getElementById("userModal").addEventListener("click", function(event){ if (event.target.id === "userModal") closeUserModal(); });
 
 document.querySelectorAll(".tab-btn").forEach(function(button){
   button.addEventListener("click", function(){
@@ -259,7 +247,6 @@ document.querySelectorAll(".tab-btn").forEach(function(button){
     document.getElementById(button.dataset.tab).classList.add("active");
   });
 });
-
 document.querySelectorAll(".status-btn").forEach(function(button){
   button.addEventListener("click", function(){
     filters.status = button.dataset.status;
@@ -268,60 +255,60 @@ document.querySelectorAll(".status-btn").forEach(function(button){
     applyCurrentFilters();
   });
 });
-
 cityFilter.addEventListener("change", function(){ filters.city = cityFilter.value; applyCurrentFilters(); });
 genderFilter.addEventListener("change", function(){ filters.gender = genderFilter.value; applyCurrentFilters(); });
 accommodationFilter.addEventListener("change", function(){ filters.accommodation = accommodationFilter.value; applyCurrentFilters(); });
 languageFilter.addEventListener("change", function(){ filters.formLanguage = languageFilter.value; applyCurrentFilters(); });
+sourceFilter.addEventListener("change", function(){ filters.source = sourceFilter.value; applyCurrentFilters(); });
 
 function tryUnlock(){
-  if(adminKeyInput.value !== ADMIN_KEY){ alert("Incorrect key."); return; }
+  if (adminKeyInput.value !== ADMIN_KEY) { alert("Incorrect key."); return; }
   document.getElementById("lockScreen").style.display = "none";
   document.getElementById("dashboard").style.display = "block";
   loadData();
 }
 
 async function loadData(){
-  currentRequestId++;
+  currentRequestId += 1;
   const requestId = currentRequestId;
   setLoadingState(true);
-  try{
+  try {
     const response = await fetch(SCRIPT_URL + "?action=getAllData&_=" + Date.now());
     const payload = await response.json();
-    if(payload.status !== "success") throw new Error(payload.message || "Could not load rows");
-    if(requestId !== currentRequestId) return;
+    if (payload.status !== "success") throw new Error(payload.message || "Could not load rows");
+    if (requestId !== currentRequestId) return;
     rawRows = Array.isArray(payload.data) ? payload.data : [];
-    alternateMobileBySubmission = buildAlternateMobileMap(rawRows);
     populateDropdowns(rawRows);
     applyCurrentFilters();
     document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toLocaleString();
     document.getElementById("content").style.display = "block";
     document.getElementById("errorMsg").style.display = "none";
-  }catch(error){
-    if(requestId !== currentRequestId) return;
+  } catch (error) {
+    if (requestId !== currentRequestId) return;
     document.getElementById("content").style.display = "none";
     document.getElementById("errorMsg").style.display = "block";
-  }finally{
-    if(requestId !== currentRequestId) return;
+  } finally {
+    if (requestId !== currentRequestId) return;
     setLoadingState(false);
   }
 }
 
 function setLoadingState(isLoading){
   document.getElementById("loadingMsg").style.display = isLoading ? "block" : "none";
-  if(isLoading){
+  if (isLoading) {
     document.getElementById("content").style.display = "none";
     document.getElementById("errorMsg").style.display = "none";
   }
 }
 
 function populateDropdowns(rows){
-  setSelectOptions(cityFilter, "All Cities", uniqueSorted(rows.map(function(row){ return row["City (from PIN)"]; })));
+  setSelectOptions(cityFilter, "All Cities", uniqueSorted(rows.map(function(row){ return row["City"]; })));
   setSelectOptions(accommodationFilter, "All Accommodation", uniqueSorted(rows.map(function(row){ return formatAccommodation(row["Accommodation"]); })));
   cityFilter.value = filters.city;
   genderFilter.value = filters.gender;
   accommodationFilter.value = filters.accommodation;
   languageFilter.value = filters.formLanguage;
+  sourceFilter.value = filters.source;
 }
 
 function setSelectOptions(select, placeholder, values){
@@ -337,16 +324,18 @@ function setSelectOptions(select, placeholder, values){
     option.textContent = value;
     select.appendChild(option);
   });
-  if(Array.from(select.options).some(function(option){ return option.value === previous; })){ select.value = previous; }
+  if (Array.from(select.options).some(function(option){ return option.value === previous; })) select.value = previous;
 }
 
 function applyCurrentFilters(){
   displayedRows = rawRows.filter(function(row){
-    if(filters.status !== "all" && normalizeStatus(row["Status"]) !== filters.status) return false;
-    if(filters.city && String(row["City (from PIN)"] || "") !== filters.city) return false;
-    if(filters.gender !== "all" && String(row["Type"] || "") !== filters.gender) return false;
-    if(filters.accommodation && formatAccommodation(row["Accommodation"]) !== filters.accommodation) return false;
-    if(filters.formLanguage !== "all" && String(row["Form Language"] || "en") !== filters.formLanguage) return false;
+    if (filters.status !== "all" && normalizeStatus(row["Status"]) !== filters.status) return false;
+    if (filters.city && String(row["City"] || "") !== filters.city) return false;
+    if (filters.gender !== "all" && String(row["Type"] || "") !== filters.gender) return false;
+    if (filters.accommodation && formatAccommodation(row["Accommodation"]) !== filters.accommodation) return false;
+    if (filters.formLanguage !== "all" && String(row["Form Language"] || "en") !== filters.formLanguage) return false;
+    if (filters.source === "self" && normalizeRegisteredBy(row["Registered By"]) !== "Self") return false;
+    if (filters.source === "agent" && !normalizeRegisteredBy(row["Registered By"]).startsWith("Agent - ")) return false;
     return true;
   });
   renderAnalytics(displayedRows);
@@ -370,19 +359,19 @@ function buildAnalytics(rows){
   const ageBuckets = {"0-12":0,"13-25":0,"26-40":0,"41-60":0,"60+":0};
   const result = { totalPeople:0, totalGents:0, totalLadies:0, cityCount:0, accomFree:0, accomOwn:0, cityBreakdown:[], ageBreakdown:[] };
   rows.forEach(function(row){
-    const city = String(row["City (from PIN)"] || "");
+    const city = String(row["City"] || "");
     const age = Number(row["Age"]);
     result.totalPeople++;
-    if(row["Type"] === "Gent") result.totalGents++;
-    if(row["Type"] === "Lady") result.totalLadies++;
-    if(row["Accommodation"] === "free") result.accomFree++;
-    if(row["Accommodation"] === "own") result.accomOwn++;
-    if(city) cityMap[city] = (cityMap[city] || 0) + 1;
-    if(!Number.isNaN(age)){
-      if(age <= 12) ageBuckets["0-12"]++;
-      else if(age <= 25) ageBuckets["13-25"]++;
-      else if(age <= 40) ageBuckets["26-40"]++;
-      else if(age <= 60) ageBuckets["41-60"]++;
+    if (row["Type"] === "Gent") result.totalGents++;
+    if (row["Type"] === "Lady") result.totalLadies++;
+    if (row["Accommodation"] === "free") result.accomFree++;
+    if (row["Accommodation"] === "own") result.accomOwn++;
+    if (city) cityMap[city] = (cityMap[city] || 0) + 1;
+    if (!Number.isNaN(age)) {
+      if (age <= 12) ageBuckets["0-12"]++;
+      else if (age <= 25) ageBuckets["13-25"]++;
+      else if (age <= 40) ageBuckets["26-40"]++;
+      else if (age <= 60) ageBuckets["41-60"]++;
       else ageBuckets["60+"]++;
     }
   });
@@ -395,7 +384,7 @@ function buildAnalytics(rows){
 function renderBars(targetId, items, labelKey){
   const target = document.getElementById(targetId);
   target.innerHTML = "";
-  if(!items.length || items.every(function(item){ return Number(item.count || 0) === 0; })){
+  if (!items.length || items.every(function(item){ return Number(item.count || 0) === 0; })) {
     target.innerHTML = '<p class="empty-note">No data for the selected filter.</p>';
     return;
   }
@@ -414,26 +403,31 @@ function renderTable(rows){
   const summary = document.getElementById("tableSummary");
   body.innerHTML = "";
   summary.textContent = rows.length + " row" + (rows.length === 1 ? "" : "s");
-  if(!rows.length){ empty.style.display = "block"; return; }
+  if (!rows.length) { empty.style.display = "block"; return; }
   empty.style.display = "none";
   let previousSubmissionNumber = null;
   let currentBand = "submission-band-a";
   rows.forEach(function(row, index){
-    if(row["Submission Number"] !== previousSubmissionNumber){
+    if (row["Submission Number"] !== previousSubmissionNumber) {
       currentBand = currentBand === "submission-band-a" ? "submission-band-b" : "submission-band-a";
       previousSubmissionNumber = row["Submission Number"];
     }
     const tr = document.createElement("tr");
     tr.className = currentBand;
     tr.innerHTML =
-      "<td>" + safeCell(row["Submission Number"]) + "</td>" +
       "<td>" + safeCell(index + 1) + "</td>" +
+      "<td>" + safeCell(row["Submission Number"]) + "</td>" +
       "<td>" + safeCell(row["Name"]) + "</td>" +
       "<td>" + safeCell(row["Mobile Number"]) + "</td>" +
-      "<td>" + safeCell(getDisplayAlternateMobile(row)) + "</td>" +
       "<td>" + safeCell(row["Age"]) + "</td>" +
-      "<td>" + safeCell(row["City (from PIN)"]) + "</td>" +
-      "<td>" + safeCell(formatAccommodation(row["Accommodation"])) + "</td>";
+      "<td>" + safeCell(row["Type"]) + "</td>" +
+      "<td>" + safeCell(row["Area/Locality"]) + "</td>" +
+      "<td>" + safeCell(row["City"]) + "</td>" +
+      "<td>" + safeCell(row["District"]) + "</td>" +
+      "<td>" + safeCell(row["State"]) + "</td>" +
+      "<td>" + safeCell(formatAccommodation(row["Accommodation"])) + "</td>" +
+      "<td>" + safeCell(normalizeRegisteredBy(row["Registered By"])) + "</td>" +
+      "<td>" + safeCell(capitalize(normalizeStatus(row["Status"]))) + "</td>";
     tr.addEventListener("click", function(){ openUserModal(row); });
     body.appendChild(tr);
   });
@@ -442,12 +436,16 @@ function renderTable(rows){
 function openUserModal(row){
   selectedRow = row;
   document.getElementById("modalName").textContent = row["Name"] || "Person Details";
-  document.getElementById("modalGender").textContent = row["Type"] === "Gent" ? "Male" : "Female";
+  document.getElementById("modalGender").textContent = row["Type"] || "-";
   document.getElementById("modalAge").textContent = row["Age"] || "-";
   document.getElementById("modalMobile").textContent = row["Mobile Number"] || "-";
-  document.getElementById("modalAlternateMobile").textContent = getDisplayAlternateMobile(row) || "-";
-  document.getElementById("modalCity").textContent = row["City (from PIN)"] || "-";
+  document.getElementById("modalArea").textContent = row["Area/Locality"] || "-";
+  document.getElementById("modalCity").textContent = row["City"] || "-";
+  document.getElementById("modalDistrict").textContent = row["District"] || "-";
+  document.getElementById("modalState").textContent = row["State"] || "-";
+  document.getElementById("modalPostcode").textContent = row["Postcode"] || "-";
   document.getElementById("modalAccommodation").textContent = formatAccommodation(row["Accommodation"]);
+  document.getElementById("modalRegisteredBy").textContent = normalizeRegisteredBy(row["Registered By"]);
   document.getElementById("modalStatus").textContent = capitalize(normalizeStatus(row["Status"]));
   document.getElementById("modalSubmissionNumber").textContent = row["Submission Number"] || "-";
   document.getElementById("modalPersonId").textContent = row["Person ID"] || "-";
@@ -460,76 +458,68 @@ function closeUserModal(){
 }
 
 async function updateSelectedStatus(nextStatus){
-  if(!selectedRow) return;
-  try{
+  if (!selectedRow) return;
+  try {
     const response = await fetch(SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action:"updateStatus", personId:selectedRow["Person ID"], rowNumber:selectedRow["_rowNumber"], nextStatus:nextStatus })
+      body: JSON.stringify({ action:"updateStatus", personId:selectedRow["Person ID"], nextStatus:nextStatus })
     });
     const payload = await response.json();
-    if(payload.status !== "success") throw new Error(payload.message || "Status update failed");
+    if (payload.status !== "success") throw new Error(payload.message || "Status update failed");
     closeUserModal();
     await loadData();
-  }catch(error){
+  } catch (error) {
     console.error("Status update failed:", error);
     alert(error && error.message ? error.message : "Could not update status. Please try again.");
   }
 }
 
 function downloadExcel(){
-  if(!displayedRows.length){ alert("No data available for export."); return; }
-  const header = ["Submission Number","Sr. No.","Name","Mobile Number","Second Mobile","Age","City","Accommodation"];
-  let previousSubmissionNumber = null;
-  let useBandA = true;
-  const rows = displayedRows.map(function(row, index){
-    if(row["Submission Number"] !== previousSubmissionNumber){
-      useBandA = !useBandA;
-      previousSubmissionNumber = row["Submission Number"];
-    }
-    const bg = useBandA ? "#fffaf3" : "#fdecd8";
-    const cells = [row["Submission Number"], index + 1, row["Name"], row["Mobile Number"], getDisplayAlternateMobile(row), row["Age"], row["City (from PIN)"], formatAccommodation(row["Accommodation"])];
-    return "<tr style=\"background-color:" + bg + ";\">" + cells.map(function(cell){ return "<td>" + safeCell(cell) + "</td>"; }).join("") + "</tr>";
-  }).join("");
-  const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body><table border="1"><tr>' + header.map(function(cell){ return "<th>" + safeCell(cell) + "</th>"; }).join("") + "</tr>" + rows + "</table></body></html>";
-  const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "parayan-submissions-" + filters.status + ".xls";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(link.href);
+  if (!displayedRows.length) { alert("No data available for export."); return; }
+  if (typeof XLSX === "undefined") { alert("Excel export library failed to load. Please refresh and try again."); return; }
+  const data = displayedRows.map(function(row, index){
+    return {
+      "Serial Number": index + 1,
+      "Submission/Booking Number": row["Submission Number"],
+      "Name": row["Name"],
+      "Mobile Number": row["Mobile Number"],
+      "Age": row["Age"],
+      "Gender": row["Type"],
+      "Area/Locality": row["Area/Locality"],
+      "City": row["City"],
+      "District": row["District"],
+      "State": row["State"],
+      "Accommodation": formatAccommodation(row["Accommodation"]),
+      "Registered By": normalizeRegisteredBy(row["Registered By"]),
+      "Status": capitalize(normalizeStatus(row["Status"]))
+    };
+  });
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  worksheet["!cols"] = [
+    { wch: 12 }, { wch: 20 }, { wch: 28 }, { wch: 18 }, { wch: 8 }, { wch: 10 },
+    { wch: 22 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 22 }, { wch: 12 }
+  ];
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Registrations");
+  const datePart = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(workbook, "parayan-registrations-" + filters.status + "-" + datePart + ".xlsx");
 }
 
 function uniqueSorted(values){
   return Array.from(new Set(values.map(function(value){ return String(value || "").trim(); }).filter(Boolean))).sort(function(a, b){ return a.localeCompare(b); });
 }
 
-function buildAlternateMobileMap(rows){
-  const map = {};
-  rows.forEach(function(row){
-    const submissionNumber = String(row["Submission Number"] || "").trim();
-    const alternateMobile = String(row["Alternate Mobile Number"] || "").trim();
-    if(submissionNumber && alternateMobile && !map[submissionNumber]){
-      map[submissionNumber] = alternateMobile;
-    }
-  });
-  return map;
-}
-
-function getDisplayAlternateMobile(row){
-  const directValue = String(row["Alternate Mobile Number"] || "").trim();
-  if(directValue) return directValue;
-  return alternateMobileBySubmission[String(row["Submission Number"] || "").trim()] || "";
-}
-
 function normalizeStatus(value){
   return String(value || "").toLowerCase() === "inactive" ? "inactive" : "active";
 }
 
+function normalizeRegisteredBy(value){
+  return String(value || "").trim() || "Self";
+}
+
 function formatAccommodation(value){
-  return String(value || "").toLowerCase() === "free" ? "Free" : String(value || "").toLowerCase() === "own" ? "Own" : String(value || "");
+  return String(value || "").toLowerCase() === "free" ? "Free" : String(value || "").toLowerCase() === "own" ? "Own/Paid" : String(value || "");
 }
 
 function capitalize(value){
@@ -538,7 +528,7 @@ function capitalize(value){
 }
 
 function safeCell(value){
-  if(value === null || value === undefined) return "";
+  if (value === null || value === undefined) return "";
   return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 </script>
