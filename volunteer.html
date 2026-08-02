@@ -35,8 +35,8 @@
   .btn.secondary{background:#f6e7d7;color:var(--primary-dark);}
   .row{display:flex;gap:12px;flex-wrap:wrap;}
   .panel{display:none;margin-top:20px;overflow:hidden;}
-  .header{background:linear-gradient(120deg,#6b1f12,#a3471c);padding:24px 24px 28px;color:#fff7ef;text-align:center;}
-  .header p{margin:0;color:#f6d6bf;}
+  .header{background:linear-gradient(120deg,#6b1f12,#a3471c);padding:24px 24px 28px;color:#ffe072;text-align:center;}
+  .header p{margin:0;color:#ffe9a8;}
   .content{padding:24px;}
   .section{margin-bottom:28px;}
   .section-title{font-size:16px;font-weight:700;color:var(--primary-dark);margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--border);}
@@ -166,6 +166,7 @@
       <div id="statusBox" class="status-box">
         <h2 id="statusTitle"></h2>
         <p id="statusMsg"></p>
+        <div id="bookingIdDisplay" class="booking-id"></div>
       </div>
     </div>
   </div>
@@ -408,6 +409,7 @@ document.querySelectorAll(".lang-btn").forEach(function(button){
 applyLanguage();
 renderCountPills();
 renderParticipantBlocks();
+hardenAutofill();
 
 function t(key){ return TEXTS[currentLanguage][key]; }
 
@@ -442,6 +444,28 @@ function applyLanguage(){
   renderContacts(currentLanguage);
   renderAccommodationOptions();
   renderAvailability();
+}
+
+function hardenAutofill(){
+  document.querySelectorAll("input").forEach(function(input, index){
+    input.setAttribute("autocomplete", "off");
+    input.setAttribute("autocorrect", "off");
+    input.setAttribute("autocapitalize", input.id === "locationSearch" ? "words" : "off");
+    input.setAttribute("spellcheck", "false");
+    input.setAttribute("data-form-type", "other");
+    input.setAttribute("data-lpignore", "true");
+    if (!input.name) input.name = "field_" + index + "_" + Math.random().toString(36).slice(2, 8);
+    if (input.type !== "radio") {
+      input.readOnly = true;
+      const unlock = function(){
+        input.readOnly = false;
+        input.removeEventListener("focus", unlock);
+        input.removeEventListener("pointerdown", unlock);
+      };
+      input.addEventListener("focus", unlock);
+      input.addEventListener("pointerdown", unlock);
+    }
+  });
 }
 
 function renderContacts(language){
@@ -880,12 +904,12 @@ function showSuccess(count, verifiedAfterRetry, bookingId){
   statusBox.classList.add("show");
   statusBox.classList.remove("error");
   document.getElementById("statusTitle").textContent = t("successTitle");
-  document.getElementById("statusMsg").innerHTML =
-    escapeHtml(formatMessage(verifiedAfterRetry ? t("successMessageRetry") : t("successMessage"), {
-      count: count,
-      bookingId: "",
-      agent: validatedAgent.name
-    })) + '<div class="booking-id">' + escapeHtml(bookingId) + "</div>";
+  document.getElementById("statusMsg").textContent = formatMessage(verifiedAfterRetry ? t("successMessageRetry") : t("successMessage"), {
+    count: count,
+    bookingId: "",
+    agent: validatedAgent.name
+  });
+  document.getElementById("bookingIdDisplay").textContent = bookingId;
 }
 
 function showFailure(message){
