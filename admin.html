@@ -157,7 +157,7 @@
           <div class="filter-group"><label>Gender</label><select id="genderFilter"><option value="all">All</option><option value="Gent">Gents</option><option value="Lady">Ladies</option></select></div>
           <div class="filter-group"><label>Accommodation</label><select id="accommodationFilter"></select></div>
           <div class="filter-group"><label>Language</label><select id="languageFilter"><option value="all">All</option><option value="en">English</option><option value="mr">Marathi</option></select></div>
-          <div class="filter-group"><label>Registered By</label><select id="sourceFilter"><option value="all">All</option><option value="self">Self</option><option value="agent">Agent</option></select></div>
+          <div class="filter-group"><label>Registered By</label><select id="sourceFilter"><option value="all">All</option><option value="self">Self</option><option value="volunteer">Volunteer</option></select></div>
         </div>
 
         <div class="table-wrap">
@@ -335,7 +335,7 @@ function applyCurrentFilters(){
     if (filters.accommodation && formatAccommodation(row["Accommodation"]) !== filters.accommodation) return false;
     if (filters.formLanguage !== "all" && String(row["Form Language"] || "en") !== filters.formLanguage) return false;
     if (filters.source === "self" && normalizeRegisteredBy(row["Registered By"]) !== "Self") return false;
-    if (filters.source === "agent" && !normalizeRegisteredBy(row["Registered By"]).startsWith("Agent - ")) return false;
+    if (filters.source === "volunteer" && !isVolunteerRow(row)) return false;
     return true;
   });
   renderAnalytics(displayedRows);
@@ -515,7 +515,13 @@ function normalizeStatus(value){
 }
 
 function normalizeRegisteredBy(value){
-  return String(value || "").trim() || "Self";
+  const text = String(value || "").trim() || "Self";
+  return text.startsWith("Agent - ") ? text.replace(/^Agent - /, "Volunteer - ") : text;
+}
+
+function isVolunteerRow(row){
+  const registeredBy = String(row["Registered By"] || "").trim();
+  return registeredBy.startsWith("Volunteer - ") || registeredBy.startsWith("Agent - ");
 }
 
 function formatAccommodation(value){
