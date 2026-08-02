@@ -92,6 +92,7 @@
   #statusIcon{font-size:52px;margin-bottom:14px;color:var(--success);}
   #statusBox h2{font-family:'Noto Serif','Noto Sans Devanagari',serif;margin-bottom:8px;}
   #statusBox p{color:#6b5a45;font-size:14.5px;word-break:break-word;}
+  .booking-id{display:inline-block;margin-top:10px;font-size:28px;font-weight:800;color:var(--maroon);letter-spacing:.6px;}
   .spinner{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px;}
   @keyframes spin{to{transform:rotate(360deg);}}
   .page-footer{width:min(100%,760px);margin:24px auto 0;padding:0 16px;}
@@ -1028,10 +1029,11 @@ function showSuccess(count, verifiedAfterRetry, bookingId){
   statusBox.classList.remove("error");
   document.getElementById("statusIcon").textContent = "✓";
   document.getElementById("statusTitle").textContent = t("successTitle");
-  document.getElementById("statusMsg").textContent = formatMessage(
-    verifiedAfterRetry ? t("successMessageRetry") : t("successMessage"),
-    { count: count, bookingId: bookingId }
-  );
+  document.getElementById("statusMsg").innerHTML =
+    escapeHtml(formatMessage(
+      verifiedAfterRetry ? t("successMessageRetry") : t("successMessage"),
+      { count: count, bookingId: "" }
+    )) + '<div class="booking-id">' + escapeHtml(bookingId) + "</div>";
 }
 
 function showFailure(message){
