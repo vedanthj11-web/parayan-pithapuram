@@ -70,13 +70,6 @@
   .inline-error,.error-text{color:var(--error);font-size:12.5px;margin-top:8px;display:none;}
   .inline-error.show,.error-text.show{display:block;}
   .field.invalid input,.field.invalid .gender-option,.field.invalid .radio-option{border-color:var(--error);}
-  .availability-card{background:#fff8ee;border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:16px;}
-  .availability-grid{display:grid;grid-template-columns:1fr;gap:10px;}
-  .availability-item{border-radius:12px;padding:12px 14px;background:#fffdf9;border:1px solid var(--border);}
-  .availability-item strong{display:block;color:var(--maroon);font-size:14px;}
-  .availability-item span{display:block;margin-top:4px;font-size:13px;color:#6b5a45;}
-  .availability-item.full{border-color:#e2b3b3;background:#fff4f4;}
-  .availability-status{font-size:12.5px;color:#6b5a45;margin-top:8px;}
   .suggestions{position:absolute;top:100%;left:0;right:0;z-index:10;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 26px rgba(0,0,0,.12);max-height:280px;overflow:auto;display:none;}
   .suggestions.show{display:block;}
   .suggestion{padding:11px 14px;border-bottom:1px solid #f1e4cf;cursor:pointer;}
@@ -119,7 +112,7 @@
   @media (min-width:640px){
     .language-grid{grid-template-columns:1fr 1fr;}
     .person-grid{grid-template-columns:2fr 1fr 1.3fr;}
-    .contact-grid,.availability-grid,.manual-grid{grid-template-columns:1fr 1fr;}
+    .contact-grid,.manual-grid{grid-template-columns:1fr 1fr;}
   }
   @media (max-width:480px){
     header{padding:24px 14px 30px;}
@@ -156,15 +149,6 @@
   </header>
   <div class="container">
     <form id="regForm" novalidate>
-      <div class="availability-card">
-        <div class="section-title" id="availabilityTitle"></div>
-        <div class="availability-grid">
-          <div class="availability-item" id="availabilityFree"><strong id="availabilityFreeTitle"></strong><span id="availabilityFreeText"></span></div>
-          <div class="availability-item" id="availabilityOwn"><strong id="availabilityOwnTitle"></strong><span id="availabilityOwnText"></span></div>
-        </div>
-        <div class="availability-status" id="availabilityStatus"></div>
-      </div>
-
       <div id="formBody">
         <div class="section">
           <div class="section-title" id="countSectionTitle"></div>
@@ -297,10 +281,10 @@ const TEXTS = {
     headerTitle: "Shripad Shrivallabh Charitamrut Samohik Parayan- 2",
     headerSubtitle: "Pithapuram Registration Form",
     headerDates: "21 - 22 - 23 November",
-    availabilityTitle: "Accommodation Availability",
     availabilityFreeTitle: "Free accommodation",
     availabilityOwnTitle: "Own/Paid accommodation",
-    availabilityPattern: "{remaining} of {capacity} seats remaining",
+    accomFreeTitleWithSeats: "Yes, we want free accommodation from Devasthanam (only {remaining} seats remaining out of {capacity})",
+    accomOwnTitleWithSeats: "No, we will arrange our stay ourselves (only {remaining} seats remaining out of {capacity})",
     availabilityFull: "Full",
     availabilityLoading: "Loading availability...",
     availabilityError: "Could not load live availability right now. Submission will still be checked at the server.",
@@ -316,14 +300,14 @@ const TEXTS = {
     participantError: "Please add at least 1 participant and complete all details.",
     locationSectionTitle: "Location",
     locationLabel: "Area / City *",
-    locationPlaceholder: "Type at least 3 letters, e.g. Uppal",
-    locationHint: "Choose a location from the list. If search is unavailable, enter details manually.",
-    locationSelected: "Selected: {area}, {city}, {state}",
+    locationPlaceholder: "Enter your village/town/city name",
+    locationHint: "",
+    locationSelected: "Selected: {city}, {state}",
     locationLoading: "Searching locations...",
     locationNoResults: "No matching Indian locations found.",
     locationSearchError: "Location search is unavailable right now. Please enter your location manually.",
-    locationManualButton: "Enter location manually",
-    locationAttribution: "Location search powered by OpenStreetMap/Photon",
+    locationManualButton: "",
+    locationAttribution: "",
     manualAreaLabel: "Area / Locality *",
     manualCityLabel: "City *",
     manualDistrictLabel: "District",
@@ -373,10 +357,10 @@ const TEXTS = {
     headerTitle: "श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण - २",
     headerSubtitle: "पिठापूरम नोंदणी फॉर्म",
     headerDates: "21 - 22 - 23 नोव्हेंबर",
-    availabilityTitle: "निवास उपलब्धता",
     availabilityFreeTitle: "मोफत निवास",
     availabilityOwnTitle: "स्वतःचा / सशुल्क निवास",
-    availabilityPattern: "{capacity} पैकी {remaining} जागा शिल्लक",
+    accomFreeTitleWithSeats: "हो, आम्हाला देवस्थानकडून मोफत निवास हवा आहे (एकूण {capacity} पैकी फक्त {remaining} जागा शिल्लक)",
+    accomOwnTitleWithSeats: "नाही, आम्ही आमचा निवास स्वतः करू (एकूण {capacity} पैकी फक्त {remaining} जागा शिल्लक)",
     availabilityFull: "पूर्ण",
     availabilityLoading: "उपलब्धता तपासत आहोत...",
     availabilityError: "सध्या उपलब्धता आणता आली नाही. अंतिम तपासणी सर्व्हरवर होईल.",
@@ -392,14 +376,14 @@ const TEXTS = {
     participantError: "कृपया किमान १ सहभागी जोडा आणि सर्व तपशील पूर्ण करा.",
     locationSectionTitle: "स्थान",
     locationLabel: "एरिया / शहर *",
-    locationPlaceholder: "किमान 3 अक्षरे टाइप करा, उदा. Uppal",
-    locationHint: "यादीतून स्थान निवडा. शोध उपलब्ध नसल्यास खाली तपशील हाताने भरा.",
-    locationSelected: "निवडलेले स्थान: {area}, {city}, {state}",
+    locationPlaceholder: "तुमचे गाव / शहर / टाउन नाव टाका",
+    locationHint: "",
+    locationSelected: "निवडलेले स्थान: {city}, {state}",
     locationLoading: "स्थान शोधत आहोत...",
     locationNoResults: "भारतातील जुळणारे स्थान मिळाले नाही.",
     locationSearchError: "सध्या स्थान शोध सेवा उपलब्ध नाही. कृपया खाली स्थान हाताने भरा.",
-    locationManualButton: "स्थान हाताने भरा",
-    locationAttribution: "Location search powered by OpenStreetMap/Photon",
+    locationManualButton: "",
+    locationAttribution: "",
     manualAreaLabel: "एरिया / परिसर *",
     manualCityLabel: "शहर *",
     manualDistrictLabel: "जिल्हा",
@@ -497,10 +481,6 @@ function applyLanguage(){
   document.getElementById("headerTitle").textContent = t("headerTitle");
   document.getElementById("headerSubtitle").textContent = t("headerSubtitle");
   document.getElementById("headerDates").textContent = t("headerDates");
-  document.getElementById("availabilityTitle").textContent = t("availabilityTitle");
-  document.getElementById("availabilityFreeTitle").textContent = t("availabilityFreeTitle");
-  document.getElementById("availabilityOwnTitle").textContent = t("availabilityOwnTitle");
-  document.getElementById("availabilityStatus").textContent = t("availabilityLoading");
   document.getElementById("countSectionTitle").textContent = t("countSectionTitle");
   document.getElementById("countLabel").textContent = t("countLabel");
   document.getElementById("participantError").textContent = t("participantError");
@@ -601,8 +581,8 @@ function renderAccommodationOptions(){
   const current = document.querySelector('input[name="accom"]:checked');
   const currentValue = current ? current.value : "";
   group.innerHTML =
-    renderAccommodationOption("free", t("accomFreeTitle"), t("accomFreeHint"), currentValue === "free") +
-    renderAccommodationOption("own", t("accomOwnTitle"), t("accomOwnHint"), currentValue === "own");
+    renderAccommodationOption("free", currentValue === "free") +
+    renderAccommodationOption("own", currentValue === "own");
   group.querySelectorAll(".radio-option").forEach(function(option){
     option.addEventListener("click", function(){
       if (option.dataset.disabled === "true") return;
@@ -615,18 +595,22 @@ function renderAccommodationOptions(){
   });
 }
 
-function renderAccommodationOption(value, title, hint, selected){
+function renderAccommodationOption(value, selected){
   const availability = availabilityData && availabilityData[value];
   const isFull = availability && availability.remaining <= 0;
-  const detailText = isFull ? t("availabilityFull") : hint;
+  const baseTitleKey = value === "free" ? "accomFreeTitle" : "accomOwnTitle";
+  const titleWithSeatsKey = value === "free" ? "accomFreeTitleWithSeats" : "accomOwnTitleWithSeats";
+  const titleText = availability
+    ? formatMessage(t(titleWithSeatsKey), availability)
+    : t(baseTitleKey);
+  const detailText = isFull ? t("availabilityFull") : (value === "free" ? t("accomFreeHint") : t("accomOwnHint"));
   return '<label class="radio-option' + (selected ? " selected" : "") + (isFull ? ' field invalid' : "") + '" data-disabled="' + (isFull ? "true" : "false") + '">' +
     '<input type="radio" name="accom" value="' + value + '"' + (selected ? " checked" : "") + (isFull ? " disabled" : "") + ">" +
-    '<span class="option-text"><strong>' + escapeHtml(title) + "</strong><span>" + escapeHtml(detailText) + "</span></span>" +
+    '<span class="option-text"><strong>' + escapeHtml(titleText) + "</strong><span>" + escapeHtml(detailText) + "</span></span>" +
   "</label>";
 }
 
 async function loadAvailability(){
-  document.getElementById("availabilityStatus").textContent = t("availabilityLoading");
   try {
     const response = await fetch(SCRIPT_URL + "?action=getAvailability&_=" + Date.now());
     const payload = await response.json();
@@ -637,37 +621,25 @@ async function loadAvailability(){
   } catch (error) {
     availabilityData = null;
     renderAvailability();
-    document.getElementById("availabilityStatus").textContent = t("availabilityError");
   }
 }
 
 function renderAvailability(){
-  const freeBox = document.getElementById("availabilityFree");
-  const ownBox = document.getElementById("availabilityOwn");
-  const status = document.getElementById("availabilityStatus");
   if (!availabilityData) {
-    document.getElementById("availabilityFreeText").textContent = "-";
-    document.getElementById("availabilityOwnText").textContent = "-";
-    freeBox.classList.remove("full");
-    ownBox.classList.remove("full");
     return;
   }
-  ["free", "own"].forEach(function(key){
-    const box = document.getElementById(key === "free" ? "availabilityFree" : "availabilityOwn");
-    const text = document.getElementById(key === "free" ? "availabilityFreeText" : "availabilityOwnText");
-    const item = availabilityData[key];
-    text.textContent = item.remaining <= 0 ? t("availabilityFull") : formatMessage(t("availabilityPattern"), item);
-    box.classList.toggle("full", item.remaining <= 0);
-  });
   const selectedAccommodation = document.querySelector('input[name="accom"]:checked');
   if (selectedAccommodation && availabilityData[selectedAccommodation.value] && participantCount > availabilityData[selectedAccommodation.value].remaining) {
-    const accomLabel = selectedAccommodation.value === "free" ? t("availabilityFreeTitle") : t("availabilityOwnTitle");
-    status.textContent = formatMessage(t("errorCapacityExceeded"), {
+    document.getElementById("field-accom").classList.add("invalid");
+    document.getElementById("accomError").textContent = formatMessage(t("errorCapacityExceeded"), {
       remaining: availabilityData[selectedAccommodation.value].remaining,
-      accommodation: accomLabel
+      accommodation: selectedAccommodation.value === "free" ? t("availabilityFreeTitle") : t("availabilityOwnTitle")
     });
+    document.getElementById("accomError").classList.add("show");
   } else {
-    status.textContent = "";
+    document.getElementById("field-accom").classList.remove("invalid");
+    document.getElementById("accomError").textContent = t("accomError");
+    document.getElementById("accomError").classList.remove("show");
   }
 }
 
@@ -752,22 +724,22 @@ function normalizePhotonResults(features){
     const countryCode = String(props.countrycode || "").toLowerCase();
     const country = String(props.country || "").toLowerCase();
     if (countryCode !== "in" && country !== "india") return null;
-    const area = firstNonEmpty([props.name, props.suburb, props.street, props.locality, props.district]);
-    const city = firstNonEmpty([props.city, props.town, props.county, props.state_district, props.district, props.village]);
-    const district = firstNonEmpty([props.district, props.county, props.state_district, city]);
+    const city = firstNonEmpty([props.city, props.town, props.village]);
     const state = firstNonEmpty([props.state]);
-    if (!area || !city || !state) return null;
+    if (!city || !state) return null;
+    if (/subdistrict/i.test(city)) return null;
+    const district = firstNonEmpty([props.district, props.county, props.state_district, city]);
     const postcode = String(props.postcode || "").trim();
-    const key = [area, city, district, state, postcode].join("|").toLowerCase();
+    const key = [city, state, postcode].join("|").toLowerCase();
     if (seen.has(key)) return null;
     seen.add(key);
     return {
-      area: area,
+      area: city,
       city: city,
       district: district,
       state: state,
       postcode: postcode,
-      label: area + ", " + city + ", " + state
+      label: city + ", " + state
     };
   }).filter(Boolean);
 }
@@ -780,8 +752,8 @@ function renderSuggestions(){
   }
   box.innerHTML = currentSuggestions.map(function(item, index){
     return '<div class="suggestion' + (index === activeSuggestionIndex ? " active" : "") + '" data-index="' + index + '">' +
-      "<strong>" + escapeHtml(item.area) + "</strong>" +
-      "<span>" + escapeHtml(item.city + ", " + item.state + (item.postcode ? " " + item.postcode : "")) + "</span>" +
+      "<strong>" + escapeHtml(item.city) + "</strong>" +
+      "<span>" + escapeHtml(item.state + (item.postcode ? " " + item.postcode : "")) + "</span>" +
       "</div>";
   }).join("");
   box.classList.add("show");
