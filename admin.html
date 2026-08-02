@@ -92,7 +92,7 @@
 <div id="lockScreen" class="card">
   <h1>Admin Access</h1>
   <p class="sub">Enter the admin key to open registrations and analytics.</p>
-  <input type="password" id="adminKey" placeholder="Admin key" autocomplete="current-password">
+  <input type="password" id="adminKey" placeholder="Admin key" autocomplete="off">
   <button type="button" class="action-btn" id="loginBtn">View Dashboard</button>
 </div>
 
@@ -172,8 +172,6 @@
                 <th>Gender</th>
                 <th>Area/Locality</th>
                 <th>City</th>
-                <th>District</th>
-                <th>State</th>
                 <th>Accommodation</th>
                 <th>Registered By</th>
                 <th>Status</th>
@@ -423,8 +421,6 @@ function renderTable(rows){
       "<td>" + safeCell(row["Type"]) + "</td>" +
       "<td>" + safeCell(row["Area/Locality"]) + "</td>" +
       "<td>" + safeCell(row["City"]) + "</td>" +
-      "<td>" + safeCell(row["District"]) + "</td>" +
-      "<td>" + safeCell(row["State"]) + "</td>" +
       "<td>" + safeCell(formatAccommodation(row["Accommodation"])) + "</td>" +
       "<td>" + safeCell(normalizeRegisteredBy(row["Registered By"])) + "</td>" +
       "<td>" + safeCell(capitalize(normalizeStatus(row["Status"]))) + "</td>";
