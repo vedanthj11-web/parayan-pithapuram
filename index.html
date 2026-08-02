@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shripad Shrivallabh Charitamrut Samohik Parayan</title>
+<title>Shripad Shrivallabh Charitamrut Samohik Parayan- 2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Serif:wght@600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -16,416 +16,124 @@
     --border:#e8d9c0;
     --success:#2f7d4f;
     --error:#c0392b;
+    --info:#2f6fa8;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;max-width:100%;overflow-x:hidden;}
-  body{
-    font-family:'Poppins','Noto Sans Devanagari',sans-serif;
-    background:linear-gradient(180deg,#fff8ee 0%,#fbeed9 100%);
-    color:var(--ink);
-    min-height:100vh;
-  }
+  body{font-family:'Poppins','Noto Sans Devanagari',sans-serif;background:linear-gradient(180deg,#fff8ee 0%,#fbeed9 100%);color:var(--ink);min-height:100vh;}
   .page{padding:0 0 60px;}
-  .language-screen{
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    background:
-      radial-gradient(circle at top left, rgba(226,113,29,0.18), transparent 40%),
-      radial-gradient(circle at bottom right, rgba(122,46,46,0.16), transparent 38%),
-      linear-gradient(180deg,#fff8ee 0%,#fbe7c6 100%);
-  }
-  .language-card{
-    width:min(100%,760px);
-    background:rgba(255,255,255,0.95);
-    border:1px solid rgba(232,217,192,0.9);
-    border-radius:28px;
-    box-shadow:0 22px 56px rgba(122,46,46,0.14);
-    padding:28px;
-    text-align:center;
-  }
-  .language-title{
-    font-family:'Noto Serif','Noto Sans Devanagari',serif;
-    font-size:clamp(28px,5vw,44px);
-    color:var(--maroon);
-    margin:0 0 12px;
-    line-height:1.15;
-  }
-  .language-subtitle{
-    margin:0 0 28px;
-    font-size:clamp(16px,2.6vw,20px);
-    color:#7a6a55;
-  }
-  .language-grid{
-    display:grid;
-    grid-template-columns:1fr;
-    gap:16px;
-  }
-  .language-btn{
-    border:none;
-    cursor:pointer;
-    width:100%;
-    min-height:180px;
-    border-radius:22px;
-    padding:24px 20px;
-    font:inherit;
-    transition:transform .14s ease, box-shadow .14s ease, background .14s ease;
-    box-shadow:0 12px 30px rgba(122,46,46,0.1);
-  }
+  .language-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at top left,rgba(226,113,29,.18),transparent 40%),radial-gradient(circle at bottom right,rgba(122,46,46,.16),transparent 38%),linear-gradient(180deg,#fff8ee 0%,#fbe7c6 100%);}
+  .language-card{width:min(100%,760px);background:rgba(255,255,255,.95);border:1px solid rgba(232,217,192,.9);border-radius:28px;box-shadow:0 22px 56px rgba(122,46,46,.14);padding:28px;text-align:center;}
+  .language-title{font-family:'Noto Serif','Noto Sans Devanagari',serif;font-size:clamp(28px,5vw,44px);color:var(--maroon);margin:0 0 12px;line-height:1.15;}
+  .language-subtitle{margin:0 0 28px;font-size:clamp(16px,2.6vw,20px);color:#7a6a55;}
+  .language-grid{display:grid;grid-template-columns:1fr;gap:16px;}
+  .language-btn{border:none;cursor:pointer;width:100%;min-height:180px;border-radius:22px;padding:24px 20px;font:inherit;transition:transform .14s ease,box-shadow .14s ease;box-shadow:0 12px 30px rgba(122,46,46,.1);}
   .language-btn:hover{transform:translateY(-2px);}
-  .language-btn.marathi{
-    background:linear-gradient(135deg,#7a2e2e,#9e4c2e);
-    color:#fff7ea;
-  }
-  .language-btn.english{
-    background:linear-gradient(135deg,#e2711d,#f1a349);
-    color:#fffaf3;
-  }
-  .language-btn .big{
-    display:block;
-    font-size:clamp(26px,5vw,40px);
-    font-weight:700;
-    margin-bottom:10px;
-  }
-  .language-btn .small{
-    display:block;
-    font-size:clamp(15px,2.8vw,20px);
-    opacity:.95;
-  }
-  header{
-    background:linear-gradient(120deg,var(--maroon),#5c2020);
-    color:#fdf1df;
-    padding:28px 20px 34px;
-    text-align:center;
-    box-shadow:0 4px 18px rgba(0,0,0,0.15);
-  }
-  header h1{
-    font-family:'Noto Serif','Noto Sans Devanagari',serif;
-    font-size:clamp(20px,4vw,30px);
-    margin:0 0 8px;
-    line-height:1.3;
-  }
-  header p{
-    margin:0;
-    font-size:clamp(14px,2.8vw,16px);
-    color:#f3d9b0;
-  }
-  .dates{
-    display:inline-block;
-    margin-top:12px;
-    background:rgba(255,255,255,0.12);
-    border:1px solid rgba(255,255,255,0.28);
-    padding:6px 16px;
-    border-radius:999px;
-    font-size:14px;
-    letter-spacing:.2px;
-  }
-  .container{
-    width:min(100%,720px);
-    margin:-20px auto 0;
-    padding:0 16px;
-  }
-  form{
-    background:#fffefb;
-    border-radius:18px;
-    box-shadow:0 10px 30px rgba(122,46,46,0.12);
-    padding:clamp(18px,4vw,34px);
-    margin-top:20px;
-  }
+  .language-btn.marathi{background:linear-gradient(135deg,#7a2e2e,#9e4c2e);color:#fff7ea;}
+  .language-btn.english{background:linear-gradient(135deg,#e2711d,#f1a349);color:#fffaf3;}
+  .language-btn .big{display:block;font-size:clamp(26px,5vw,40px);font-weight:700;margin-bottom:10px;}
+  .language-btn .small{display:block;font-size:clamp(15px,2.8vw,20px);opacity:.95;}
+  header{background:linear-gradient(120deg,var(--maroon),#5c2020);color:#fdf1df;padding:28px 20px 34px;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,.15);}
+  header h1{font-family:'Noto Serif','Noto Sans Devanagari',serif;font-size:clamp(20px,4vw,30px);margin:0 0 8px;line-height:1.3;}
+  header p{margin:0;font-size:clamp(14px,2.8vw,16px);color:#f3d9b0;}
+  .dates{display:inline-block;margin-top:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);padding:6px 16px;border-radius:999px;font-size:14px;letter-spacing:.2px;}
+  .container{width:min(100%,760px);margin:-20px auto 0;padding:0 16px;}
+  form{background:#fffefb;border-radius:18px;box-shadow:0 10px 30px rgba(122,46,46,.12);padding:clamp(18px,4vw,34px);margin-top:20px;}
   .section{margin-bottom:28px;}
-  .section-title{
-    font-size:16px;
-    font-weight:700;
-    color:var(--saffron-dark);
-    margin-bottom:14px;
-    padding-bottom:8px;
-    border-bottom:2px solid var(--border);
-  }
-  .field{margin-bottom:18px;}
-  label{
-    display:block;
-    font-weight:600;
-    font-size:14.5px;
-    margin-bottom:6px;
-    color:var(--ink);
-  }
+  .section-title{font-size:16px;font-weight:700;color:var(--saffron-dark);margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--border);}
+  .field{margin-bottom:18px;position:relative;}
+  label{display:block;font-weight:600;font-size:14.5px;margin-bottom:6px;color:var(--ink);}
   .req{color:var(--saffron-dark);}
-  .hint{
-    font-size:12px;
-    color:#a3906f;
-    margin-top:5px;
-  }
-  input[type="text"],input[type="tel"],input[type="number"]{
-    width:100%;
-    padding:12px 14px;
-    font-size:15px;
-    border:1.5px solid var(--border);
-    border-radius:10px;
-    background:#fffdf9;
-    font-family:inherit;
-    color:var(--ink);
-    transition:border-color .15s, box-shadow .15s;
-    appearance:none;
-  }
-  input:focus{
-    outline:none;
-    border-color:var(--saffron);
-    box-shadow:0 0 0 3px rgba(226,113,29,0.15);
-  }
-  .count-pills{
-    display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:10px;
-  }
-  .count-pill{
-    min-height:52px;
-    border-radius:12px;
-    border:1.5px solid var(--border);
-    background:#fffdf9;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:17px;
-    font-weight:700;
-    cursor:pointer;
-    transition:all .15s;
-  }
+  .hint{font-size:12px;color:#a3906f;margin-top:5px;}
+  input[type="text"],input[type="tel"],input[type="number"]{width:100%;padding:12px 14px;font-size:15px;border:1.5px solid var(--border);border-radius:10px;background:#fffdf9;font-family:inherit;color:var(--ink);transition:border-color .15s,box-shadow .15s;appearance:none;}
+  input:focus{outline:none;border-color:var(--saffron);box-shadow:0 0 0 3px rgba(226,113,29,.15);}
+  .count-pills{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;}
+  .count-pill{min-height:52px;border-radius:12px;border:1.5px solid var(--border);background:#fffdf9;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;cursor:pointer;transition:all .15s;}
   .count-pill:hover{border-color:var(--saffron);}
-  .count-pill.selected{
-    background:var(--saffron);
-    border-color:var(--saffron);
-    color:#fff;
-  }
-  .person-blocks{
-    margin-top:16px;
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-  }
-  .person-card{
-    background:var(--cream);
-    border:1.5px solid var(--border);
-    border-radius:14px;
-    padding:14px;
-  }
-  .p-title{
-    font-weight:700;
-    font-size:14px;
-    color:var(--maroon);
-    margin-bottom:10px;
-  }
-  .person-grid{
-    display:grid;
-    grid-template-columns:1fr;
-    gap:10px;
-  }
-  .gender-group{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-  }
-  .gender-option,.radio-option{
-    display:flex;
-    align-items:flex-start;
-    gap:10px;
-    border:1.5px solid var(--border);
-    border-radius:12px;
-    padding:12px 14px;
-    cursor:pointer;
-    transition:border-color .15s, background .15s;
-    background:#fffdf9;
-  }
+  .count-pill.selected{background:var(--saffron);border-color:var(--saffron);color:#fff;}
+  .person-blocks{margin-top:16px;display:flex;flex-direction:column;gap:14px;}
+  .person-card{background:var(--cream);border:1.5px solid var(--border);border-radius:14px;padding:14px;}
+  .person-card.primary{background:linear-gradient(180deg,#fff4df 0%,#fff9f0 100%);border-color:#e8b36d;box-shadow:0 8px 18px rgba(226,113,29,.12);}
+  .p-title{font-weight:700;font-size:14px;color:var(--maroon);margin-bottom:10px;}
+  .p-note{display:block;margin-top:4px;font-size:12px;font-weight:500;color:#7a6a55;}
+  .person-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+  .gender-group{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+  .gender-option,.radio-option{display:flex;align-items:flex-start;gap:10px;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;transition:border-color .15s,background .15s;background:#fffdf9;}
   .gender-option:hover,.radio-option:hover{border-color:var(--saffron);}
-  .gender-option.selected,.radio-option.selected{
-    border-color:var(--saffron);
-    background:#fff3e4;
-  }
-  .gender-option input,.radio-option input{
-    margin-top:2px;
-    accent-color:var(--saffron-dark);
-    width:18px;
-    height:18px;
-    flex-shrink:0;
-  }
-  .radio-group{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-  }
-  .option-text strong{
-    display:block;
-    font-size:14.5px;
-  }
-  .option-text span{
-    font-size:12.5px;
-    color:#7a6a55;
-  }
-  .submit-btn{
-    width:100%;
-    padding:16px;
-    font-size:16px;
-    font-weight:700;
-    color:#fff;
-    background:linear-gradient(120deg,var(--saffron),var(--saffron-dark));
-    border:none;
-    border-radius:12px;
-    cursor:pointer;
-    box-shadow:0 6px 16px rgba(226,113,29,0.35);
-  }
+  .gender-option.selected,.radio-option.selected{border-color:var(--saffron);background:#fff3e4;}
+  .gender-option input,.radio-option input{margin-top:2px;accent-color:var(--saffron-dark);width:18px;height:18px;flex-shrink:0;}
+  .radio-group{display:flex;flex-direction:column;gap:10px;}
+  .option-text strong{display:block;font-size:14.5px;}
+  .option-text span{font-size:12.5px;color:#7a6a55;}
+  .submit-btn{width:100%;padding:16px;font-size:16px;font-weight:700;color:#fff;background:linear-gradient(120deg,var(--saffron),var(--saffron-dark));border:none;border-radius:12px;cursor:pointer;box-shadow:0 6px 16px rgba(226,113,29,.35);}
   .submit-btn:disabled{opacity:.65;cursor:not-allowed;}
-  .error-text{
-    color:var(--error);
-    font-size:12.5px;
-    margin-top:5px;
-    display:none;
-  }
-  .field.invalid input{border-color:var(--error);}
-  .field.invalid .error-text{display:block;}
-  .inline-error{
-    color:var(--error);
-    font-size:12.5px;
-    margin-top:8px;
-    display:none;
-  }
-  .inline-error.show{display:block;}
-  #statusBox{
-    display:none;
-    text-align:center;
-    padding:40px 20px;
-  }
+  .inline-error,.error-text{color:var(--error);font-size:12.5px;margin-top:8px;display:none;}
+  .inline-error.show,.error-text.show{display:block;}
+  .field.invalid input,.field.invalid .gender-option,.field.invalid .radio-option{border-color:var(--error);}
+  .availability-card{background:#fff8ee;border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:16px;}
+  .availability-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+  .availability-item{border-radius:12px;padding:12px 14px;background:#fffdf9;border:1px solid var(--border);}
+  .availability-item strong{display:block;color:var(--maroon);font-size:14px;}
+  .availability-item span{display:block;margin-top:4px;font-size:13px;color:#6b5a45;}
+  .availability-item.full{border-color:#e2b3b3;background:#fff4f4;}
+  .availability-status{font-size:12.5px;color:#6b5a45;margin-top:8px;}
+  .suggestions{position:absolute;top:100%;left:0;right:0;z-index:10;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 26px rgba(0,0,0,.12);max-height:280px;overflow:auto;display:none;}
+  .suggestions.show{display:block;}
+  .suggestion{padding:11px 14px;border-bottom:1px solid #f1e4cf;cursor:pointer;}
+  .suggestion:last-child{border-bottom:none;}
+  .suggestion.active,.suggestion:hover{background:#fff4e5;}
+  .suggestion strong{display:block;font-size:14px;color:var(--ink);}
+  .suggestion span{font-size:12px;color:#7a6a55;}
+  .location-meta{margin-top:8px;font-size:12.5px;color:#6b5a45;}
+  .location-meta strong{color:var(--success);}
+  .location-actions{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:8px;}
+  .link-btn{border:none;background:none;padding:0;color:var(--info);font:inherit;font-weight:600;cursor:pointer;}
+  .manual-location{display:none;padding:14px;border:1px dashed var(--border);border-radius:12px;background:#fffaf4;margin-top:12px;}
+  .manual-location.show{display:block;}
+  .manual-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+  .attribution{font-size:11.5px;color:#8a7454;margin-top:8px;}
+  #statusBox{display:none;text-align:center;padding:40px 20px;}
   #statusBox.show{display:block;}
   #statusBox.error #statusIcon{color:var(--error);}
-  #statusIcon{
-    font-size:52px;
-    margin-bottom:14px;
-    color:var(--success);
-  }
-  #statusBox h2{
-    font-family:'Noto Serif','Noto Sans Devanagari',serif;
-    margin-bottom:8px;
-  }
-  #statusBox p{
-    color:#6b5a45;
-    font-size:14.5px;
-    word-break:break-word;
-  }
-  .spinner{
-    display:inline-block;
-    width:18px;
-    height:18px;
-    border:2.5px solid rgba(255,255,255,0.5);
-    border-top-color:#fff;
-    border-radius:50%;
-    animation:spin .7s linear infinite;
-    vertical-align:middle;
-    margin-right:8px;
-  }
+  #statusIcon{font-size:52px;margin-bottom:14px;color:var(--success);}
+  #statusBox h2{font-family:'Noto Serif','Noto Sans Devanagari',serif;margin-bottom:8px;}
+  #statusBox p{color:#6b5a45;font-size:14.5px;word-break:break-word;}
+  .spinner{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px;}
   @keyframes spin{to{transform:rotate(360deg);}}
-  .page-footer{
-    width:min(100%,720px);
-    margin:24px auto 0;
-    padding:0 16px;
-  }
-  .footer-card{
-    background:#fffaf3;
-    border:1px solid var(--border);
-    border-radius:16px;
-    padding:18px;
-    color:#7a6a55;
-  }
-  .footer-note{
-    text-align:center;
-    font-size:12px;
-    margin-top:14px;
-  }
-  .contact-title{
-    margin:0 0 12px;
-    font-size:15px;
-    font-weight:700;
-    color:var(--maroon);
-  }
-  .contact-grid{
-    display:grid;
-    grid-template-columns:1fr;
-    gap:10px 18px;
-  }
-  .contact-item{
-    font-size:13.5px;
-    color:var(--ink);
-  }
-  .contact-item a{
-    color:var(--saffron-dark);
-    text-decoration:none;
-    font-weight:600;
-  }
-  .contact-item a:hover{
-    text-decoration:underline;
-  }
-  .validation-modal{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.42);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    padding:16px;
-    z-index:20;
-  }
-  .validation-modal.show{
-    display:flex;
-  }
-  .validation-card{
-    width:min(100%,520px);
-    max-height:min(80vh,640px);
-    overflow:auto;
-    background:#fffefb;
-    border-radius:18px;
-    padding:20px;
-    box-shadow:0 18px 46px rgba(0,0,0,0.24);
-  }
-  .validation-card h3{
-    margin:0 0 8px;
-    color:var(--maroon);
-    font-size:20px;
-  }
-  .validation-card p{
-    margin:0 0 14px;
-    color:#6b5a45;
-    font-size:14px;
-  }
-  .validation-list{
-    margin:0;
-    padding-left:18px;
-    color:var(--ink);
-    font-size:14px;
-  }
-  .validation-list li + li{
-    margin-top:8px;
-  }
-  .validation-actions{
-    display:flex;
-    justify-content:flex-end;
-    margin-top:18px;
-  }
+  .page-footer{width:min(100%,760px);margin:24px auto 0;padding:0 16px;}
+  .footer-card{background:#fffaf3;border:1px solid var(--border);border-radius:16px;padding:18px;color:#7a6a55;}
+  .footer-note{text-align:center;font-size:12px;margin-top:14px;}
+  .contact-title{margin:0 0 12px;font-size:15px;font-weight:700;color:var(--maroon);}
+  .contact-grid{display:grid;grid-template-columns:1fr;gap:10px 18px;}
+  .contact-item{font-size:13.5px;color:var(--ink);}
+  .contact-item a{color:var(--saffron-dark);text-decoration:none;font-weight:600;}
+  .contact-item a:hover{text-decoration:underline;}
+  .validation-modal{position:fixed;inset:0;background:rgba(0,0,0,.42);display:none;align-items:center;justify-content:center;padding:16px;z-index:20;}
+  .validation-modal.show{display:flex;}
+  .validation-card{width:min(100%,520px);max-height:min(80vh,640px);overflow:auto;background:#fffefb;border-radius:18px;padding:20px;box-shadow:0 18px 46px rgba(0,0,0,.24);}
+  .validation-card h3{margin:0 0 8px;color:var(--maroon);font-size:20px;}
+  .validation-card p{margin:0 0 14px;color:#6b5a45;font-size:14px;}
+  .validation-list{margin:0;padding-left:18px;color:var(--ink);font-size:14px;}
+  .validation-list li+li{margin-top:8px;}
+  .validation-actions{display:flex;justify-content:flex-end;margin-top:18px;}
   @media (min-width:640px){
     .language-grid{grid-template-columns:1fr 1fr;}
-    .person-grid{grid-template-columns:2fr 1fr 1.4fr;}
-    .contact-grid{grid-template-columns:1fr 1fr;}
+    .person-grid{grid-template-columns:2fr 1fr 1.3fr;}
+    .contact-grid,.availability-grid,.manual-grid{grid-template-columns:1fr 1fr;}
   }
   @media (max-width:480px){
     header{padding:24px 14px 30px;}
     form{padding:18px 14px;}
     .language-card{padding:20px 16px;}
     .language-btn{min-height:160px;}
+    .count-pills{grid-template-columns:repeat(2,minmax(0,1fr));}
   }
 </style>
 </head>
 <body>
 <div id="languageScreen" class="language-screen">
   <div class="language-card">
-    <h1 class="language-title" id="languageTitle">Choose Your Language</h1>
+    <h1 class="language-title" id="languageTitle"></h1>
     <p class="language-subtitle" id="languageSubtitle"></p>
     <div class="language-grid">
       <button type="button" class="language-btn marathi" data-language="mr">
@@ -448,11 +156,20 @@
   </header>
   <div class="container">
     <form id="regForm" novalidate>
+      <div class="availability-card">
+        <div class="section-title" id="availabilityTitle"></div>
+        <div class="availability-grid">
+          <div class="availability-item" id="availabilityFree"><strong id="availabilityFreeTitle"></strong><span id="availabilityFreeText"></span></div>
+          <div class="availability-item" id="availabilityOwn"><strong id="availabilityOwnTitle"></strong><span id="availabilityOwnText"></span></div>
+        </div>
+        <div class="availability-status" id="availabilityStatus"></div>
+      </div>
+
       <div id="formBody">
         <div class="section">
           <div class="section-title" id="countSectionTitle"></div>
           <div class="field">
-            <label id="countLabel" for="participantCount"></label>
+            <label id="countLabel"></label>
             <div class="count-pills" id="countPills"></div>
           </div>
           <div class="person-blocks" id="participantBlocks"></div>
@@ -461,11 +178,41 @@
 
         <div class="section">
           <div class="section-title" id="locationSectionTitle"></div>
-          <div class="field" id="field-pincode">
-            <label id="pincodeLabel" for="pincode"></label>
-            <input type="text" id="pincode" inputmode="numeric" maxlength="6" required>
-            <div class="hint" id="pincodeHint"></div>
-            <div class="error-text" id="pincodeError"></div>
+          <div class="field" id="field-location">
+            <label id="locationLabel" for="locationSearch"></label>
+            <input type="text" id="locationSearch" autocomplete="off">
+            <div class="suggestions" id="locationSuggestions"></div>
+            <div class="hint" id="locationHint"></div>
+            <div class="location-meta" id="locationMeta"></div>
+            <div class="location-actions">
+              <button type="button" class="link-btn" id="manualLocationBtn"></button>
+            </div>
+            <div class="error-text" id="locationError"></div>
+            <div class="manual-location" id="manualLocationFields">
+              <div class="manual-grid">
+                <div class="field" id="field-manual-area">
+                  <label id="manualAreaLabel" for="manualArea"></label>
+                  <input type="text" id="manualArea">
+                </div>
+                <div class="field" id="field-manual-city">
+                  <label id="manualCityLabel" for="manualCity"></label>
+                  <input type="text" id="manualCity">
+                </div>
+                <div class="field" id="field-manual-district">
+                  <label id="manualDistrictLabel" for="manualDistrict"></label>
+                  <input type="text" id="manualDistrict">
+                </div>
+                <div class="field" id="field-manual-state">
+                  <label id="manualStateLabel" for="manualState"></label>
+                  <input type="text" id="manualState">
+                </div>
+                <div class="field" id="field-manual-postcode">
+                  <label id="manualPostcodeLabel" for="manualPostcode"></label>
+                  <input type="text" id="manualPostcode" inputmode="numeric" maxlength="6">
+                </div>
+              </div>
+            </div>
+            <div class="attribution" id="locationAttribution"></div>
           </div>
         </div>
 
@@ -520,42 +267,68 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTkXBHASxYiSdqjy1ey
 const REQUEST_TIMEOUT_MS = 8000;
 const MOBILE_REGEX = /^\d{10}$/;
 const AGE_REGEX = /^(?:1[01]\d|120|[1-9]\d?)$/;
+const POSTCODE_REGEX = /^\d{6}$/;
 const VERIFY_ATTEMPTS = 2;
 const VERIFY_WAIT_MS = 700;
-const MAX_PARTICIPANTS = 6;
+const MAX_PARTICIPANTS = 10;
+const PHOTON_URL = "https://photon.komoot.io/api/";
+const PHOTON_BBOX = [68.1, 6.5, 97.5, 37.5];
 let currentLanguage = "";
-let participantCount = 0;
-let resolvedLocation = { city: "", district: "", state: "" };
+let participantCount = 1;
 let validationFocusTarget = null;
+let availabilityData = null;
+let selectedLocation = null;
+let manualLocationVisible = false;
+let locationAbortController = null;
+let locationDebounceId = null;
+let activeSuggestionIndex = -1;
+const locationCache = new Map();
+let currentSuggestions = [];
 
 const TEXTS = {
   en: {
     languageTitle: "Choose Your Language",
-    languageSubtitle: "\u0928\u094b\u0902\u0926\u0923\u0940 \u0915\u0930\u0923\u094d\u092f\u093e\u0938\u093e\u0920\u0940 \u092d\u093e\u0937\u093e \u0928\u093f\u0935\u0921\u093e",
-    languageMarathiTitle: "\u092e\u0930\u093e\u0920\u0940",
-    languageMarathiText: "\u092e\u0930\u093e\u0920\u0940\u0924 \u092b\u0949\u0930\u094d\u092e \u092d\u0930\u093e",
+    languageSubtitle: "Select a language to continue registration",
+    languageMarathiTitle: "मराठी",
+    languageMarathiText: "मराठीत फॉर्म भरा",
     languageEnglishTitle: "English",
     languageEnglishText: "Fill the form in English",
     pageTitle: "Shripad Shrivallabh Charitamrut Samohik Parayan- 2",
     headerTitle: "Shripad Shrivallabh Charitamrut Samohik Parayan- 2",
     headerSubtitle: "Pithapuram Registration Form",
     headerDates: "21 - 22 - 23 November",
+    availabilityTitle: "Accommodation Availability",
+    availabilityFreeTitle: "Free accommodation",
+    availabilityOwnTitle: "Own/Paid accommodation",
+    availabilityPattern: "{remaining} of {capacity} seats remaining",
+    availabilityFull: "Full",
+    availabilityLoading: "Loading availability...",
+    availabilityError: "Could not load live availability right now. Submission will still be checked at the server.",
     countSectionTitle: "Participants",
     countLabel: "How many people are participating? *",
     personTitle: "Participant",
-    bookingPersonNote: "(the one who is doing the booking, and can be contacted)",
+    primaryParticipantNote: "Participant 1 — The person making this booking and who can be contacted",
     namePlaceholder: "Full Name",
     agePlaceholder: "Age",
     mobilePlaceholder: "Mobile Number",
-    alternateMobilePlaceholder: "Second Mobile Number",
     genderMale: "Male",
     genderFemale: "Female",
     participantError: "Please add at least 1 participant and complete all details.",
     locationSectionTitle: "Location",
-    pincodeLabel: "What is your PIN code? *",
-    pincodePlaceholder: "e.g. 533450",
-    pincodeHint: "Enter your 6-digit postal PIN code.",
-    pincodeError: "Please enter a valid 6-digit PIN code.",
+    locationLabel: "Area / City *",
+    locationPlaceholder: "Type at least 3 letters, e.g. Uppal",
+    locationHint: "Choose a location from the list. If search is unavailable, enter details manually.",
+    locationSelected: "Selected: {area}, {city}, {state}",
+    locationLoading: "Searching locations...",
+    locationNoResults: "No matching Indian locations found.",
+    locationSearchError: "Location search is unavailable right now. Please enter your location manually.",
+    locationManualButton: "Enter location manually",
+    locationAttribution: "Location search powered by OpenStreetMap/Photon",
+    manualAreaLabel: "Area / Locality *",
+    manualCityLabel: "City *",
+    manualDistrictLabel: "District",
+    manualStateLabel: "State *",
+    manualPostcodeLabel: "Postcode",
     accomSectionTitle: "Accommodation",
     accomError: "Please select an accommodation option.",
     accomFreeTitle: "Yes, we want free accommodation from Devasthanam",
@@ -579,85 +352,114 @@ const TEXTS = {
     errorAgeInvalid: "Participant {index}: Age must be between 1 and 120",
     errorMobileRequired: "Participant {index}: Mobile number is required",
     errorMobileInvalid: "Participant {index}: Mobile number must be 10 digits",
-    errorAlternateMobileRequired: "Participant {index}: Second mobile number is required",
-    errorAlternateMobileInvalid: "Participant {index}: Second mobile number must be 10 digits",
     errorGenderRequired: "Participant {index}: Please select gender",
-    errorPincodeRequired: "PIN code is required",
-    errorPincodeInvalid: "PIN code must be 6 digits",
+    errorLocationRequired: "Please select a location or enter it manually",
+    errorManualAreaRequired: "Area / Locality is required",
+    errorManualCityRequired: "City is required",
+    errorManualStateRequired: "State is required",
+    errorManualPostcodeInvalid: "Postcode must be 6 digits when provided",
     errorAccommodationRequired: "Please select an accommodation option",
+    errorCapacityExceeded: "Only {remaining} seat(s) remain for {accommodation}. Please reduce participants or choose another accommodation.",
     footer: "Shripad Shrivallabh Charitamrut Samohik Parayan · Pithapuram, 2026"
   },
   mr: {
-    languageTitle: "\u0924\u0941\u092e\u094d\u0939\u0940 \u0915\u094b\u0923\u0924\u094d\u092f\u093e \u092d\u093e\u0937\u0947\u0924 \u092b\u0949\u0930\u094d\u092e \u092d\u0930\u0923\u093e\u0930?",
-    languageSubtitle: "\u0928\u094b\u0902\u0926\u0923\u0940 \u0915\u0930\u0923\u094d\u092f\u093e\u0938\u093e\u0920\u0940 \u092d\u093e\u0937\u093e \u0928\u093f\u0935\u0921\u093e",
-    languageMarathiTitle: "\u092e\u0930\u093e\u0920\u0940",
-    languageMarathiText: "\u092e\u0930\u093e\u0920\u0940\u0924 \u092b\u0949\u0930\u094d\u092e \u092d\u0930\u093e",
+    languageTitle: "तुम्ही कोणत्या भाषेत फॉर्म भरणार?",
+    languageSubtitle: "नोंदणी करण्यासाठी भाषा निवडा",
+    languageMarathiTitle: "मराठी",
+    languageMarathiText: "मराठीत फॉर्म भरा",
     languageEnglishTitle: "English",
-    languageEnglishText: "\u0907\u0902\u0917\u094d\u0930\u091c\u0940\u0924 \u092b\u0949\u0930\u094d\u092e \u092d\u0930\u093e",
-    pageTitle: "\u0936\u094d\u0930\u0940\u092a\u093e\u0926 \u0936\u094d\u0930\u0940\u0935\u0932\u094d\u0932\u092d \u091a\u0930\u093f\u0924\u093e\u092e\u0943\u0924 \u0938\u093e\u092e\u0942\u0939\u093f\u0915 \u092a\u093e\u0930\u093e\u092f\u0923 - \u0968",
-    headerTitle: "\u0936\u094d\u0930\u0940\u092a\u093e\u0926 \u0936\u094d\u0930\u0940\u0935\u0932\u094d\u0932\u092d \u091a\u0930\u093f\u0924\u093e\u092e\u0943\u0924 \u0938\u093e\u092e\u0942\u0939\u093f\u0915 \u092a\u093e\u0930\u093e\u092f\u0923 - \u0968",
-    headerSubtitle: "\u092a\u093f\u0920\u093e\u092a\u0941\u0930\u092e \u0928\u094b\u0902\u0926\u0923\u0940 \u092b\u0949\u0930\u094d\u092e",
-    headerDates: "21 - 22 - 23 \u0928\u094b\u0935\u094d\u0939\u0947\u0902\u092c\u0930",
-    countSectionTitle: "\u0938\u0939\u092d\u093e\u0917\u0940",
-    countLabel: "\u0915\u093f\u0924\u0940 \u091c\u0923 \u0938\u0939\u092d\u093e\u0917\u0940 \u0906\u0939\u0947\u0924? *",
-    personTitle: "\u0938\u0939\u092d\u093e\u0917\u0940",
-    bookingPersonNote: "(\u0939\u0947 \u092c\u0941\u0915\u093f\u0902\u0917 \u0915\u0930\u0923\u093e\u0930\u0947 \u0906\u0939\u0947\u0924 \u0906\u0923\u093f \u092f\u093e\u0902\u091a\u094d\u092f\u093e\u0936\u0940 \u0938\u0902\u092a\u0930\u094d\u0915 \u0938\u093e\u0927\u0924\u093e \u092f\u0947\u0908\u0932)",
-    namePlaceholder: "\u092a\u0942\u0930\u094d\u0923 \u0928\u093e\u0935",
-    agePlaceholder: "\u0935\u092f",
-    mobilePlaceholder: "\u092e\u094b\u092c\u093e\u0908\u0932 \u0915\u094d\u0930\u092e\u093e\u0902\u0915",
-    alternateMobilePlaceholder: "\u0926\u0941\u0938\u0930\u093e \u092e\u094b\u092c\u093e\u0908\u0932 \u0915\u094d\u0930\u092e\u093e\u0902\u0915",
-    genderMale: "\u092a\u0941\u0930\u0941\u0937",
-    genderFemale: "\u0938\u094d\u0924\u094d\u0930\u0940",
-    participantError: "\u0915\u0943\u092a\u092f\u093e \u0915\u092e\u0940\u0924 \u0915\u092e\u0940 1 \u0938\u0939\u092d\u093e\u0917\u0940 \u092d\u0930\u093e \u0906\u0923\u093f \u0938\u0930\u094d\u0935 \u092e\u093e\u0939\u093f\u0924\u0940 \u092a\u0942\u0930\u094d\u0923 \u0915\u0930\u093e.",
-    locationSectionTitle: "\u0920\u093f\u0915\u093e\u0923",
-    pincodeLabel: "\u0924\u0941\u092e\u091a\u093e \u092a\u093f\u0928\u0915\u094b\u0921 \u0915\u093e\u092f \u0906\u0939\u0947? *",
-    pincodePlaceholder: "\u0909\u0926\u093e. 533450",
-    pincodeHint: "6 \u0905\u0902\u0915\u0940 \u092a\u093f\u0928\u0915\u094b\u0921 \u091f\u093e\u0915\u093e.",
-    pincodeError: "\u0915\u0943\u092a\u092f\u093e \u0935\u0948\u0927 6 \u0905\u0902\u0915\u0940 \u092a\u093f\u0928\u0915\u094b\u0921 \u091f\u093e\u0915\u093e.",
-    accomSectionTitle: "\u0928\u093f\u0935\u093e\u0938",
-    accomError: "\u0915\u0943\u092a\u092f\u093e \u0928\u093f\u0935\u093e\u0938 \u092a\u0930\u094d\u092f\u093e\u092f \u0928\u093f\u0935\u0921\u093e.",
-    accomFreeTitle: "\u0939\u094b\u092f, \u0906\u092e\u094d\u0939\u093e\u0932\u093e \u0926\u0947\u0935\u0938\u094d\u0925\u093e\u0928\u0915\u0921\u0942\u0928 \u092e\u094b\u092b\u0924 \u0928\u093f\u0935\u093e\u0938 \u0939\u0935\u093e \u0906\u0939\u0947",
-    accomFreeHint: "\u092e\u0930\u094d\u092f\u093e\u0926\u093f\u0924 \u091c\u093e\u0917\u093e \u0909\u092a\u0932\u092c\u094d\u0927",
-    accomOwnTitle: "\u0928\u093e\u0939\u0940, \u0906\u092e\u0940 \u0906\u092e\u091a\u0940 \u0935\u094d\u092f\u0935\u0938\u094d\u0925\u093e \u0938\u094d\u0935\u0924\u0903 \u0915\u0930\u0942",
-    accomOwnHint: "\u0926\u0947\u0935\u0938\u094d\u0925\u093e\u0928\u0915\u0921\u0942\u0928 \u0928\u093f\u0935\u093e\u0938 \u0928\u0915\u094b",
-    submit: "\u0928\u094b\u0902\u0926\u0923\u0940 \u0938\u092c\u092e\u093f\u091f \u0915\u0930\u093e",
-    submitting: "\u0938\u092c\u092e\u093f\u091f \u0915\u0930\u0924 \u0906\u0939\u0947...",
-    successTitle: "\u0928\u094b\u0902\u0926\u0923\u0940 \u092f\u0936\u0938\u094d\u0935\u0940",
-    successMessage: "\u0927\u0928\u094d\u092f\u0935\u093e\u0926. {count} \u0938\u0939\u092d\u093e\u0917\u0940\u0902\u091a\u0940 \u0928\u094b\u0902\u0926\u0923\u0940 \u092a\u0942\u0930\u094d\u0923 \u091d\u093e\u0932\u0940. \u0924\u0941\u092e\u091a\u093e \u092c\u0941\u0915\u093f\u0902\u0917 \u0906\u092f\u0921\u0940 {bookingId} \u0906\u0939\u0947.",
-    successMessageRetry: "\u0928\u094b\u0902\u0926\u0923\u0940 \u091c\u0924\u0928 \u091d\u093e\u0932\u0940 \u0906\u0939\u0947. {count} \u0938\u0939\u092d\u093e\u0917\u0940\u0902\u091a\u0940 \u0928\u094b\u0902\u0926\u0923\u0940 \u092a\u0942\u0930\u094d\u0923 \u091d\u093e\u0932\u0940. \u0924\u0941\u092e\u091a\u093e \u092c\u0941\u0915\u093f\u0902\u0917 \u0906\u092f\u0921\u0940 {bookingId} \u0906\u0939\u0947.",
-    failureTitle: "\u0938\u092c\u092e\u093f\u0936\u0928 \u0905\u092f\u0936\u0938\u094d\u0935\u0940",
-    failureMessage: "\u0938\u092c\u092e\u093f\u0936\u0928 \u0916\u093e\u0924\u094d\u0930\u0940\u0936\u0940\u0930 \u0939\u094b\u090a \u0936\u0915\u0932\u0947 \u0928\u093e\u0939\u0940. \u0915\u0943\u092a\u092f\u093e \u092a\u0941\u0928\u094d\u0939\u093e \u092a\u094d\u0930\u092f\u0924\u094d\u0928 \u0915\u0930\u093e.",
-    contactHelpLabel: "\u092e\u0926\u0924\u0940\u0938\u093e\u0920\u0940 \u0938\u0902\u092a\u0930\u094d\u0915:",
-    validationTitle: "\u0915\u0943\u092a\u092f\u093e \u0916\u093e\u0932\u0940\u0932 \u092e\u093e\u0939\u093f\u0924\u0940 \u092a\u0942\u0930\u094d\u0923 \u0915\u0930\u093e",
-    validationIntro: "\u0928\u094b\u0902\u0926\u0923\u0940\u0938\u093e\u0920\u0940 \u0915\u093e\u0939\u0940 \u0905\u0928\u093f\u0935\u093e\u0930\u094d\u092f \u092e\u093e\u0939\u093f\u0924\u0940 \u0905\u092a\u0942\u0930\u094d\u0923 \u0906\u0939\u0947.",
-    validationClose: "\u092a\u0939\u093f\u0932\u094d\u092f\u093e \u091a\u0941\u0915\u0940\u0915\u0921\u0947 \u091c\u093e",
-    errorParticipantCount: "\u0915\u093f\u0924\u0940 \u0938\u0939\u092d\u093e\u0917\u0940 \u0928\u094b\u0902\u0926\u0935\u0923\u093e\u0930 \u0906\u0939\u0947\u0924 \u0924\u0947 \u0928\u093f\u0935\u0921\u093e",
-    errorNameRequired: "\u0938\u0939\u092d\u093e\u0917\u0940 {index}: \u0928\u093e\u0935 \u0905\u0928\u093f\u0935\u093e\u0930\u094d\u092f \u0906\u0939\u0947",
-    errorAgeRequired: "\u0938\u0939\u092d\u093e\u0917\u0940 {index}: \u0935\u092f \u0905\u0928\u093f\u0935\u093e\u0930\u094d\u092f \u0906\u0939\u0947",
-    errorAgeInvalid: "\u0938\u0939\u092d\u093e\u0917\u0940 {index}: \u0935\u092f 1 \u0924\u0947 120 \u092e\u0927\u094d\u092f\u0947 \u0905\u0938\u093e\u0935\u0947",
-    errorMobileRequired: "\u0938\u0939\u092d\u093e\u0917\u0940 {index}: \u092e\u094b\u092c\u093e\u0908\u0932 \u0915\u094d\u0930\u092e\u093e\u0902\u0915 \u0905\u0928\u093f\u0935\u093e\u0930\u094d\u092f \u0906\u0939\u0947",
-    errorMobileInvalid: "\u0938\u0939\u092d\u093e\u0917\u0940 {index}: \u092e\u094b\u092c\u093e\u0908\u0932 \u0915\u094d\u0930\u092e\u093e\u0902\u0915 10 \u0905\u0902\u0915\u093e\u0902\u091a\u093e \u0905\u0938\u093e\u0935\u093e",
-    errorAlternateMobileRequired: "\u0938\u0939\u092d\u093e\u0917\u0940 {index}: \u0926\u0941\u0938\u0930\u093e \u092e\u094b\u092c\u093e\u0908\u0932 \u0915\u094d\u0930\u092e\u093e\u0902\u0915 \u0905\u0928\u093f\u0935\u093e\u0930\u094d\u092f \u0906\u0939\u0947",
-    errorAlternateMobileInvalid: "\u0938\u0939\u092d\u093e\u0917\u0940 {index}: \u0926\u0941\u0938\u0930\u093e \u092e\u094b\u092c\u093e\u0908\u0932 \u0915\u094d\u0930\u092e\u093e\u0902\u0915 10 \u0905\u0902\u0915\u093e\u0902\u091a\u093e \u0905\u0938\u093e\u0935\u093e",
-    errorGenderRequired: "\u0938\u0939\u092d\u093e\u0917\u0940 {index}: \u0932\u093f\u0902\u0917 \u0928\u093f\u0935\u0921\u093e",
-    errorPincodeRequired: "\u092a\u093f\u0928\u0915\u094b\u0921 \u0905\u0928\u093f\u0935\u093e\u0930\u094d\u092f \u0906\u0939\u0947",
-    errorPincodeInvalid: "\u092a\u093f\u0928\u0915\u094b\u0921 6 \u0905\u0902\u0915\u093e\u0902\u091a\u093e \u0905\u0938\u093e\u0935\u093e",
-    errorAccommodationRequired: "\u0915\u0943\u092a\u092f\u093e \u0928\u093f\u0935\u093e\u0938 \u092a\u0930\u094d\u092f\u093e\u092f \u0928\u093f\u0935\u0921\u093e",
-    footer: "\u0936\u094d\u0930\u0940\u092a\u093e\u0926 \u0936\u094d\u0930\u0940\u0935\u0932\u094d\u0932\u092d \u091a\u0930\u093f\u0924\u093e\u092e\u0943\u0924 \u0938\u093e\u092e\u0942\u0939\u093f\u0915 \u092a\u093e\u0930\u093e\u092f\u0923 \u00b7 \u092a\u093f\u0920\u093e\u092a\u0941\u0930\u092e, 2026"
+    languageEnglishText: "Fill the form in English",
+    pageTitle: "श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण - २",
+    headerTitle: "श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण - २",
+    headerSubtitle: "पिठापूरम नोंदणी फॉर्म",
+    headerDates: "21 - 22 - 23 नोव्हेंबर",
+    availabilityTitle: "निवास उपलब्धता",
+    availabilityFreeTitle: "मोफत निवास",
+    availabilityOwnTitle: "स्वतःचा / सशुल्क निवास",
+    availabilityPattern: "{capacity} पैकी {remaining} जागा शिल्लक",
+    availabilityFull: "पूर्ण",
+    availabilityLoading: "उपलब्धता तपासत आहोत...",
+    availabilityError: "सध्या उपलब्धता आणता आली नाही. अंतिम तपासणी सर्व्हरवर होईल.",
+    countSectionTitle: "सहभागी",
+    countLabel: "किती जण सहभागी आहेत? *",
+    personTitle: "सहभागी",
+    primaryParticipantNote: "सहभागी १ — बुकिंग करणारी आणि संपर्कासाठी उपलब्ध व्यक्ती",
+    namePlaceholder: "पूर्ण नाव",
+    agePlaceholder: "वय",
+    mobilePlaceholder: "मोबाईल क्रमांक",
+    genderMale: "पुरुष",
+    genderFemale: "स्त्री",
+    participantError: "कृपया किमान १ सहभागी जोडा आणि सर्व तपशील पूर्ण करा.",
+    locationSectionTitle: "स्थान",
+    locationLabel: "एरिया / शहर *",
+    locationPlaceholder: "किमान 3 अक्षरे टाइप करा, उदा. Uppal",
+    locationHint: "यादीतून स्थान निवडा. शोध उपलब्ध नसल्यास खाली तपशील हाताने भरा.",
+    locationSelected: "निवडलेले स्थान: {area}, {city}, {state}",
+    locationLoading: "स्थान शोधत आहोत...",
+    locationNoResults: "भारतातील जुळणारे स्थान मिळाले नाही.",
+    locationSearchError: "सध्या स्थान शोध सेवा उपलब्ध नाही. कृपया खाली स्थान हाताने भरा.",
+    locationManualButton: "स्थान हाताने भरा",
+    locationAttribution: "Location search powered by OpenStreetMap/Photon",
+    manualAreaLabel: "एरिया / परिसर *",
+    manualCityLabel: "शहर *",
+    manualDistrictLabel: "जिल्हा",
+    manualStateLabel: "राज्य *",
+    manualPostcodeLabel: "पोस्टकोड",
+    accomSectionTitle: "निवास",
+    accomError: "कृपया निवास पर्याय निवडा.",
+    accomFreeTitle: "हो, आम्हाला देवस्थानकडून मोफत निवास हवा आहे",
+    accomFreeHint: "मर्यादित उपलब्धता",
+    accomOwnTitle: "नाही, आम्ही आमचा निवास स्वतः करू",
+    accomOwnHint: "देवस्थानकडून निवास नको",
+    submit: "नोंदणी पाठवा",
+    submitting: "पाठवत आहोत...",
+    successTitle: "नोंदणी यशस्वी",
+    successMessage: "{count} सहभागींसाठी नोंदणी पूर्ण झाली. तुमचा बुकिंग आयडी {bookingId} आहे.",
+    successMessageRetry: "नोंदणी जतन झाली. {count} सहभागींसाठी नोंदणी पूर्ण झाली. तुमचा बुकिंग आयडी {bookingId} आहे.",
+    failureTitle: "नोंदणी अयशस्वी",
+    failureMessage: "नोंदणीची खात्री करता आली नाही. कृपया पुन्हा प्रयत्न करा.",
+    contactHelpLabel: "मदतीसाठी संपर्क:",
+    validationTitle: "कृपया पुढील माहिती पूर्ण करा",
+    validationIntro: "नोंदणीमध्ये काही आवश्यक तपशील अपूर्ण आहेत.",
+    validationClose: "पहिल्या चुकीच्या फील्डकडे जा",
+    errorParticipantCount: "किती सहभागी नोंदवत आहात ते निवडा",
+    errorNameRequired: "सहभागी {index}: नाव आवश्यक आहे",
+    errorAgeRequired: "सहभागी {index}: वय आवश्यक आहे",
+    errorAgeInvalid: "सहभागी {index}: वय 1 ते 120 दरम्यान असावे",
+    errorMobileRequired: "सहभागी {index}: मोबाईल क्रमांक आवश्यक आहे",
+    errorMobileInvalid: "सहभागी {index}: मोबाईल क्रमांक 10 अंकी असावा",
+    errorGenderRequired: "सहभागी {index}: लिंग निवडा",
+    errorLocationRequired: "कृपया स्थान निवडा किंवा हाताने भरा",
+    errorManualAreaRequired: "एरिया / परिसर आवश्यक आहे",
+    errorManualCityRequired: "शहर आवश्यक आहे",
+    errorManualStateRequired: "राज्य आवश्यक आहे",
+    errorManualPostcodeInvalid: "पोस्टकोड दिल्यास 6 अंकी असावा",
+    errorAccommodationRequired: "कृपया निवास पर्याय निवडा",
+    errorCapacityExceeded: "{accommodation} साठी फक्त {remaining} जागा शिल्लक आहेत. कृपया सहभागी कमी करा किंवा दुसरा पर्याय निवडा.",
+    footer: "श्रीपाद श्रीवल्लभ चरितामृत सामूहिक पारायण · पिठापूरम, 2026"
   }
 };
 
 document.querySelectorAll(".language-btn").forEach(function(button){
-  button.addEventListener("click", function(){
-    selectLanguage(button.dataset.language);
-  });
+  button.addEventListener("click", function(){ selectLanguage(button.dataset.language); });
 });
-
 document.getElementById("regForm").addEventListener("submit", handleSubmit);
 document.getElementById("closeValidationBtn").addEventListener("click", closeValidationModal);
 document.getElementById("validationModal").addEventListener("click", function(event){
-  if(event.target.id === "validationModal") closeValidationModal();
+  if (event.target.id === "validationModal") closeValidationModal();
 });
+document.getElementById("manualLocationBtn").addEventListener("click", function(){
+  manualLocationVisible = true;
+  selectedLocation = null;
+  renderManualLocation();
+  updateLocationMeta();
+});
+document.getElementById("locationSearch").addEventListener("input", handleLocationInput);
+document.getElementById("locationSearch").addEventListener("keydown", handleLocationKeydown);
+document.addEventListener("click", function(event){
+  if (!document.getElementById("field-location").contains(event.target)) hideSuggestions();
+});
+
 renderLanguageChooser();
 
 function renderLanguageChooser(){
@@ -682,6 +484,7 @@ function selectLanguage(language){
   applyLanguage();
   renderCountPills();
   renderParticipantBlocks();
+  loadAvailability();
 }
 
 function t(key){
@@ -694,14 +497,24 @@ function applyLanguage(){
   document.getElementById("headerTitle").textContent = t("headerTitle");
   document.getElementById("headerSubtitle").textContent = t("headerSubtitle");
   document.getElementById("headerDates").textContent = t("headerDates");
+  document.getElementById("availabilityTitle").textContent = t("availabilityTitle");
+  document.getElementById("availabilityFreeTitle").textContent = t("availabilityFreeTitle");
+  document.getElementById("availabilityOwnTitle").textContent = t("availabilityOwnTitle");
+  document.getElementById("availabilityStatus").textContent = t("availabilityLoading");
   document.getElementById("countSectionTitle").textContent = t("countSectionTitle");
   document.getElementById("countLabel").textContent = t("countLabel");
   document.getElementById("participantError").textContent = t("participantError");
   document.getElementById("locationSectionTitle").textContent = t("locationSectionTitle");
-  document.getElementById("pincodeLabel").textContent = t("pincodeLabel");
-  document.getElementById("pincode").placeholder = t("pincodePlaceholder");
-  document.getElementById("pincodeHint").textContent = t("pincodeHint");
-  document.getElementById("pincodeError").textContent = t("pincodeError");
+  document.getElementById("locationLabel").textContent = t("locationLabel");
+  document.getElementById("locationSearch").placeholder = t("locationPlaceholder");
+  document.getElementById("locationHint").textContent = t("locationHint");
+  document.getElementById("manualLocationBtn").textContent = t("locationManualButton");
+  document.getElementById("locationAttribution").textContent = t("locationAttribution");
+  document.getElementById("manualAreaLabel").textContent = t("manualAreaLabel");
+  document.getElementById("manualCityLabel").textContent = t("manualCityLabel");
+  document.getElementById("manualDistrictLabel").textContent = t("manualDistrictLabel");
+  document.getElementById("manualStateLabel").textContent = t("manualStateLabel");
+  document.getElementById("manualPostcodeLabel").textContent = t("manualPostcodeLabel");
   document.getElementById("accomSectionTitle").textContent = t("accomSectionTitle");
   document.getElementById("accomError").textContent = t("accomError");
   document.getElementById("submitBtn").textContent = t("submit");
@@ -711,16 +524,15 @@ function applyLanguage(){
   document.getElementById("validationIntro").textContent = t("validationIntro");
   document.getElementById("closeValidationBtn").textContent = t("validationClose");
   renderAccommodationOptions();
+  renderManualLocation();
+  renderAvailability();
+  updateLocationMeta();
 }
-
-document.getElementById("pincode").addEventListener("blur", function(){
-  prefetchLocation(this.value.trim());
-});
 
 function renderCountPills(){
   const container = document.getElementById("countPills");
   container.innerHTML = "";
-  for(let i = 1; i <= MAX_PARTICIPANTS; i++){
+  for (let i = 1; i <= MAX_PARTICIPANTS; i++) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "count-pill" + (participantCount === i ? " selected" : "");
@@ -729,7 +541,7 @@ function renderCountPills(){
       participantCount = i;
       renderCountPills();
       renderParticipantBlocks();
-      document.getElementById("participantError").classList.remove("show");
+      renderAvailability();
     });
     container.appendChild(button);
   }
@@ -737,30 +549,29 @@ function renderCountPills(){
 
 function renderParticipantBlocks(){
   const container = document.getElementById("participantBlocks");
-  const existing = [];
-  container.querySelectorAll(".person-card").forEach(function(card){
-    existing.push({
+  const existing = Array.from(container.querySelectorAll(".person-card")).map(function(card){
+    return {
       name: card.querySelector(".p-name").value,
       age: card.querySelector(".p-age").value,
       mobile: card.querySelector(".p-mobile").value,
-      alternateMobile: card.querySelector(".p-alt-mobile") ? card.querySelector(".p-alt-mobile").value : "",
       gender: (card.querySelector('input[type="radio"]:checked') || {}).value || ""
-    });
+    };
   });
   container.innerHTML = "";
-  for(let i = 0; i < participantCount; i++){
-    const value = existing[i] || { name: "", age: "", mobile: "", alternateMobile: "", gender: "" };
+  for (let i = 0; i < participantCount; i++) {
+    const value = existing[i] || { name: "", age: "", mobile: "", gender: "" };
     const card = document.createElement("div");
-    card.className = "person-card";
+    card.className = "person-card" + (i === 0 ? " primary" : "");
     card.innerHTML =
-      '<div class="p-title">' + t("personTitle") + " " + (i + 1) + (i === 0 ? ' <span style="font-weight:500;color:#7a6a55;">' + escapeHtml(t("bookingPersonNote")) + "</span>" : "") + "</div>" +
+      '<div class="p-title">' + escapeHtml(t("personTitle")) + " " + (i + 1) +
+      (i === 0 ? '<span class="p-note">' + escapeHtml(t("primaryParticipantNote")) + "</span>" : "") +
+      "</div>" +
       '<div class="person-grid">' +
-        '<input type="text" class="p-name" placeholder="' + escapeHtml(t("namePlaceholder")) + '" value="' + escapeHtml(value.name) + '" required>' +
-        '<input type="number" class="p-age" placeholder="' + escapeHtml(t("agePlaceholder")) + '" value="' + escapeHtml(value.age) + '" min="0" max="120" required>' +
-        '<input type="tel" class="p-mobile" placeholder="' + escapeHtml(t("mobilePlaceholder")) + '" value="' + escapeHtml(value.mobile) + '" required>' +
-      '</div>' +
-      (i === 0 ? '<div style="margin-top:10px;"><input type="tel" class="p-alt-mobile" placeholder="' + escapeHtml(t("alternateMobilePlaceholder")) + '" value="' + escapeHtml(value.alternateMobile) + '" required></div>' : "") +
-      '<div class="gender-group" style="margin-top:10px;">' +
+        '<input type="text" class="p-name" placeholder="' + escapeHtml(t("namePlaceholder")) + '" value="' + escapeHtml(value.name) + '">' +
+        '<input type="number" class="p-age" placeholder="' + escapeHtml(t("agePlaceholder")) + '" value="' + escapeHtml(value.age) + '" min="1" max="120">' +
+        '<input type="tel" class="p-mobile" placeholder="' + escapeHtml(t("mobilePlaceholder")) + '" value="' + escapeHtml(value.mobile) + '">' +
+      "</div>" +
+      '<div class="gender-group">' +
         renderGenderOption(i, "male", t("genderMale"), value.gender === "male") +
         renderGenderOption(i, "female", t("genderFemale"), value.gender === "female") +
       "</div>";
@@ -779,7 +590,7 @@ function renderGenderOption(index, value, label, selected){
 function attachCardEvents(card){
   card.querySelectorAll(".gender-option").forEach(function(option){
     option.addEventListener("click", function(){
-      option.parentElement.querySelectorAll(".gender-option").forEach(function(item){ item.classList.remove("selected"); });
+      option.parentElement.querySelectorAll(".gender-option").forEach(function(item){ item.classList.remove("selected"); item.style.borderColor = ""; });
       option.classList.add("selected");
     });
   });
@@ -794,34 +605,250 @@ function renderAccommodationOptions(){
     renderAccommodationOption("own", t("accomOwnTitle"), t("accomOwnHint"), currentValue === "own");
   group.querySelectorAll(".radio-option").forEach(function(option){
     option.addEventListener("click", function(){
+      if (option.dataset.disabled === "true") return;
       group.querySelectorAll(".radio-option").forEach(function(item){ item.classList.remove("selected"); });
       option.classList.add("selected");
       option.querySelector("input").checked = true;
       document.getElementById("field-accom").classList.remove("invalid");
+      renderAvailability();
     });
   });
 }
 
 function renderAccommodationOption(value, title, hint, selected){
-  return '<label class="radio-option' + (selected ? " selected" : "") + '">' +
-    '<input type="radio" name="accom" value="' + value + '"' + (selected ? " checked" : "") + ">" +
-    '<span class="option-text"><strong>' + escapeHtml(title) + "</strong><span>" + escapeHtml(hint) + "</span></span>" +
+  const availability = availabilityData && availabilityData[value];
+  const isFull = availability && availability.remaining <= 0;
+  const detailText = isFull ? t("availabilityFull") : hint;
+  return '<label class="radio-option' + (selected ? " selected" : "") + (isFull ? ' field invalid' : "") + '" data-disabled="' + (isFull ? "true" : "false") + '">' +
+    '<input type="radio" name="accom" value="' + value + '"' + (selected ? " checked" : "") + (isFull ? " disabled" : "") + ">" +
+    '<span class="option-text"><strong>' + escapeHtml(title) + "</strong><span>" + escapeHtml(detailText) + "</span></span>" +
   "</label>";
+}
+
+async function loadAvailability(){
+  document.getElementById("availabilityStatus").textContent = t("availabilityLoading");
+  try {
+    const response = await fetch(SCRIPT_URL + "?action=getAvailability&_=" + Date.now());
+    const payload = await response.json();
+    if (payload.status !== "success") throw new Error(payload.message || "Availability failed");
+    availabilityData = payload.data || null;
+    renderAccommodationOptions();
+    renderAvailability();
+  } catch (error) {
+    availabilityData = null;
+    renderAvailability();
+    document.getElementById("availabilityStatus").textContent = t("availabilityError");
+  }
+}
+
+function renderAvailability(){
+  const freeBox = document.getElementById("availabilityFree");
+  const ownBox = document.getElementById("availabilityOwn");
+  const status = document.getElementById("availabilityStatus");
+  if (!availabilityData) {
+    document.getElementById("availabilityFreeText").textContent = "-";
+    document.getElementById("availabilityOwnText").textContent = "-";
+    freeBox.classList.remove("full");
+    ownBox.classList.remove("full");
+    return;
+  }
+  ["free", "own"].forEach(function(key){
+    const box = document.getElementById(key === "free" ? "availabilityFree" : "availabilityOwn");
+    const text = document.getElementById(key === "free" ? "availabilityFreeText" : "availabilityOwnText");
+    const item = availabilityData[key];
+    text.textContent = item.remaining <= 0 ? t("availabilityFull") : formatMessage(t("availabilityPattern"), item);
+    box.classList.toggle("full", item.remaining <= 0);
+  });
+  const selectedAccommodation = document.querySelector('input[name="accom"]:checked');
+  if (selectedAccommodation && availabilityData[selectedAccommodation.value] && participantCount > availabilityData[selectedAccommodation.value].remaining) {
+    const accomLabel = selectedAccommodation.value === "free" ? t("availabilityFreeTitle") : t("availabilityOwnTitle");
+    status.textContent = formatMessage(t("errorCapacityExceeded"), {
+      remaining: availabilityData[selectedAccommodation.value].remaining,
+      accommodation: accomLabel
+    });
+  } else {
+    status.textContent = "";
+  }
+}
+
+function handleLocationInput(event){
+  const query = event.target.value.trim();
+  selectedLocation = null;
+  updateLocationMeta();
+  if (locationDebounceId) clearTimeout(locationDebounceId);
+  if (locationAbortController) locationAbortController.abort();
+  if (query.length < 3) {
+    hideSuggestions();
+    if (query.length === 0) manualLocationVisible = false;
+    renderManualLocation();
+    return;
+  }
+  locationDebounceId = setTimeout(function(){
+    searchLocationSuggestions(query);
+  }, 450);
+}
+
+function handleLocationKeydown(event){
+  if (!currentSuggestions.length) return;
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    activeSuggestionIndex = Math.min(activeSuggestionIndex + 1, currentSuggestions.length - 1);
+    renderSuggestions();
+  } else if (event.key === "ArrowUp") {
+    event.preventDefault();
+    activeSuggestionIndex = Math.max(activeSuggestionIndex - 1, 0);
+    renderSuggestions();
+  } else if (event.key === "Enter" && activeSuggestionIndex >= 0) {
+    event.preventDefault();
+    chooseSuggestion(currentSuggestions[activeSuggestionIndex]);
+  } else if (event.key === "Escape") {
+    hideSuggestions();
+  }
+}
+
+async function searchLocationSuggestions(query){
+  const statusEl = document.getElementById("locationError");
+  statusEl.classList.remove("show");
+  currentSuggestions = [];
+  activeSuggestionIndex = -1;
+  if (locationCache.has(query)) {
+    currentSuggestions = locationCache.get(query);
+    renderSuggestions();
+    return;
+  }
+  document.getElementById("locationSuggestions").innerHTML = '<div class="suggestion"><strong>' + escapeHtml(t("locationLoading")) + "</strong></div>";
+  document.getElementById("locationSuggestions").classList.add("show");
+  locationAbortController = new AbortController();
+  try {
+    const params = new URLSearchParams({
+      q: query,
+      limit: "10",
+      bbox: PHOTON_BBOX.join(",")
+    });
+    const response = await fetch(PHOTON_URL + "?" + params.toString(), { signal: locationAbortController.signal });
+    const payload = await response.json();
+    const suggestions = normalizePhotonResults(payload && payload.features ? payload.features : []);
+    locationCache.set(query, suggestions);
+    currentSuggestions = suggestions;
+    renderSuggestions();
+    if (!suggestions.length) {
+      document.getElementById("locationSuggestions").innerHTML = '<div class="suggestion"><strong>' + escapeHtml(t("locationNoResults")) + "</strong></div>";
+      document.getElementById("locationSuggestions").classList.add("show");
+    }
+  } catch (error) {
+    if (error.name === "AbortError") return;
+    manualLocationVisible = true;
+    renderManualLocation();
+    document.getElementById("locationError").textContent = t("locationSearchError");
+    document.getElementById("locationError").classList.add("show");
+    hideSuggestions();
+  }
+}
+
+function normalizePhotonResults(features){
+  const seen = new Set();
+  return features.map(function(feature){
+    const props = feature.properties || {};
+    const countryCode = String(props.countrycode || "").toLowerCase();
+    const country = String(props.country || "").toLowerCase();
+    if (countryCode !== "in" && country !== "india") return null;
+    const area = firstNonEmpty([props.name, props.suburb, props.street, props.locality, props.district]);
+    const city = firstNonEmpty([props.city, props.town, props.county, props.state_district, props.district, props.village]);
+    const district = firstNonEmpty([props.district, props.county, props.state_district, city]);
+    const state = firstNonEmpty([props.state]);
+    if (!area || !city || !state) return null;
+    const postcode = String(props.postcode || "").trim();
+    const key = [area, city, district, state, postcode].join("|").toLowerCase();
+    if (seen.has(key)) return null;
+    seen.add(key);
+    return {
+      area: area,
+      city: city,
+      district: district,
+      state: state,
+      postcode: postcode,
+      label: area + ", " + city + ", " + state
+    };
+  }).filter(Boolean);
+}
+
+function renderSuggestions(){
+  const box = document.getElementById("locationSuggestions");
+  if (!currentSuggestions.length) {
+    hideSuggestions();
+    return;
+  }
+  box.innerHTML = currentSuggestions.map(function(item, index){
+    return '<div class="suggestion' + (index === activeSuggestionIndex ? " active" : "") + '" data-index="' + index + '">' +
+      "<strong>" + escapeHtml(item.area) + "</strong>" +
+      "<span>" + escapeHtml(item.city + ", " + item.state + (item.postcode ? " " + item.postcode : "")) + "</span>" +
+      "</div>";
+  }).join("");
+  box.classList.add("show");
+  box.querySelectorAll(".suggestion").forEach(function(item){
+    item.addEventListener("mousedown", function(event){
+      event.preventDefault();
+      chooseSuggestion(currentSuggestions[Number(item.dataset.index)]);
+    });
+  });
+}
+
+function chooseSuggestion(item){
+  selectedLocation = item;
+  manualLocationVisible = false;
+  document.getElementById("locationSearch").value = item.label;
+  hideSuggestions();
+  renderManualLocation();
+  updateLocationMeta();
+  document.getElementById("field-location").classList.remove("invalid");
+}
+
+function hideSuggestions(){
+  document.getElementById("locationSuggestions").classList.remove("show");
+}
+
+function renderManualLocation(){
+  document.getElementById("manualLocationFields").classList.toggle("show", manualLocationVisible);
+}
+
+function updateLocationMeta(){
+  const meta = document.getElementById("locationMeta");
+  if (selectedLocation) {
+    meta.innerHTML = "<strong>" + escapeHtml(formatMessage(t("locationSelected"), selectedLocation)) + "</strong>";
+  } else {
+    meta.textContent = "";
+  }
+}
+
+function getResolvedLocation(){
+  if (selectedLocation && !manualLocationVisible) {
+    return {
+      area: selectedLocation.area,
+      city: selectedLocation.city,
+      district: selectedLocation.district,
+      state: selectedLocation.state,
+      postcode: selectedLocation.postcode
+    };
+  }
+  return {
+    area: document.getElementById("manualArea").value.trim(),
+    city: document.getElementById("manualCity").value.trim(),
+    district: document.getElementById("manualDistrict").value.trim() || document.getElementById("manualCity").value.trim(),
+    state: document.getElementById("manualState").value.trim(),
+    postcode: document.getElementById("manualPostcode").value.trim()
+  };
 }
 
 function validate(){
   const errors = [];
   let firstInvalidField = null;
-  const participantError = document.getElementById("participantError");
-  participantError.classList.remove("show");
 
   function pushError(message, element){
     errors.push(message);
-    if(!firstInvalidField && element) firstInvalidField = element;
+    if (!firstInvalidField && element) firstInvalidField = element;
   }
 
-  if(participantCount < 1){
-    participantError.classList.add("show");
+  if (participantCount < 1) {
     pushError(t("errorParticipantCount"), document.getElementById("countPills"));
   }
 
@@ -830,113 +857,102 @@ function validate(){
     const name = card.querySelector(".p-name");
     const age = card.querySelector(".p-age");
     const mobile = card.querySelector(".p-mobile");
-    const alternateMobile = card.querySelector(".p-alt-mobile");
     const gender = card.querySelector('input[type="radio"]:checked');
 
-    if(!name.value.trim()){
-      name.style.borderColor = "#c0392b";
+    resetFieldState(name);
+    resetFieldState(age);
+    resetFieldState(mobile);
+    card.querySelectorAll(".gender-option").forEach(function(option){ option.style.borderColor = ""; });
+
+    if (!name.value.trim()) {
+      markInvalidField(name);
       pushError(formatMessage(t("errorNameRequired"), { index: personNo }), name);
-    } else {
-      name.style.borderColor = "";
     }
-
-    if(!age.value.trim()){
-      age.style.borderColor = "#c0392b";
+    if (!age.value.trim()) {
+      markInvalidField(age);
       pushError(formatMessage(t("errorAgeRequired"), { index: personNo }), age);
-    } else if(!AGE_REGEX.test(age.value.trim())){
-      age.style.borderColor = "#c0392b";
+    } else if (!AGE_REGEX.test(age.value.trim())) {
+      markInvalidField(age);
       pushError(formatMessage(t("errorAgeInvalid"), { index: personNo }), age);
-    } else {
-      age.style.borderColor = "";
     }
-
-    if(!mobile.value.trim()){
-      mobile.style.borderColor = "#c0392b";
+    if (!mobile.value.trim()) {
+      markInvalidField(mobile);
       pushError(formatMessage(t("errorMobileRequired"), { index: personNo }), mobile);
-    } else if(!MOBILE_REGEX.test(mobile.value.trim())){
-      mobile.style.borderColor = "#c0392b";
+    } else if (!MOBILE_REGEX.test(mobile.value.trim())) {
+      markInvalidField(mobile);
       pushError(formatMessage(t("errorMobileInvalid"), { index: personNo }), mobile);
-    } else {
-      mobile.style.borderColor = "";
     }
-
-    if(alternateMobile){
-      if(!alternateMobile.value.trim()){
-        alternateMobile.style.borderColor = "#c0392b";
-        pushError(formatMessage(t("errorAlternateMobileRequired"), { index: personNo }), alternateMobile);
-      } else if(!MOBILE_REGEX.test(alternateMobile.value.trim())){
-        alternateMobile.style.borderColor = "#c0392b";
-        pushError(formatMessage(t("errorAlternateMobileInvalid"), { index: personNo }), alternateMobile);
-      } else {
-        alternateMobile.style.borderColor = "";
-      }
-    }
-
-    card.querySelectorAll(".gender-option").forEach(function(option){
-      option.style.borderColor = "";
-    });
-    if(!gender){
-      card.querySelectorAll(".gender-option").forEach(function(option){
-        option.style.borderColor = "#c0392b";
-      });
+    if (!gender) {
+      card.querySelectorAll(".gender-option").forEach(function(option){ option.style.borderColor = "#c0392b"; });
       pushError(formatMessage(t("errorGenderRequired"), { index: personNo }), card.querySelector(".gender-group"));
     }
   });
 
-  const pinField = document.getElementById("field-pincode");
-  const pinValue = document.getElementById("pincode").value.trim();
-  if(!pinValue){
-    pinField.classList.add("invalid");
-    pushError(t("errorPincodeRequired"), document.getElementById("pincode"));
-  } else if(!/^\d{6}$/.test(pinValue)){
-    pinField.classList.add("invalid");
-    pushError(t("errorPincodeInvalid"), document.getElementById("pincode"));
-  } else {
-    pinField.classList.remove("invalid");
+  const location = getResolvedLocation();
+  const locationField = document.getElementById("field-location");
+  locationField.classList.remove("invalid");
+  document.getElementById("locationError").classList.remove("show");
+  if (!selectedLocation && !manualLocationVisible) {
+    locationField.classList.add("invalid");
+    document.getElementById("locationError").textContent = t("errorLocationRequired");
+    document.getElementById("locationError").classList.add("show");
+    pushError(t("errorLocationRequired"), document.getElementById("locationSearch"));
+  }
+  if (manualLocationVisible) {
+    ["manualArea", "manualCity", "manualState", "manualPostcode"].forEach(function(id){
+      resetFieldState(document.getElementById(id));
+    });
+    if (!location.area) {
+      markInvalidField(document.getElementById("manualArea"));
+      pushError(t("errorManualAreaRequired"), document.getElementById("manualArea"));
+    }
+    if (!location.city) {
+      markInvalidField(document.getElementById("manualCity"));
+      pushError(t("errorManualCityRequired"), document.getElementById("manualCity"));
+    }
+    if (!location.state) {
+      markInvalidField(document.getElementById("manualState"));
+      pushError(t("errorManualStateRequired"), document.getElementById("manualState"));
+    }
+    if (location.postcode && !POSTCODE_REGEX.test(location.postcode)) {
+      markInvalidField(document.getElementById("manualPostcode"));
+      pushError(t("errorManualPostcodeInvalid"), document.getElementById("manualPostcode"));
+    }
   }
 
   const accomField = document.getElementById("field-accom");
   const accomChecked = document.querySelector('input[name="accom"]:checked');
-  if(!accomChecked){
+  accomField.classList.remove("invalid");
+  if (!accomChecked) {
     accomField.classList.add("invalid");
     pushError(t("errorAccommodationRequired"), document.getElementById("accomGroup"));
-  } else {
-    accomField.classList.remove("invalid");
+  } else if (availabilityData && availabilityData[accomChecked.value] && participantCount > availabilityData[accomChecked.value].remaining) {
+    const accomLabel = accomChecked.value === "free" ? t("availabilityFreeTitle") : t("availabilityOwnTitle");
+    accomField.classList.add("invalid");
+    pushError(formatMessage(t("errorCapacityExceeded"), {
+      remaining: availabilityData[accomChecked.value].remaining,
+      accommodation: accomLabel
+    }), document.getElementById("accomGroup"));
   }
 
   return { isValid: errors.length === 0, errors: errors, firstInvalidField: firstInvalidField };
 }
 
 function collectParticipants(){
-  const participants = [];
-  document.querySelectorAll(".person-card").forEach(function(card){
-    participants.push({
+  return Array.from(document.querySelectorAll(".person-card")).map(function(card){
+    return {
       name: card.querySelector(".p-name").value.trim(),
       age: card.querySelector(".p-age").value.trim(),
       mobile: card.querySelector(".p-mobile").value.trim(),
-      alternateMobile: card.querySelector(".p-alt-mobile") ? card.querySelector(".p-alt-mobile").value.trim() : "",
       gender: card.querySelector('input[type="radio"]:checked').value
-    });
-  });
-  return participants;
-}
-
-function currentResolvedLocationFor(pincode){
-  if(resolvedLocation && resolvedLocation._pincode === pincode){
-    return {
-      city: resolvedLocation.city || "",
-      district: resolvedLocation.district || "",
-      state: resolvedLocation.state || ""
     };
-  }
-  return { city: "", district: "", state: "" };
+  });
 }
 
 async function handleSubmit(event){
   event.preventDefault();
   const validation = validate();
-  if(!validation.isValid){
-    participantError.classList.toggle("show", participantCount < 1);
+  if (!validation.isValid) {
     showValidationModal(validation.errors, validation.firstInvalidField);
     return;
   }
@@ -947,23 +963,21 @@ async function handleSubmit(event){
 
   const participants = collectParticipants();
   const submissionId = "sub_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
-  const pincode = document.getElementById("pincode").value.trim();
   const requestTimestamp = new Date().toISOString();
   const payload = {
     participants: participants,
-    pincode: pincode,
     accommodation: document.querySelector('input[name="accom"]:checked').value,
     timestamp: requestTimestamp,
     submissionId: submissionId,
     formLanguage: currentLanguage,
-    location: currentResolvedLocationFor(pincode)
+    location: getResolvedLocation()
   };
 
-  try{
+  try {
     const controller = new AbortController();
     const timeoutId = setTimeout(function(){ controller.abort(); }, REQUEST_TIMEOUT_MS);
     let response;
-    try{
+    try {
       response = await fetch(SCRIPT_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -974,52 +988,34 @@ async function handleSubmit(event){
       clearTimeout(timeoutId);
     }
     const result = await response.json();
-    if(result.status !== "success") throw new Error(result.message || "Submission failed");
+    if (result.status !== "success") throw new Error(result.message || "Submission failed");
     const bookingId = String(result.submissionNumber || "");
-    if(!bookingId) throw new Error("Missing submission number");
+    if (!bookingId) throw new Error("Missing submission number");
+    await loadAvailability();
     showSuccess(participants.length, false, bookingId);
-  }catch(error){
+  } catch (error) {
     const verification = await verifySubmission(submissionId);
-    if(verification.confirmed){
+    if (verification.confirmed) {
+      await loadAvailability();
       showSuccess(participants.length, true, verification.bookingId);
       return;
     }
     submitBtn.disabled = false;
     submitBtn.textContent = t("submit");
-    showFailure();
+    showFailure(error && error.message ? error.message : t("failureMessage"));
   }
-}
-
-async function prefetchLocation(pincode){
-  if(!/^\d{6}$/.test(pincode)) return resolvedLocation;
-  if(resolvedLocation && resolvedLocation._pincode === pincode) return resolvedLocation;
-  try{
-    const response = await fetch("https://api.postalpincode.in/pincode/" + encodeURIComponent(pincode));
-    const payload = await response.json();
-    const office = payload && payload[0] && payload[0].Status === "Success" && payload[0].PostOffice && payload[0].PostOffice[0];
-    resolvedLocation = office ? {
-      city: office.District || office.Block || office.Name || "",
-      district: office.District || "",
-      state: office.State || "",
-      _pincode: pincode
-    } : { city: "", district: "", state: "", _pincode: pincode };
-  }catch(error){
-    resolvedLocation = { city: "", district: "", state: "", _pincode: pincode };
-  }
-  return resolvedLocation;
 }
 
 async function verifySubmission(submissionId){
-  for(let attempt = 0; attempt < VERIFY_ATTEMPTS; attempt++){
-    try{
-      const response = await fetch(SCRIPT_URL + "?action=getSubmissionStatus&submissionId=" + encodeURIComponent(submissionId));
+  for (let attempt = 0; attempt < VERIFY_ATTEMPTS; attempt++) {
+    try {
+      const response = await fetch(SCRIPT_URL + "?action=getSubmissionStatus&submissionId=" + encodeURIComponent(submissionId) + "&_=" + Date.now());
       const result = await response.json();
-      if(Boolean(result && result.status === "success" && result.data && result.data.exists)) {
+      if (result && result.status === "success" && result.data && result.data.exists) {
         return { confirmed: true, bookingId: String(result.data.submissionNumber || "") };
       }
-    }catch(error){
-    }
-    if(attempt < VERIFY_ATTEMPTS - 1) await wait(VERIFY_WAIT_MS);
+    } catch (error) {}
+    if (attempt < VERIFY_ATTEMPTS - 1) await wait(VERIFY_WAIT_MS);
   }
   return { confirmed: false, bookingId: "" };
 }
@@ -1037,12 +1033,12 @@ function showSuccess(count, verifiedAfterRetry, bookingId){
   );
 }
 
-function showFailure(){
+function showFailure(message){
   const statusBox = document.getElementById("statusBox");
   statusBox.classList.add("show", "error");
   document.getElementById("statusIcon").textContent = "✕";
   document.getElementById("statusTitle").textContent = t("failureTitle");
-  document.getElementById("statusMsg").textContent = t("failureMessage");
+  document.getElementById("statusMsg").textContent = message || t("failureMessage");
   setTimeout(function(){
     statusBox.classList.remove("show", "error");
   }, 3500);
@@ -1062,32 +1058,41 @@ function showValidationModal(errors, firstInvalidField){
 
 function closeValidationModal(){
   document.getElementById("validationModal").classList.remove("show");
-  if(validationFocusTarget && typeof validationFocusTarget.scrollIntoView === "function"){
+  if (validationFocusTarget && typeof validationFocusTarget.scrollIntoView === "function") {
     validationFocusTarget.scrollIntoView({ behavior: "smooth", block: "center" });
-    if(typeof validationFocusTarget.focus === "function") validationFocusTarget.focus({ preventScroll: true });
+    if (typeof validationFocusTarget.focus === "function") validationFocusTarget.focus({ preventScroll: true });
   }
 }
 
+function markInvalidField(element){
+  if (element) element.style.borderColor = "#c0392b";
+}
+
+function resetFieldState(element){
+  if (element) element.style.borderColor = "";
+}
+
+function firstNonEmpty(values){
+  for (let i = 0; i < values.length; i++) {
+    const value = String(values[i] || "").trim();
+    if (value) return value;
+  }
+  return "";
+}
+
 function wait(ms){
-  return new Promise(function(resolve){
-    setTimeout(resolve, ms);
-  });
+  return new Promise(function(resolve){ setTimeout(resolve, ms); });
 }
 
 function formatMessage(template, values){
-  return template.replace(/\{(\w+)\}/g, function(_, key){
+  return String(template).replace(/\{(\w+)\}/g, function(_, key){
     return values[key] !== undefined ? values[key] : "";
   });
 }
 
 function escapeHtml(value){
-  return String(value || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+  return String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 </script>
 </body>
 </html>
-
