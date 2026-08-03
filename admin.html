@@ -1955,7 +1955,7 @@ function renderEditParticipants(rows){
     const registeredBy = normalizeRegisteredBy(row["Registered By"] || "");
     const mode = registeredBy === "Self" ? "self" : /^Volunteer - /.test(registeredBy) ? "volunteer" : "";
     const volunteerName = mode === "volunteer" ? registeredBy.replace(/^Volunteer - /, "") : "";
-    const volunteerOptions = ['<option value="">Select volunteer</option>'].concat(VOLUNTEERS.map(function(name){
+    const volunteerOptions = ['<option value="">Volunteer Name</option>'].concat(VOLUNTEERS.map(function(name){
       return '<option value="' + safeCell(name) + '"' + (volunteerName === name ? ' selected' : '') + '>' + safeCell(name) + '</option>';
     })).join("");
     const block = document.createElement("div");
@@ -1970,7 +1970,7 @@ function renderEditParticipants(rows){
       '<input type="text" class="edit-city-row" value="' + safeCell(row["City"] || "") + '" placeholder="City" autocomplete="off">' +
       '<select class="edit-accommodation-row"><option value="">Leave blank</option><option value="free"' + (row["Accommodation"] === "free" ? " selected" : "") + '>Free</option><option value="own"' + (row["Accommodation"] === "own" ? " selected" : "") + '>Own/Paid</option></select>' +
       '<select class="edit-registered-by-row"><option value="">Leave blank</option><option value="self"' + (mode === "self" ? " selected" : "") + '>Self</option><option value="volunteer"' + (mode === "volunteer" ? " selected" : "") + '>Volunteer</option></select>' +
-      '<div class="edit-volunteer-wrap' + (mode === "volunteer" ? '' : ' hidden') + '"><select class="edit-volunteer-row">' + volunteerOptions + '</select></div>' +
+      '<div class="edit-volunteer-wrap' + (mode === "volunteer" ? '' : ' hidden') + '"><select class="edit-volunteer-row" title="Volunteer Name">' + volunteerOptions + '</select></div>' +
       "</div>";
     container.appendChild(block);
   });
@@ -2292,7 +2292,7 @@ function renderTextImportParticipants(participants){
       '<div><input type="text" class="import-person-city" value="' + safeCell(person.city || "") + '" placeholder="City" autocomplete="off"><div class="field-hint"></div></div>' +
       '<div><select class="import-person-accommodation"><option value="">Leave blank</option><option value="free"' + (person.accommodation === "free" ? " selected" : "") + '>Free</option><option value="own"' + (person.accommodation === "own" ? " selected" : "") + '>Own/Paid</option></select><div class="field-hint"></div></div>' +
       '<div><select class="import-person-registered-by"><option value="">Leave blank</option><option value="self"' + (person.registeredByMode === "self" ? " selected" : "") + '>Self</option><option value="volunteer"' + (person.registeredByMode === "volunteer" ? " selected" : "") + '>Volunteer</option></select><div class="field-hint"></div></div>' +
-      '<div class="import-person-volunteer-wrap' + (person.registeredByMode === "volunteer" ? '' : ' hidden') + '"><select class="import-person-volunteer">' + volunteerOptions + '</select><div class="field-hint"></div></div>' +
+      '<div class="import-person-volunteer-wrap' + (person.registeredByMode === "volunteer" ? '' : ' hidden') + '"><select class="import-person-volunteer" title="Volunteer Name">' + volunteerOptions + '</select><div class="field-hint"></div></div>' +
       "</div>";
     container.appendChild(block);
   });
@@ -2511,10 +2511,15 @@ function downloadExcel(){
 }
 
 function hideObsoleteAdminImportFields(){
+  if (document.getElementById("importArea")) document.getElementById("importArea").parentElement.classList.add("hidden");
   if (document.getElementById("importCity")) document.getElementById("importCity").parentElement.classList.add("hidden");
+  if (document.getElementById("importDistrict")) document.getElementById("importDistrict").parentElement.classList.add("hidden");
+  if (document.getElementById("importState")) document.getElementById("importState").parentElement.classList.add("hidden");
+  if (document.getElementById("importPostcode")) document.getElementById("importPostcode").parentElement.classList.add("hidden");
   if (document.getElementById("importAccommodation")) document.getElementById("importAccommodation").parentElement.classList.add("hidden");
   if (document.getElementById("importRegisteredByMode")) document.getElementById("importRegisteredByMode").parentElement.classList.add("hidden");
   if (document.getElementById("importVolunteerWrap")) document.getElementById("importVolunteerWrap").classList.add("hidden");
+  if (document.getElementById("addressMatchBox")) document.getElementById("addressMatchBox").classList.add("hidden");
 }
 
 hideObsoleteAdminImportFields();
