@@ -68,6 +68,8 @@
   .multi-select-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .multi-select-menu{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:30;display:none;padding:10px;border:1px solid var(--border);border-radius:12px;background:#fff;box-shadow:0 16px 36px rgba(0,0,0,.16);}
   .multi-select-menu.show{display:block;}
+  .multi-select-actions{display:flex;justify-content:space-between;gap:8px;margin-bottom:8px;}
+  .mini-btn{padding:7px 10px;border-radius:8px;background:#f4e7d5;color:var(--maroon);font-size:12px;font-weight:600;}
   .multi-select-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
   .multi-select-option{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:#fffaf3;font-size:13px;cursor:pointer;}
   .multi-select-option input{width:auto;min-width:auto;margin:0;}
@@ -217,9 +219,13 @@
             <label>Duplicate Check</label>
             <div id="duplicateFilter" class="multi-select-wrap">
               <button type="button" id="duplicateFilterButton" class="multi-select-trigger" aria-expanded="false">
-                <span id="duplicateFilterLabel" class="multi-select-label">All</span>
+                <span id="duplicateFilterLabel" class="multi-select-label">Select Fields</span>
               </button>
               <div id="duplicateFilterMenu" class="multi-select-menu">
+                <div class="multi-select-actions">
+                  <button type="button" id="duplicateSelectAllBtn" class="mini-btn">Select All</button>
+                  <button type="button" id="duplicateClearBtn" class="mini-btn">Clear</button>
+                </div>
                 <div class="multi-select-options">
                   <label class="multi-select-option"><input type="checkbox" value="name"><span>Name</span></label>
                   <label class="multi-select-option"><input type="checkbox" value="age"><span>Age</span></label>
@@ -556,6 +562,8 @@ const duplicateFilter = document.getElementById("duplicateFilter");
 const duplicateFilterButton = document.getElementById("duplicateFilterButton");
 const duplicateFilterLabel = document.getElementById("duplicateFilterLabel");
 const duplicateFilterMenu = document.getElementById("duplicateFilterMenu");
+const duplicateSelectAllBtn = document.getElementById("duplicateSelectAllBtn");
+const duplicateClearBtn = document.getElementById("duplicateClearBtn");
 const searchFilter = document.getElementById("searchFilter");
 const importVolunteerName = document.getElementById("importVolunteerName");
 
@@ -613,6 +621,18 @@ duplicateFilterButton.addEventListener("click", function(event){
   duplicateFilterButton.classList.toggle("open", isOpen);
   duplicateFilterButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
 });
+duplicateSelectAllBtn.addEventListener("click", function(event){
+  event.preventDefault();
+  filters.duplicates = ["name", "age", "mobile", "city"];
+  syncDuplicateFilterUi();
+  applyCurrentFilters();
+});
+duplicateClearBtn.addEventListener("click", function(event){
+  event.preventDefault();
+  filters.duplicates = [];
+  syncDuplicateFilterUi();
+  applyCurrentFilters();
+});
 Array.from(duplicateFilter.querySelectorAll('input[type="checkbox"]')).forEach(function(input){
   input.addEventListener("change", function(){
     filters.duplicates = Array.from(duplicateFilter.querySelectorAll('input[type="checkbox"]:checked')).map(function(node){ return node.value; });
@@ -643,7 +663,7 @@ function syncDuplicateFilterUi(){
     if (value === "city") return "City";
     return value;
   });
-  duplicateFilterLabel.textContent = labels.length ? labels.join(", ") : "All";
+  duplicateFilterLabel.textContent = labels.length ? labels.join(", ") : "Select Fields";
   Array.from(duplicateFilter.querySelectorAll('input[type="checkbox"]')).forEach(function(input){
     input.checked = filters.duplicates.indexOf(input.value) !== -1;
   });
