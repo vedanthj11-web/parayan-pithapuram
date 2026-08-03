@@ -2126,6 +2126,7 @@ async function parseTextImport(){
 function mapAiParseToDraft(data, rawText, parseError){
   const source = data || {};
   const booking = source.booking || {};
+  const hints = Array.isArray(source.participant_hints) ? source.participant_hints : [];
   const participants = Array.isArray(source.participants) && source.participants.length ? source.participants : [{ name: "", mobile: "", age: "", gender: "" }];
   return {
     rawText: rawText,
@@ -2142,16 +2143,17 @@ function mapAiParseToDraft(data, rawText, parseError){
       registeredByMode: String(booking.registration_type || "").trim(),
       volunteerName: String(booking.volunteer_name || "").trim()
     },
-    participants: participants.map(function(person){
+    participants: participants.map(function(person, index){
+      const hint = hints[index] || {};
       return {
         name: String(person.name || "").trim(),
         mobile: normalizeImportedMobile(person.mobile || ""),
         age: String(person.age || "").trim(),
         gender: String(person.gender || "").trim(),
-        city: String(person.city || booking.city || "").trim(),
-        accommodation: String(person.accommodation || booking.accommodation || "").trim(),
-        registeredByMode: String(person.registeredByMode || booking.registration_type || "").trim(),
-        volunteerName: String(person.volunteerName || booking.volunteer_name || "").trim()
+        city: String(person.city || hint.city || booking.city || "").trim(),
+        accommodation: String(person.accommodation || hint.accommodation || booking.accommodation || "").trim(),
+        registeredByMode: String(person.registeredByMode || hint.registeredByMode || booking.registration_type || "").trim(),
+        volunteerName: String(person.volunteerName || hint.volunteerName || booking.volunteer_name || "").trim()
       };
     })
   };
