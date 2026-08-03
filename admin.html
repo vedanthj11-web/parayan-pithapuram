@@ -61,9 +61,7 @@
   .toolbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;align-items:start;}
   .filter-group label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px;}
   .filter-group.wide{grid-column:span 2;}
-  .checkbox-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
-  .check-option{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:#fffaf3;font-size:13px;}
-  .check-option input{width:auto;min-width:auto;margin:0;}
+  .multi-select{min-height:120px;padding:8px 10px;}
   .filter-help{margin-top:6px;font-size:12px;color:var(--muted);line-height:1.4;}
   .status-switch{display:flex;gap:8px;flex-wrap:wrap;}
   .status-btn{background:#fff8ee;border:1px solid var(--border);color:var(--maroon);padding:10px 12px;}
@@ -128,7 +126,6 @@
     .top-row{align-items:stretch;}
     .top-actions{width:100%;}
     .top-actions .action-btn{flex:1 1 160px;}
-    .checkbox-grid{grid-template-columns:1fr;}
     table{min-width:1120px;}
   }
 </style>
@@ -208,13 +205,13 @@
           <div class="filter-group"><label>Incomplete Data</label><select id="incompleteFilter"><option value="all">All</option><option value="incomplete">Incomplete Only</option><option value="complete">Complete Only</option></select></div>
           <div class="filter-group wide">
             <label>Duplicate Check</label>
-            <div id="duplicateFilter" class="checkbox-grid">
-              <label class="check-option"><input type="checkbox" value="name"><span>Name</span></label>
-              <label class="check-option"><input type="checkbox" value="age"><span>Age</span></label>
-              <label class="check-option"><input type="checkbox" value="mobile"><span>Mobile Number</span></label>
-              <label class="check-option"><input type="checkbox" value="city"><span>City</span></label>
-            </div>
-            <div class="filter-help" id="duplicateHelp">Select one or more fields. Only rows with matching values across all selected fields will be shown.</div>
+            <select id="duplicateFilter" class="multi-select" multiple>
+              <option value="name">Name</option>
+              <option value="age">Age</option>
+              <option value="mobile">Mobile Number</option>
+              <option value="city">City</option>
+            </select>
+            <div class="filter-help" id="duplicateHelp">Hold Ctrl or Cmd to select multiple fields.</div>
           </div>
           <div class="filter-group"><label>Search</label><input id="searchFilter" type="text" placeholder="Search table" autocomplete="off"></div>
         </div>
@@ -590,11 +587,9 @@ languageFilter.addEventListener("change", function(){ filters.formLanguage = lan
 sourceFilter.addEventListener("change", function(){ filters.source = sourceFilter.value; applyCurrentFilters(); });
 dateFilter.addEventListener("change", function(){ filters.registrationDate = dateFilter.value; applyCurrentFilters(); });
 incompleteFilter.addEventListener("change", function(){ filters.incomplete = incompleteFilter.value; applyCurrentFilters(); });
-Array.from(duplicateFilter.querySelectorAll('input[type="checkbox"]')).forEach(function(input){
-  input.addEventListener("change", function(){
-    filters.duplicates = Array.from(duplicateFilter.querySelectorAll('input[type="checkbox"]:checked')).map(function(node){ return node.value; });
-    applyCurrentFilters();
-  });
+duplicateFilter.addEventListener("change", function(){
+  filters.duplicates = Array.from(duplicateFilter.selectedOptions).map(function(option){ return option.value; });
+  applyCurrentFilters();
 });
 searchFilter.addEventListener("input", function(){ filters.search = searchFilter.value.trim().toLowerCase(); applyCurrentFilters(); });
 
@@ -672,10 +667,11 @@ function applyUiLanguage(){
   document.querySelector("#languageFilter option[value='all']").textContent = t().languageOptions.all;
   document.querySelector("#languageFilter option[value='en']").textContent = t().languageOptions.en;
   document.querySelector("#languageFilter option[value='mr']").textContent = t().languageOptions.mr;
-  Array.from(document.querySelectorAll("#duplicateFilter .check-option")).forEach(function(label){
-    const input = label.querySelector('input[type="checkbox"]');
-    const span = label.querySelector("span");
-    if (input && span && t().duplicateOptions[input.value]) span.textContent = t().duplicateOptions[input.value];
+  Array.from(duplicateFilter.options).forEach(function(option){
+    if (option.value === "name") option.textContent = "Name";
+    if (option.value === "age") option.textContent = "Age";
+    if (option.value === "mobile") option.textContent = "Mobile Number";
+    if (option.value === "city") option.textContent = "City";
   });
   document.querySelectorAll("thead th").forEach(function(th, index){ th.textContent = t().tableHeaders[index]; });
   document.getElementById("dataEmpty").textContent = t().empty;
@@ -703,8 +699,8 @@ function populateDropdowns(rows){
   setSelectOptions(accommodationFilter, t().accommodationPlaceholder, ["free", "own"], function(value){ return translateAccommodation(value); });
   setSelectOptions(dateFilter, t().datePlaceholder, uniqueSorted(rows.map(function(row){ return getRegistrationDate(row["Timestamp"]); }).filter(Boolean)));
   populateSourceFilter();
-  Array.from(document.querySelectorAll('#duplicateFilter input[type="checkbox"]')).forEach(function(input){
-    input.checked = filters.duplicates.indexOf(input.value) !== -1;
+  Array.from(duplicateFilter.options).forEach(function(option){
+    option.selected = filters.duplicates.indexOf(option.value) !== -1;
   });
   cityFilter.value = filters.city;
   genderFilter.value = filters.gender;
@@ -1802,15 +1798,12 @@ function applyUiLanguage(){
   document.querySelector("#dataTab .panel h2").textContent = "Submitted People";
   const filterLabels = ["Status", "City", "Gender", "Accommodation", "Language", "Registered By", "Registration Date", "Incomplete Data", "Duplicate Check", "Search"];
   document.querySelectorAll(".filter-group label").forEach(function(label, index){ label.textContent = filterLabels[index] || label.textContent; });
-  document.getElementById("duplicateHelp").textContent = "Select one or more fields. Rows are shown only when all selected values match.";
-  Array.from(document.querySelectorAll("#duplicateFilter .check-option")).forEach(function(label){
-    const input = label.querySelector('input[type="checkbox"]');
-    const span = label.querySelector("span");
-    if (!input || !span) return;
-    if (input.value === "name") span.textContent = "Name";
-    if (input.value === "age") span.textContent = "Age";
-    if (input.value === "mobile") span.textContent = "Mobile Number";
-    if (input.value === "city") span.textContent = "City";
+  document.getElementById("duplicateHelp").textContent = "Hold Ctrl or Cmd to select multiple fields.";
+  Array.from(duplicateFilter.options).forEach(function(option){
+    if (option.value === "name") option.textContent = "Name";
+    if (option.value === "age") option.textContent = "Age";
+    if (option.value === "mobile") option.textContent = "Mobile Number";
+    if (option.value === "city") option.textContent = "City";
   });
   document.querySelectorAll(".status-btn")[0].textContent = "Active";
   document.querySelectorAll(".status-btn")[1].textContent = "All";
@@ -1845,8 +1838,8 @@ function populateDropdowns(rows){
   sourceFilter.value = filters.source;
   dateFilter.value = filters.registrationDate;
   incompleteFilter.value = filters.incomplete;
-  Array.from(duplicateFilter.querySelectorAll('input[type="checkbox"]')).forEach(function(input){
-    input.checked = filters.duplicates.indexOf(input.value) !== -1;
+  Array.from(duplicateFilter.options).forEach(function(option){
+    option.selected = filters.duplicates.indexOf(option.value) !== -1;
   });
   searchFilter.value = filters.search;
   searchFilter.placeholder = "Search name, city, mobile, booking ID";
