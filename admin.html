@@ -937,8 +937,6 @@ function parseTextImport(){
 function parseImportedTextBlock(text){
   const lines = String(text || "").split(/\r?\n/).map(function(line){ return line.trim(); }).filter(Boolean);
   if (!lines.length) throw new Error("Paste at least one participant line.");
-  if (lines.length > 10) throw new Error("A maximum of 10 participants can be imported in one booking.");
-
   const parsedParticipants = lines.map(parseImportedParticipantLine);
   const booking = {
     city: resolveSharedBookingValue(parsedParticipants, "city"),
@@ -2529,3 +2527,4 @@ applyUiLanguage();
 </script>
 </body>
 </html>
+
