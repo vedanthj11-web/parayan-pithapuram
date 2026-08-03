@@ -1923,6 +1923,8 @@ function openEditFromSelected(){
   document.getElementById("editState").value = bookingRows[0]["State"] || "";
   document.getElementById("editArea").value = bookingRows[0]["Area/Locality"] || "";
   document.getElementById("editPostcode").value = bookingRows[0]["Postcode"] || "";
+  document.getElementById("editAccommodation").parentElement.parentElement.classList.add("hidden");
+  document.getElementById("editCity").parentElement.classList.add("hidden");
   document.getElementById("editError").style.display = "none";
   renderEditParticipants(bookingRows);
   document.getElementById("editModal").classList.add("show");
@@ -1950,6 +1952,12 @@ function renderEditParticipants(rows){
   const container = document.getElementById("editParticipants");
   container.innerHTML = "";
   rows.forEach(function(row, index){
+    const registeredBy = normalizeRegisteredBy(row["Registered By"] || "");
+    const mode = registeredBy === "Self" ? "self" : /^Volunteer - /.test(registeredBy) ? "volunteer" : "";
+    const volunteerName = mode === "volunteer" ? registeredBy.replace(/^Volunteer - /, "") : "";
+    const volunteerOptions = ['<option value="">Select volunteer</option>'].concat(VOLUNTEERS.map(function(name){
+      return '<option value="' + safeCell(name) + '"' + (volunteerName === name ? ' selected' : '') + '>' + safeCell(name) + '</option>';
+    })).join("");
     const block = document.createElement("div");
     block.className = "booking-participant";
     block.innerHTML =
@@ -1959,8 +1967,18 @@ function renderEditParticipants(rows){
       '<input type="number" class="edit-age" value="' + safeCell(row["Age"] || "") + '" min="1" max="120" placeholder="Age" autocomplete="off">' +
       '<input type="tel" class="edit-mobile" value="' + safeCell(row["Mobile Number"] || "") + '" autocomplete="off">' +
       '<select class="edit-gender"><option value="">Leave blank</option><option value="male"' + (row["Type"] === "Gent" ? " selected" : "") + '>Male</option><option value="female"' + (row["Type"] === "Lady" ? " selected" : "") + '>Female</option></select>' +
+      '<input type="text" class="edit-city-row" value="' + safeCell(row["City"] || "") + '" placeholder="City" autocomplete="off">' +
+      '<select class="edit-accommodation-row"><option value="">Leave blank</option><option value="free"' + (row["Accommodation"] === "free" ? " selected" : "") + '>Free</option><option value="own"' + (row["Accommodation"] === "own" ? " selected" : "") + '>Own/Paid</option></select>' +
+      '<select class="edit-registered-by-row"><option value="">Leave blank</option><option value="self"' + (mode === "self" ? " selected" : "") + '>Self</option><option value="volunteer"' + (mode === "volunteer" ? " selected" : "") + '>Volunteer</option></select>' +
+      '<div class="edit-volunteer-wrap' + (mode === "volunteer" ? '' : ' hidden') + '"><select class="edit-volunteer-row">' + volunteerOptions + '</select></div>' +
       "</div>";
     container.appendChild(block);
+  });
+  container.querySelectorAll(".edit-registered-by-row").forEach(function(select){
+    select.addEventListener("change", function(){
+      const wrap = select.closest(".participant-edit-grid").querySelector(".edit-volunteer-wrap");
+      wrap.classList.toggle("hidden", select.value !== "volunteer");
+    });
   });
 }
 
@@ -1971,21 +1989,24 @@ async function saveBookingEdit(){
       name: card.querySelector(".edit-name").value.trim(),
       age: card.querySelector(".edit-age").value.trim(),
       mobile: card.querySelector(".edit-mobile").value.trim(),
-      gender: card.querySelector(".edit-gender").value
+      gender: card.querySelector(".edit-gender").value,
+      city: card.querySelector(".edit-city-row").value.trim(),
+      accommodation: card.querySelector(".edit-accommodation-row").value,
+      registeredByMode: card.querySelector(".edit-registered-by-row").value,
+      volunteerName: card.querySelector(".edit-volunteer-row").value
     };
   });
-  const accommodationSelect = document.getElementById("editAccommodation");
   const payload = {
     action: "updateBooking",
     adminKey: ADMIN_KEY,
     submissionId: editingSubmissionId,
-    accommodation: accommodationSelect.value,
-    registeredByMode: accommodationSelect.dataset.registeredByMode || "",
-    volunteerName: accommodationSelect.dataset.volunteerName || "",
+    accommodation: "",
+    registeredByMode: "",
+    volunteerName: "",
     location: {
       area: document.getElementById("editArea").value.trim(),
-      city: document.getElementById("editCity").value.trim(),
-      district: document.getElementById("editCity").value.trim(),
+      city: "",
+      district: "",
       state: document.getElementById("editState").value.trim(),
       postcode: document.getElementById("editPostcode").value.trim()
     },
@@ -2126,7 +2147,11 @@ function mapAiParseToDraft(data, rawText, parseError){
         name: String(person.name || "").trim(),
         mobile: normalizeImportedMobile(person.mobile || ""),
         age: String(person.age || "").trim(),
-        gender: String(person.gender || "").trim()
+        gender: String(person.gender || "").trim(),
+        city: String(person.city || booking.city || "").trim(),
+        accommodation: String(person.accommodation || booking.accommodation || "").trim(),
+        registeredByMode: String(person.registeredByMode || booking.registration_type || "").trim(),
+        volunteerName: String(person.volunteerName || booking.volunteer_name || "").trim()
       };
     })
   };
@@ -2233,14 +2258,9 @@ function applyAddressMatchToDraft(match){
 
 function renderTextImportPreview(draft){
   document.getElementById("importArea").value = draft.booking.area || "";
-  document.getElementById("importCity").value = draft.booking.city || "";
   document.getElementById("importDistrict").value = draft.booking.district || "";
   document.getElementById("importState").value = draft.booking.state || "";
   document.getElementById("importPostcode").value = draft.booking.postcode || "";
-  document.getElementById("importAccommodation").value = draft.booking.accommodation || "";
-  document.getElementById("importRegisteredByMode").value = draft.booking.registeredByMode || "";
-  importVolunteerName.value = draft.booking.volunteerName && VOLUNTEERS.indexOf(draft.booking.volunteerName) !== -1 ? draft.booking.volunteerName : VOLUNTEERS[0];
-  syncImportVolunteerVisibility();
   document.getElementById("textImportPreviewIssue").textContent = draft.parseError || buildPreviewIssueMessage(draft);
   document.getElementById("previewParticipantCount").textContent = draft.participants.length + " participant" + (draft.participants.length === 1 ? "" : "s");
   renderTextImportParticipants(draft.participants);
@@ -2257,6 +2277,9 @@ function renderTextImportParticipants(participants){
   const container = document.getElementById("textImportParticipants");
   container.innerHTML = "";
   participants.forEach(function(person, index){
+    const volunteerOptions = ['<option value="">Select volunteer</option>'].concat(VOLUNTEERS.map(function(name){
+      return '<option value="' + safeCell(name) + '"' + (person.volunteerName === name ? ' selected' : '') + '>' + safeCell(name) + '</option>';
+    })).join("");
     const block = document.createElement("div");
     block.className = "import-participant";
     block.innerHTML =
@@ -2266,15 +2289,30 @@ function renderTextImportParticipants(participants){
       '<div><select class="import-gender"><option value="">Leave blank</option><option value="male"' + (person.gender === "male" ? " selected" : "") + '>Male</option><option value="female"' + (person.gender === "female" ? " selected" : "") + '>Female</option></select><div class="field-hint"></div></div>' +
       '<div><input type="tel" class="import-mobile" value="' + safeCell(person.mobile || "") + '" placeholder="Mobile" autocomplete="off"><div class="field-hint"></div></div>' +
       '<div><input type="number" class="import-age" value="' + safeCell(person.age || "") + '" min="1" max="120" placeholder="Age" autocomplete="off"><div class="field-hint"></div></div>' +
+      '<div><input type="text" class="import-person-city" value="' + safeCell(person.city || "") + '" placeholder="City" autocomplete="off"><div class="field-hint"></div></div>' +
+      '<div><select class="import-person-accommodation"><option value="">Leave blank</option><option value="free"' + (person.accommodation === "free" ? " selected" : "") + '>Free</option><option value="own"' + (person.accommodation === "own" ? " selected" : "") + '>Own/Paid</option></select><div class="field-hint"></div></div>' +
+      '<div><select class="import-person-registered-by"><option value="">Leave blank</option><option value="self"' + (person.registeredByMode === "self" ? " selected" : "") + '>Self</option><option value="volunteer"' + (person.registeredByMode === "volunteer" ? " selected" : "") + '>Volunteer</option></select><div class="field-hint"></div></div>' +
+      '<div class="import-person-volunteer-wrap' + (person.registeredByMode === "volunteer" ? '' : ' hidden') + '"><select class="import-person-volunteer">' + volunteerOptions + '</select><div class="field-hint"></div></div>' +
       "</div>";
     container.appendChild(block);
+  });
+  container.querySelectorAll(".import-person-registered-by").forEach(function(select){
+    select.addEventListener("change", function(){
+      const wrap = select.closest(".import-participant-grid").querySelector(".import-person-volunteer-wrap");
+      wrap.classList.toggle("hidden", select.value !== "volunteer");
+      refreshPreviewHighlights();
+    });
+  });
+  container.querySelectorAll("input, select").forEach(function(input){
+    input.addEventListener("input", refreshPreviewHighlights);
+    input.addEventListener("change", refreshPreviewHighlights);
   });
   container.querySelectorAll(".remove-link").forEach(function(button){
     button.addEventListener("click", function(){
       const index = Number(button.dataset.index);
       importedBookingDraft.participants.splice(index, 1);
       if (!importedBookingDraft.participants.length) {
-        importedBookingDraft.participants.push({ name: "", mobile: "", age: "", gender: "" });
+        importedBookingDraft.participants.push({ name: "", mobile: "", age: "", gender: "", city: "", accommodation: "", registeredByMode: "", volunteerName: "" });
       }
       renderTextImportPreview(importedBookingDraft);
     });
@@ -2288,7 +2326,11 @@ function collectTextImportDraft(){
       name: card.querySelector(".import-name").value.trim(),
       gender: card.querySelector(".import-gender").value,
       mobile: normalizeImportedMobile(card.querySelector(".import-mobile").value),
-      age: String(card.querySelector(".import-age").value || "").trim()
+      age: String(card.querySelector(".import-age").value || "").trim(),
+      city: card.querySelector(".import-person-city").value.trim(),
+      accommodation: card.querySelector(".import-person-accommodation").value,
+      registeredByMode: card.querySelector(".import-person-registered-by").value,
+      volunteerName: card.querySelector(".import-person-volunteer").value
     };
   });
   return {
@@ -2298,13 +2340,9 @@ function collectTextImportDraft(){
     uncertainFields: importedBookingDraft ? importedBookingDraft.uncertainFields.slice() : [],
     booking: {
       area: document.getElementById("importArea").value.trim(),
-      city: document.getElementById("importCity").value.trim(),
       district: document.getElementById("importDistrict").value.trim(),
       state: document.getElementById("importState").value.trim(),
-      postcode: document.getElementById("importPostcode").value.trim(),
-      accommodation: document.getElementById("importAccommodation").value,
-      registeredByMode: document.getElementById("importRegisteredByMode").value,
-      volunteerName: importVolunteerName.value
+      postcode: document.getElementById("importPostcode").value.trim()
     },
     participants: participants
   };
@@ -2315,10 +2353,10 @@ function getPreviewMissingEntries(draft){
   draft.participants.forEach(function(person, index){
     if (!String(person.age || "").trim()) missing.push({ path: "participants[" + index + "].age", label: "Age" });
     if (!String(person.gender || "").trim()) missing.push({ path: "participants[" + index + "].gender", label: "Gender" });
+    if (!String(person.city || "").trim()) missing.push({ path: "participants[" + index + "].city", label: "City" });
+    if (!String(person.accommodation || "").trim()) missing.push({ path: "participants[" + index + "].accommodation", label: "Accommodation" });
+    if (!String(person.registeredByMode || "").trim()) missing.push({ path: "participants[" + index + "].registered_by", label: "Registered By" });
   });
-  if (!draft.booking.city) missing.push({ path: "booking.city", label: "City" });
-  if (!draft.booking.accommodation) missing.push({ path: "booking.accommodation", label: "Accommodation" });
-  if (!draft.booking.registeredByMode) missing.push({ path: "booking.registered_by", label: "Registered By" });
   return missing;
 }
 
@@ -2328,22 +2366,23 @@ function refreshPreviewHighlights(){
   const missingEntries = getPreviewMissingEntries(draft);
   const uncertain = new Set((draft.uncertainFields || []).map(function(value){ return String(value || "").trim(); }));
   document.getElementById("previewMissingCount").textContent = missingEntries.length + " missing fields";
-  setFieldHighlight(document.getElementById("importArea"), hasPath(missingEntries, "booking.area"), uncertain.has("booking.area"));
-  setFieldHighlight(document.getElementById("importCity"), hasPath(missingEntries, "booking.city"), uncertain.has("booking.city"));
-  setFieldHighlight(document.getElementById("importDistrict"), hasPath(missingEntries, "booking.district"), uncertain.has("booking.district"));
-  setFieldHighlight(document.getElementById("importState"), hasPath(missingEntries, "booking.state"), uncertain.has("booking.state"));
-  setFieldHighlight(document.getElementById("importPostcode"), hasPath(missingEntries, "booking.postcode"), uncertain.has("booking.postcode"));
-  setFieldHighlight(document.getElementById("importAccommodation"), hasPath(missingEntries, "booking.accommodation"), uncertain.has("booking.accommodation"));
-  setFieldHighlight(document.getElementById("importRegisteredByMode"), hasPath(missingEntries, "booking.registered_by"), uncertain.has("booking.registration_type"));
   Array.from(document.querySelectorAll("#textImportParticipants .import-participant")).forEach(function(card, index){
     const fields = {
       name: card.querySelector(".import-name"),
       gender: card.querySelector(".import-gender"),
       mobile: card.querySelector(".import-mobile"),
-      age: card.querySelector(".import-age")
+      age: card.querySelector(".import-age"),
+      city: card.querySelector(".import-person-city"),
+      accommodation: card.querySelector(".import-person-accommodation"),
+      registeredBy: card.querySelector(".import-person-registered-by"),
+      volunteerName: card.querySelector(".import-person-volunteer")
     };
     setFieldHighlight(fields.age, hasPath(missingEntries, "participants[" + index + "].age"), uncertain.has("participants[" + index + "].age"));
     setFieldHighlight(fields.gender, hasPath(missingEntries, "participants[" + index + "].gender"), uncertain.has("participants[" + index + "].gender"));
+    setFieldHighlight(fields.city, hasPath(missingEntries, "participants[" + index + "].city"), uncertain.has("participants[" + index + "].city"));
+    setFieldHighlight(fields.accommodation, hasPath(missingEntries, "participants[" + index + "].accommodation"), uncertain.has("participants[" + index + "].accommodation"));
+    setFieldHighlight(fields.registeredBy, hasPath(missingEntries, "participants[" + index + "].registered_by"), uncertain.has("participants[" + index + "].registered_by"));
+    setFieldHighlight(fields.volunteerName, false, uncertain.has("participants[" + index + "].volunteer_name"));
     setFieldHighlight(fields.name, false, uncertain.has("participants[" + index + "].name"));
     setFieldHighlight(fields.mobile, false, uncertain.has("participants[" + index + "].mobile"));
   });
@@ -2380,13 +2419,15 @@ function validateTextImportDraft(draft){
       if (card) card.querySelectorAll(".field-hint")[3].textContent = "Enter age from 1 to 120.";
       issues.push("Participant " + (index + 1) + ": age must be 1 to 120.");
     }
+    if (!person.city) {
+      if (card) card.querySelectorAll(".field-hint")[4].textContent = "City is required.";
+      issues.push("Participant " + (index + 1) + ": city is required.");
+    }
+    if (person.registeredByMode === "volunteer" && !person.volunteerName) {
+      if (card) card.querySelectorAll(".field-hint")[7].textContent = "Select an approved volunteer.";
+      issues.push("Participant " + (index + 1) + ": select an approved volunteer.");
+    }
   });
-  if (!draft.booking.city) {
-    issues.push("City is required.");
-  }
-  if (draft.booking.registeredByMode === "volunteer" && !draft.booking.volunteerName) {
-    issues.push("Select an approved volunteer.");
-  }
   return issues;
 }
 
@@ -2408,12 +2449,9 @@ async function saveTextImportBooking(){
       body: JSON.stringify({
         action: "saveAdminTextBooking",
         adminKey: ADMIN_KEY,
-        accommodation: draft.booking.accommodation,
-        registeredByMode: draft.booking.registeredByMode,
-        volunteerName: draft.booking.registeredByMode === "volunteer" ? draft.booking.volunteerName : "",
         location: {
           area: draft.booking.area,
-          city: draft.booking.city,
+          city: "",
           district: draft.booking.district,
           state: draft.booking.state,
           postcode: draft.booking.postcode
@@ -2472,6 +2510,14 @@ function downloadExcel(){
   XLSX.writeFile(workbook, "parayan-registrations-" + filters.status + "-" + new Date().toISOString().slice(0, 10) + ".xlsx");
 }
 
+function hideObsoleteAdminImportFields(){
+  if (document.getElementById("importCity")) document.getElementById("importCity").parentElement.classList.add("hidden");
+  if (document.getElementById("importAccommodation")) document.getElementById("importAccommodation").parentElement.classList.add("hidden");
+  if (document.getElementById("importRegisteredByMode")) document.getElementById("importRegisteredByMode").parentElement.classList.add("hidden");
+  if (document.getElementById("importVolunteerWrap")) document.getElementById("importVolunteerWrap").classList.add("hidden");
+}
+
+hideObsoleteAdminImportFields();
 applyUiLanguage();
 </script>
 </body>
