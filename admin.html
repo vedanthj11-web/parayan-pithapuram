@@ -195,6 +195,15 @@
           <div class="filter-group"><label>Registered By</label><select id="sourceFilter"></select></div>
           <div class="filter-group"><label>Registration Date</label><select id="dateFilter"></select></div>
           <div class="filter-group"><label>Incomplete Data</label><select id="incompleteFilter"><option value="all">All</option><option value="incomplete">Incomplete Only</option><option value="complete">Complete Only</option></select></div>
+          <div class="filter-group">
+            <label>Duplicate Check</label>
+            <div id="duplicateFilter" class="checkbox-grid">
+              <label class="check-option"><input type="checkbox" value="name"><span>Name</span></label>
+              <label class="check-option"><input type="checkbox" value="age"><span>Age</span></label>
+              <label class="check-option"><input type="checkbox" value="mobile"><span>Mobile Number</span></label>
+              <label class="check-option"><input type="checkbox" value="city"><span>City</span></label>
+            </div>
+          </div>
           <div class="filter-group"><label>Search</label><input id="searchFilter" type="text" placeholder="Search table" autocomplete="off"></div>
         </div>
 
@@ -385,7 +394,7 @@ const VOLUNTEERS = [
   "Rupali Joshi",
   "B.D. Wani"
 ];
-const filters = { status: "active", city: "", gender: "all", accommodation: "", formLanguage: "all", source: "all", registrationDate: "", incomplete: "all", search: "" };
+const filters = { status: "active", city: "", gender: "all", accommodation: "", formLanguage: "all", source: "all", registrationDate: "", incomplete: "all", duplicates: [], search: "" };
 const UI_TEXTS = {
   original: {
     pageTitle: "Admin Dashboard - Parayan Registrations",
@@ -517,6 +526,7 @@ const languageFilter = document.getElementById("languageFilter");
 const sourceFilter = document.getElementById("sourceFilter");
 const dateFilter = document.getElementById("dateFilter");
 const incompleteFilter = document.getElementById("incompleteFilter");
+const duplicateFilter = document.getElementById("duplicateFilter");
 const searchFilter = document.getElementById("searchFilter");
 const importVolunteerName = document.getElementById("importVolunteerName");
 
@@ -568,6 +578,12 @@ languageFilter.addEventListener("change", function(){ filters.formLanguage = lan
 sourceFilter.addEventListener("change", function(){ filters.source = sourceFilter.value; applyCurrentFilters(); });
 dateFilter.addEventListener("change", function(){ filters.registrationDate = dateFilter.value; applyCurrentFilters(); });
 incompleteFilter.addEventListener("change", function(){ filters.incomplete = incompleteFilter.value; applyCurrentFilters(); });
+Array.from(duplicateFilter.querySelectorAll('input[type="checkbox"]')).forEach(function(input){
+  input.addEventListener("change", function(){
+    filters.duplicates = Array.from(duplicateFilter.querySelectorAll('input[type="checkbox"]:checked')).map(function(node){ return node.value; });
+    applyCurrentFilters();
+  });
+});
 searchFilter.addEventListener("input", function(){ filters.search = searchFilter.value.trim().toLowerCase(); applyCurrentFilters(); });
 
 // English-only UI labels are applied by the final admin override block below.
@@ -1761,8 +1777,17 @@ function applyUiLanguage(){
   document.querySelectorAll("#analyticsTab .panel h2")[1].textContent = "City Breakdown";
   document.querySelectorAll("#analyticsTab .panel h2")[2].textContent = "Age Distribution";
   document.querySelector("#dataTab .panel h2").textContent = "Submitted People";
-  const filterLabels = ["Status", "City", "Gender", "Accommodation", "Language", "Registered By", "Registration Date", "Incomplete Data", "Search"];
+  const filterLabels = ["Status", "City", "Gender", "Accommodation", "Language", "Registered By", "Registration Date", "Incomplete Data", "Duplicate Check", "Search"];
   document.querySelectorAll(".filter-group label").forEach(function(label, index){ label.textContent = filterLabels[index] || label.textContent; });
+  Array.from(document.querySelectorAll("#duplicateFilter .check-option")).forEach(function(label){
+    const input = label.querySelector('input[type="checkbox"]');
+    const span = label.querySelector("span");
+    if (!input || !span) return;
+    if (input.value === "name") span.textContent = "Name";
+    if (input.value === "age") span.textContent = "Age";
+    if (input.value === "mobile") span.textContent = "Mobile Number";
+    if (input.value === "city") span.textContent = "City";
+  });
   document.querySelectorAll(".status-btn")[0].textContent = "Active";
   document.querySelectorAll(".status-btn")[1].textContent = "All";
   document.querySelectorAll(".status-btn")[2].textContent = "Inactive";
@@ -1796,6 +1821,9 @@ function populateDropdowns(rows){
   sourceFilter.value = filters.source;
   dateFilter.value = filters.registrationDate;
   incompleteFilter.value = filters.incomplete;
+  Array.from(duplicateFilter.querySelectorAll('input[type="checkbox"]')).forEach(function(input){
+    input.checked = filters.duplicates.indexOf(input.value) !== -1;
+  });
   searchFilter.value = filters.search;
   searchFilter.placeholder = "Search name, city, mobile, booking ID";
 }
@@ -1814,7 +1842,7 @@ function populateSourceFilter(){
 }
 
 function applyCurrentFilters(){
-  displayedRows = rawRows.filter(function(row){
+  const baseRows = rawRows.filter(function(row){
     if (filters.status !== "all" && normalizeStatus(row["Status"]) !== filters.status) return false;
     if (filters.city && String(row["City"] || "") !== filters.city) return false;
     if (filters.gender !== "all" && String(row["Type"] || "") !== filters.gender) return false;
@@ -1838,6 +1866,10 @@ function applyCurrentFilters(){
       if (haystack.indexOf(filters.search) === -1) return false;
     }
     return true;
+  });
+  const duplicateSet = buildDuplicateSet(baseRows, filters.duplicates);
+  displayedRows = baseRows.filter(function(row){
+    return !filters.duplicates.length || duplicateSet.has(buildDuplicateKey(row, filters.duplicates));
   });
   renderAnalytics(displayedRows);
   renderTable(displayedRows);
@@ -2527,4 +2559,3 @@ applyUiLanguage();
 </script>
 </body>
 </html>
-
