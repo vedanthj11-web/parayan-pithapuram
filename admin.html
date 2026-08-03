@@ -212,6 +212,7 @@
           </div>
           <div class="filter-group"><label>City</label><select id="cityFilter"></select></div>
           <div class="filter-group"><label>Gender</label><select id="genderFilter"><option value="all">All</option><option value="Gent">Gents</option><option value="Lady">Ladies</option></select></div>
+          <div class="filter-group"><label>Age</label><select id="ageFilter"></select></div>
           <div class="filter-group"><label>Accommodation</label><select id="accommodationFilter"></select></div>
           <div class="filter-group"><label>Language</label><select id="languageFilter"><option value="all">All</option><option value="en">English</option><option value="mr">Marathi</option></select></div>
           <div class="filter-group"><label>Registered By</label><select id="sourceFilter"></select></div>
@@ -428,7 +429,7 @@ const VOLUNTEERS = [
   "Rupali Joshi",
   "B.D. Wani"
 ];
-const filters = { status: "active", city: "", gender: "all", accommodation: "", formLanguage: "all", source: "all", registrationDate: "", incomplete: "all", duplicates: [], search: "" };
+const filters = { status: "active", city: "", gender: "all", ageRange: "", accommodation: "", formLanguage: "all", source: "all", registrationDate: "", incomplete: "all", duplicates: [], search: "" };
 const UI_TEXTS = {
   original: {
     pageTitle: "Admin Dashboard - Parayan Registrations",
@@ -555,6 +556,7 @@ let pendingAddressMatches = [];
 const adminKeyInput = document.getElementById("adminKey");
 const cityFilter = document.getElementById("cityFilter");
 const genderFilter = document.getElementById("genderFilter");
+const ageFilter = document.getElementById("ageFilter");
 const accommodationFilter = document.getElementById("accommodationFilter");
 const languageFilter = document.getElementById("languageFilter");
 const sourceFilter = document.getElementById("sourceFilter");
@@ -612,6 +614,7 @@ document.querySelectorAll(".status-btn").forEach(function(button){
 });
 cityFilter.addEventListener("change", function(){ filters.city = cityFilter.value; applyCurrentFilters(); });
 genderFilter.addEventListener("change", function(){ filters.gender = genderFilter.value; applyCurrentFilters(); });
+ageFilter.addEventListener("change", function(){ filters.ageRange = ageFilter.value; applyCurrentFilters(); });
 accommodationFilter.addEventListener("change", function(){ filters.accommodation = accommodationFilter.value; applyCurrentFilters(); });
 languageFilter.addEventListener("change", function(){ filters.formLanguage = languageFilter.value; applyCurrentFilters(); });
 sourceFilter.addEventListener("change", function(){ filters.source = sourceFilter.value; applyCurrentFilters(); });
@@ -1531,6 +1534,14 @@ function normalizeMobile(value){
   return String(value || "").replace(/\D/g, "").replace(/^91/, "").slice(-10);
 }
 
+function getAgeRangeKey(value){
+  const age = Number(value);
+  if (Number.isNaN(age) || age < 0 || age > 120) return "";
+  const bucketStart = age <= 10 ? 0 : (Math.floor((age - 1) / 10) * 10) + 1;
+  const bucketEnd = bucketStart === 0 ? 10 : bucketStart + 9;
+  return bucketStart + "-" + bucketEnd;
+}
+
 function getDuplicateComparableValue(row, field){
   if (field === "name") return String(row["Name"] || "").trim().replace(/\s+/g, " ").toLowerCase();
   if (field === "age") return String(row["Age"] || "").trim();
@@ -1882,7 +1893,7 @@ function applyUiLanguage(){
   document.querySelectorAll("#analyticsTab .panel h2")[1].textContent = "City Breakdown";
   document.querySelectorAll("#analyticsTab .panel h2")[2].textContent = "Age Distribution";
   document.querySelector("#dataTab .panel h2").textContent = "Submitted People";
-  const filterLabels = ["Status", "City", "Gender", "Accommodation", "Language", "Registered By", "Registration Date", "Incomplete Data", "Duplicate Check", "Search"];
+  const filterLabels = ["Status", "City", "Gender", "Age", "Accommodation", "Language", "Registered By", "Registration Date", "Incomplete Data", "Duplicate Check", "Search"];
   document.querySelectorAll(".filter-group label").forEach(function(label, index){ label.textContent = filterLabels[index] || label.textContent; });
   document.getElementById("duplicateHelp").textContent = "Open the dropdown and select one or more fields.";
   Array.from(duplicateFilter.querySelectorAll(".multi-select-option")).forEach(function(label){
@@ -1917,11 +1928,13 @@ function applyUiLanguage(){
 
 function populateDropdowns(rows){
   setSelectOptions(cityFilter, "All Cities", uniqueSorted(rows.map(function(row){ return row["City"]; })));
+  setSelectOptions(ageFilter, "All Ages", ["0-10","11-20","21-30","31-40","41-50","51-60","61-70","71-80","81-90","91-100","101-110","111-120"]);
   setSelectOptions(accommodationFilter, "All Accommodation", ["free", "own"], translateAccommodation);
   setSelectOptions(dateFilter, "All Dates", uniqueSorted(rows.map(function(row){ return getRegistrationDate(row["Timestamp"]); }).filter(Boolean)));
   populateSourceFilter();
   cityFilter.value = filters.city;
   genderFilter.value = filters.gender;
+  ageFilter.value = filters.ageRange;
   accommodationFilter.value = filters.accommodation;
   languageFilter.value = filters.formLanguage;
   sourceFilter.value = filters.source;
@@ -1950,6 +1963,7 @@ function applyCurrentFilters(){
     if (filters.status !== "all" && normalizeStatus(row["Status"]) !== filters.status) return false;
     if (filters.city && String(row["City"] || "") !== filters.city) return false;
     if (filters.gender !== "all" && String(row["Type"] || "") !== filters.gender) return false;
+    if (filters.ageRange && getAgeRangeKey(row["Age"]) !== filters.ageRange) return false;
     if (filters.accommodation && String(row["Accommodation"] || "") !== filters.accommodation) return false;
     if (filters.formLanguage !== "all" && String(row["Form Language"] || "en") !== filters.formLanguage) return false;
     if (filters.source !== "all" && normalizeRegisteredBy(row["Registered By"]) !== filters.source) return false;
@@ -1975,7 +1989,7 @@ function applyCurrentFilters(){
   displayedRows = baseRows.filter(function(row){
     return !filters.duplicates.length || duplicateSet.has(buildDuplicateKey(row, filters.duplicates));
   });
-  renderAnalytics(displayedRows);
+  renderAnalytics(baseRows);
   renderTable(displayedRows);
 }
 
