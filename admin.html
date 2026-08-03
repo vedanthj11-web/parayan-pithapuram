@@ -58,13 +58,13 @@
   .bar-track{flex:1;height:18px;background:#f4e5d0;border-radius:999px;overflow:hidden;}
   .bar-fill{height:100%;background:linear-gradient(90deg,var(--saffron),var(--saffron-dark));}
   .bar-count{width:38px;flex-shrink:0;text-align:right;font-size:13px;font-weight:600;}
-  .toolbar{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px;margin-bottom:16px;}
-  @media(min-width:700px){.toolbar{grid-template-columns:repeat(3,minmax(0,1fr));}}
-  @media(min-width:1100px){.toolbar{grid-template-columns:1.1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;}}
+  .toolbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;align-items:start;}
   .filter-group label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px;}
+  .filter-group.wide{grid-column:span 2;}
   .checkbox-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
   .check-option{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:#fffaf3;font-size:13px;}
   .check-option input{width:auto;min-width:auto;margin:0;}
+  .filter-help{margin-top:6px;font-size:12px;color:var(--muted);line-height:1.4;}
   .status-switch{display:flex;gap:8px;flex-wrap:wrap;}
   .status-btn{background:#fff8ee;border:1px solid var(--border);color:var(--maroon);padding:10px 12px;}
   .status-btn.active{background:var(--saffron);border-color:var(--saffron);color:#fff;}
@@ -118,8 +118,19 @@
   .hidden{display:none !important;}
   .capacity-note{font-size:13px;color:var(--muted);}
   .modal-actions.spread{justify-content:space-between;align-items:center;}
+  @media(max-width:900px){.filter-group.wide{grid-column:span 1;}}
   @media(max-width:760px){.edit-grid,.participant-edit-grid,.import-grid,.import-participant-grid{grid-template-columns:1fr;}}
-  @media(max-width:640px){body{padding:14px;}.panel,.card,#lockScreen{padding:16px;}.detail-grid{grid-template-columns:1fr;}.accom-grid{grid-template-columns:1fr;}}
+  @media(max-width:640px){
+    body{padding:14px;}
+    .panel,.card,#lockScreen{padding:16px;}
+    .detail-grid{grid-template-columns:1fr;}
+    .accom-grid{grid-template-columns:1fr;}
+    .top-row{align-items:stretch;}
+    .top-actions{width:100%;}
+    .top-actions .action-btn{flex:1 1 160px;}
+    .checkbox-grid{grid-template-columns:1fr;}
+    table{min-width:1120px;}
+  }
 </style>
 </head>
 <body>
@@ -195,7 +206,7 @@
           <div class="filter-group"><label>Registered By</label><select id="sourceFilter"></select></div>
           <div class="filter-group"><label>Registration Date</label><select id="dateFilter"></select></div>
           <div class="filter-group"><label>Incomplete Data</label><select id="incompleteFilter"><option value="all">All</option><option value="incomplete">Incomplete Only</option><option value="complete">Complete Only</option></select></div>
-          <div class="filter-group">
+          <div class="filter-group wide">
             <label>Duplicate Check</label>
             <div id="duplicateFilter" class="checkbox-grid">
               <label class="check-option"><input type="checkbox" value="name"><span>Name</span></label>
@@ -203,6 +214,7 @@
               <label class="check-option"><input type="checkbox" value="mobile"><span>Mobile Number</span></label>
               <label class="check-option"><input type="checkbox" value="city"><span>City</span></label>
             </div>
+            <div class="filter-help" id="duplicateHelp">Select one or more fields. Only rows with matching values across all selected fields will be shown.</div>
           </div>
           <div class="filter-group"><label>Search</label><input id="searchFilter" type="text" placeholder="Search table" autocomplete="off"></div>
         </div>
@@ -1437,13 +1449,24 @@ function normalizeMobile(value){
   return String(value || "").replace(/\D/g, "").replace(/^91/, "").slice(-10);
 }
 
+function getDuplicateComparableValue(row, field){
+  if (field === "name") return String(row["Name"] || "").trim().replace(/\s+/g, " ").toLowerCase();
+  if (field === "age") return String(row["Age"] || "").trim();
+  if (field === "mobile") return normalizeMobile(row["Mobile Number"]);
+  if (field === "city") return String(row["City"] || "").trim().replace(/\s+/g, " ").toLowerCase();
+  return "";
+}
+
 function buildDuplicateKey(row, mode){
-  const selected = Array.isArray(mode) ? mode : (mode ? [mode] : []);
+  const selected = Array.isArray(mode) ? mode.slice() : (mode ? [mode] : []);
+  if (!selected.length) return "";
   const parts = [];
-  if (selected.indexOf("name") !== -1) parts.push(String(row["Name"] || "").trim().toLowerCase());
-  if (selected.indexOf("age") !== -1) parts.push(String(row["Age"] || "").trim());
-  if (selected.indexOf("mobile") !== -1) parts.push(normalizeMobile(row["Mobile Number"]));
-  if (selected.indexOf("city") !== -1) parts.push(String(row["City"] || "").trim().toLowerCase());
+  for (let index = 0; index < selected.length; index++) {
+    const field = selected[index];
+    const value = getDuplicateComparableValue(row, field);
+    if (!value) return "";
+    parts.push(field + ":" + value);
+  }
   return parts.join("|");
 }
 
@@ -1452,7 +1475,7 @@ function buildDuplicateSet(rows, mode){
   const counts = {};
   rows.forEach(function(row){
     const key = buildDuplicateKey(row, mode);
-    if (!key || /^\|*$/.test(key)) return;
+    if (!key) return;
     counts[key] = (counts[key] || 0) + 1;
   });
   return new Set(Object.keys(counts).filter(function(key){ return counts[key] > 1; }));
@@ -1779,6 +1802,7 @@ function applyUiLanguage(){
   document.querySelector("#dataTab .panel h2").textContent = "Submitted People";
   const filterLabels = ["Status", "City", "Gender", "Accommodation", "Language", "Registered By", "Registration Date", "Incomplete Data", "Duplicate Check", "Search"];
   document.querySelectorAll(".filter-group label").forEach(function(label, index){ label.textContent = filterLabels[index] || label.textContent; });
+  document.getElementById("duplicateHelp").textContent = "Select one or more fields. Rows are shown only when all selected values match.";
   Array.from(document.querySelectorAll("#duplicateFilter .check-option")).forEach(function(label){
     const input = label.querySelector('input[type="checkbox"]');
     const span = label.querySelector("span");
@@ -1880,7 +1904,14 @@ function renderTable(rows){
   const empty = document.getElementById("dataEmpty");
   const summary = document.getElementById("tableSummary");
   body.innerHTML = "";
-  summary.textContent = rows.length + " rows";
+  const duplicateSummary = filters.duplicates.length ? " • duplicate check: " + filters.duplicates.map(function(value){
+    if (value === "name") return "Name";
+    if (value === "age") return "Age";
+    if (value === "mobile") return "Mobile";
+    if (value === "city") return "City";
+    return value;
+  }).join(" + ") : "";
+  summary.textContent = rows.length + " rows" + duplicateSummary;
   if (!rows.length) { empty.style.display = "block"; return; }
   empty.style.display = "none";
   let previousSubmissionNumber = null;
