@@ -1884,11 +1884,7 @@ function getMissingFieldsForRow(row){
   const fields = [];
   if (!String(row["Age"] || "").trim()) fields.push("Age");
   if (!String(row["Type"] || "").trim()) fields.push("Gender");
-  if (!String(row["Area/Locality"] || "").trim()) fields.push("Area/Locality");
   if (!String(row["City"] || "").trim()) fields.push("City");
-  if (!String(row["District"] || "").trim()) fields.push("District");
-  if (!String(row["State"] || "").trim()) fields.push("State");
-  if (!String(row["Postcode"] || "").trim()) fields.push("Postcode");
   if (!String(row["Accommodation"] || "").trim()) fields.push("Accommodation");
   if (!String(row["Registered By"] || "").trim()) fields.push("Registered By");
   return fields;
@@ -2320,11 +2316,7 @@ function getPreviewMissingEntries(draft){
     if (!String(person.age || "").trim()) missing.push({ path: "participants[" + index + "].age", label: "Age" });
     if (!String(person.gender || "").trim()) missing.push({ path: "participants[" + index + "].gender", label: "Gender" });
   });
-  if (!draft.booking.area) missing.push({ path: "booking.area", label: "Area/Locality" });
   if (!draft.booking.city) missing.push({ path: "booking.city", label: "City" });
-  if (!draft.booking.district) missing.push({ path: "booking.district", label: "District" });
-  if (!draft.booking.state) missing.push({ path: "booking.state", label: "State" });
-  if (!draft.booking.postcode) missing.push({ path: "booking.postcode", label: "Postcode" });
   if (!draft.booking.accommodation) missing.push({ path: "booking.accommodation", label: "Accommodation" });
   if (!draft.booking.registeredByMode) missing.push({ path: "booking.registered_by", label: "Registered By" });
   return missing;
