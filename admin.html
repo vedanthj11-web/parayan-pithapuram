@@ -104,6 +104,16 @@
   .import-participant{border:1px solid var(--border);border-radius:12px;padding:14px;background:#fffaf3;margin-bottom:12px;}
   .import-participant h4{margin:0 0 10px;color:var(--maroon);}
   .import-participant-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
+  .voice-actions{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;}
+  .recording-note{font-size:13px;color:var(--red);display:none;}
+  .recording-note.show{display:block;}
+  .address-match-box{display:none;padding:12px;border:1px solid var(--border);border-radius:12px;background:#fffaf3;margin-bottom:14px;}
+  .address-match-box.show{display:block;}
+  .missing-highlight{background:#fff3b0;border-color:#e0b341 !important;}
+  .uncertain-highlight{background:#ffe6bf;border-color:#d9923b !important;}
+  .preview-summary{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:8px 0 14px;}
+  .summary-pill{padding:8px 12px;border-radius:999px;background:#f6ead7;color:var(--maroon);font-size:12px;font-weight:700;}
+  .remove-link{border:none;background:none;padding:0;color:var(--red);font:inherit;font-weight:600;cursor:pointer;}
   .field-hint{font-size:11px;color:var(--red);margin-top:4px;}
   .hidden{display:none !important;}
   .capacity-note{font-size:13px;color:var(--muted);}
@@ -127,12 +137,7 @@
   <div class="top-row">
     <div id="lastUpdated"></div>
     <div class="top-actions">
-      <select id="languageMode">
-        <option value="original">Original</option>
-        <option value="en">Complete English</option>
-        <option value="mr">Complete Marathi</option>
-      </select>
-      <button type="button" class="action-btn secondary" id="addViaTextBtn">Add via Text</button>
+      <button type="button" class="action-btn secondary" id="addViaTextBtn">Add via Text / Voice</button>
       <button type="button" class="action-btn secondary" id="downloadBtn">Download Excel</button>
       <button type="button" class="action-btn" id="refreshBtn">Refresh</button>
     </div>
@@ -189,15 +194,7 @@
           <div class="filter-group"><label>Language</label><select id="languageFilter"><option value="all">All</option><option value="en">English</option><option value="mr">Marathi</option></select></div>
           <div class="filter-group"><label>Registered By</label><select id="sourceFilter"></select></div>
           <div class="filter-group"><label>Registration Date</label><select id="dateFilter"></select></div>
-          <div class="filter-group">
-            <label>Duplicate Data</label>
-            <div id="duplicateFilter" class="checkbox-grid">
-              <label class="check-option"><input type="checkbox" value="name"> <span>Name</span></label>
-              <label class="check-option"><input type="checkbox" value="age"> <span>Age</span></label>
-              <label class="check-option"><input type="checkbox" value="mobile"> <span>Mobile</span></label>
-              <label class="check-option"><input type="checkbox" value="city"> <span>City</span></label>
-            </div>
-          </div>
+          <div class="filter-group"><label>Incomplete Data</label><select id="incompleteFilter"><option value="all">All</option><option value="incomplete">Incomplete Only</option><option value="complete">Complete Only</option></select></div>
           <div class="filter-group"><label>Search</label><input id="searchFilter" type="text" placeholder="Search table" autocomplete="off"></div>
         </div>
 
@@ -214,6 +211,7 @@
                 <th>City</th>
                 <th>Accommodation</th>
                 <th>Registered By</th>
+                <th>Missing Fields</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -295,12 +293,16 @@
 
 <div id="textImportModal" class="modal-backdrop" role="dialog" aria-modal="true">
   <div class="import-modal-card">
-    <h3 class="modal-title">Add Booking via Text</h3>
-    <p class="import-help">Paste one participant per line. All non-empty lines will be saved as one booking.</p>
+    <h3 class="modal-title">Add Booking via Text / Voice</h3>
+    <p class="import-help">Paste WhatsApp text or record one booking. Nothing is saved until you review the preview and confirm it.</p>
     <textarea id="textImportInput" class="import-textarea" placeholder="Shalaka Navathe, female, 9420772721, age 61, Karad, free accommodation, self"></textarea>
+    <div class="voice-actions">
+      <button type="button" class="action-btn secondary" id="recordVoiceBtn">Start Recording</button>
+      <button type="button" class="action-btn" id="parseTextImportBtn">Paste and Analyse</button>
+    </div>
+    <p id="recordingNote" class="recording-note">Recording in progress...</p>
     <p id="textImportError" class="import-error"></p>
     <div class="modal-actions">
-      <button type="button" class="action-btn" id="parseTextImportBtn">Parse Text</button>
       <button type="button" class="action-btn secondary" id="cancelTextImportBtn">Cancel</button>
     </div>
   </div>
@@ -309,18 +311,42 @@
 <div id="textImportPreviewModal" class="modal-backdrop" role="dialog" aria-modal="true">
   <div class="import-modal-card">
     <h3 class="modal-title">Review Imported Booking</h3>
-    <p class="import-help">Edit only the fields that are missing or unclear, then save the booking.</p>
+    <p class="import-help">Edit missing or uncertain values, verify the address if needed, then save the booking.</p>
     <p id="textImportPreviewIssue" class="import-issue"></p>
     <p id="textImportPreviewError" class="import-error"></p>
+    <div id="addressMatchBox" class="address-match-box">
+      <label for="addressMatchSelect">Address matches</label>
+      <select id="addressMatchSelect"></select>
+    </div>
+    <div class="preview-summary">
+      <div class="summary-pill" id="previewMissingCount">0 missing fields</div>
+      <div class="summary-pill" id="previewParticipantCount">0 participants</div>
+    </div>
     <div class="import-grid">
+      <div>
+        <label for="importArea">Area / Locality</label>
+        <input id="importArea" type="text" autocomplete="off">
+      </div>
       <div>
         <label for="importCity">City</label>
         <input id="importCity" type="text" autocomplete="off">
       </div>
       <div>
+        <label for="importDistrict">District</label>
+        <input id="importDistrict" type="text" autocomplete="off">
+      </div>
+      <div>
+        <label for="importState">State</label>
+        <input id="importState" type="text" autocomplete="off">
+      </div>
+      <div>
+        <label for="importPostcode">Postcode</label>
+        <input id="importPostcode" type="text" maxlength="6" autocomplete="off">
+      </div>
+      <div>
         <label for="importAccommodation">Accommodation</label>
         <select id="importAccommodation">
-          <option value="">Select accommodation</option>
+          <option value="">Leave blank</option>
           <option value="free">Free</option>
           <option value="own">Own/Paid</option>
         </select>
@@ -328,7 +354,7 @@
       <div>
         <label for="importRegisteredByMode">Registered By</label>
         <select id="importRegisteredByMode">
-          <option value="">Select source</option>
+          <option value="">Leave blank</option>
           <option value="self">Self</option>
           <option value="volunteer">Volunteer</option>
         </select>
@@ -340,7 +366,7 @@
     </div>
     <div id="textImportParticipants" class="import-preview-list"></div>
     <div class="modal-actions">
-      <button type="button" class="action-btn" id="saveTextImportBtn">Save Booking</button>
+      <button type="button" class="action-btn" id="saveTextImportBtn">Save With Missing Data</button>
       <button type="button" class="action-btn secondary" id="backTextImportBtn">Back</button>
       <button type="button" class="action-btn secondary" id="closeTextImportPreviewBtn">Close</button>
     </div>
@@ -359,7 +385,7 @@ const VOLUNTEERS = [
   "Rupali Joshi",
   "B.D. Wani"
 ];
-const filters = { status: "active", city: "", gender: "all", accommodation: "", formLanguage: "all", source: "all", registrationDate: "", duplicates: [], search: "" };
+const filters = { status: "active", city: "", gender: "all", accommodation: "", formLanguage: "all", source: "all", registrationDate: "", incomplete: "all", search: "" };
 const UI_TEXTS = {
   original: {
     pageTitle: "Admin Dashboard - Parayan Registrations",
@@ -476,8 +502,12 @@ let displayedRows = [];
 let selectedRow = null;
 let editingSubmissionId = "";
 let currentRequestId = 0;
-let displayMode = "original";
+let displayMode = "en";
 let importedBookingDraft = null;
+let mediaRecorder = null;
+let recordedChunks = [];
+let isRecording = false;
+let pendingAddressMatches = [];
 
 const adminKeyInput = document.getElementById("adminKey");
 const cityFilter = document.getElementById("cityFilter");
@@ -486,9 +516,8 @@ const accommodationFilter = document.getElementById("accommodationFilter");
 const languageFilter = document.getElementById("languageFilter");
 const sourceFilter = document.getElementById("sourceFilter");
 const dateFilter = document.getElementById("dateFilter");
-const duplicateFilter = document.getElementById("duplicateFilter");
+const incompleteFilter = document.getElementById("incompleteFilter");
 const searchFilter = document.getElementById("searchFilter");
-const languageMode = document.getElementById("languageMode");
 const importVolunteerName = document.getElementById("importVolunteerName");
 
 document.getElementById("loginBtn").addEventListener("click", tryUnlock);
@@ -502,22 +531,18 @@ document.getElementById("closeModalBtn").addEventListener("click", closeUserModa
 document.getElementById("editBookingBtn").addEventListener("click", openEditFromSelected);
 document.getElementById("saveBookingBtn").addEventListener("click", saveBookingEdit);
 document.getElementById("cancelEditBtn").addEventListener("click", closeEditModal);
+document.getElementById("recordVoiceBtn").addEventListener("click", toggleVoiceRecording);
 document.getElementById("parseTextImportBtn").addEventListener("click", parseTextImport);
 document.getElementById("cancelTextImportBtn").addEventListener("click", closeTextImportModal);
 document.getElementById("saveTextImportBtn").addEventListener("click", saveTextImportBooking);
 document.getElementById("backTextImportBtn").addEventListener("click", backToTextImportModal);
 document.getElementById("closeTextImportPreviewBtn").addEventListener("click", closeTextImportPreviewModal);
 document.getElementById("importRegisteredByMode").addEventListener("change", syncImportVolunteerVisibility);
+document.getElementById("addressMatchSelect").addEventListener("change", handleAddressMatchSelection);
 document.getElementById("userModal").addEventListener("click", function(event){ if (event.target.id === "userModal") closeUserModal(); });
 document.getElementById("editModal").addEventListener("click", function(event){ if (event.target.id === "editModal") closeEditModal(); });
 document.getElementById("textImportModal").addEventListener("click", function(event){ if (event.target.id === "textImportModal") closeTextImportModal(); });
 document.getElementById("textImportPreviewModal").addEventListener("click", function(event){ if (event.target.id === "textImportPreviewModal") closeTextImportPreviewModal(); });
-languageMode.addEventListener("change", function(){
-  displayMode = languageMode.value;
-  applyUiLanguage();
-  populateDropdowns(rawRows);
-  applyCurrentFilters();
-});
 populateVolunteerOptions();
 
 document.querySelectorAll(".tab-btn").forEach(function(button){
@@ -542,13 +567,10 @@ accommodationFilter.addEventListener("change", function(){ filters.accommodation
 languageFilter.addEventListener("change", function(){ filters.formLanguage = languageFilter.value; applyCurrentFilters(); });
 sourceFilter.addEventListener("change", function(){ filters.source = sourceFilter.value; applyCurrentFilters(); });
 dateFilter.addEventListener("change", function(){ filters.registrationDate = dateFilter.value; applyCurrentFilters(); });
-duplicateFilter.addEventListener("change", function(){
-  filters.duplicates = Array.from(duplicateFilter.querySelectorAll('input[type="checkbox"]:checked')).map(function(input){ return input.value; });
-  applyCurrentFilters();
-});
+incompleteFilter.addEventListener("change", function(){ filters.incomplete = incompleteFilter.value; applyCurrentFilters(); });
 searchFilter.addEventListener("input", function(){ filters.search = searchFilter.value.trim().toLowerCase(); applyCurrentFilters(); });
 
-applyUiLanguage();
+// English-only UI labels are applied by the final admin override block below.
 
 function t(){
   return UI_TEXTS[displayMode] || UI_TEXTS.original;
@@ -1684,7 +1706,776 @@ function safeCell(value){
   if (value === null || value === undefined) return "";
   return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
+
+const PHOTON_URL = "https://photon.komoot.io/api/";
+const PHOTON_BBOX = [68.1, 6.5, 97.5, 37.5];
+
+function t(){
+  return UI_TEXTS.en || UI_TEXTS.original;
+}
+
+function displayText(value){
+  return String(value || "");
+}
+
+function translateAccommodation(value){
+  const normalized = String(value || "").trim().toLowerCase();
+  if (!normalized) return "-";
+  if (normalized === "free") return "Free";
+  if (normalized === "own") return "Own/Paid";
+  return value;
+}
+
+function translateStatus(value){
+  return normalizeStatus(value) === "active" ? "Active" : "Inactive";
+}
+
+function translateType(value){
+  const normalized = String(value || "").trim();
+  if (normalized === "Gent") return "Male";
+  if (normalized === "Lady") return "Female";
+  return normalized || "-";
+}
+
+function normalizeRegisteredBy(value){
+  const text = String(value || "").trim();
+  return text.startsWith("Agent - ") ? text.replace(/^Agent - /, "Volunteer - ") : text;
+}
+
+function translateRegisteredBy(value){
+  const normalized = normalizeRegisteredBy(value);
+  return normalized || "-";
+}
+
+function applyUiLanguage(){
+  document.title = "Admin Dashboard - Parayan Registrations";
+  document.querySelector("#dashboard > h1").textContent = "Registration Dashboard";
+  document.querySelector("#dashboard > .sub").textContent = "Shripad Shrivallabh Charitamrut Samohik Parayan · Pithapuram";
+  document.querySelectorAll(".tab-btn")[0].textContent = "Analytics";
+  document.querySelectorAll(".tab-btn")[1].textContent = "All Submissions";
+  document.querySelectorAll(".stat-card .lbl")[0].textContent = "People";
+  document.querySelectorAll(".stat-card .lbl")[1].textContent = "Gents";
+  document.querySelectorAll(".stat-card .lbl")[2].textContent = "Ladies";
+  document.querySelectorAll(".stat-card .lbl")[3].textContent = "Cities";
+  document.querySelector("#analyticsTab .panel h2").textContent = "Accommodation";
+  document.getElementById("accomFreeTitle").textContent = "Devasthanam Free";
+  document.getElementById("accomOwnTitle").textContent = "Own/Paid";
+  document.querySelectorAll("#analyticsTab .panel h2")[1].textContent = "City Breakdown";
+  document.querySelectorAll("#analyticsTab .panel h2")[2].textContent = "Age Distribution";
+  document.querySelector("#dataTab .panel h2").textContent = "Submitted People";
+  const filterLabels = ["Status", "City", "Gender", "Accommodation", "Language", "Registered By", "Registration Date", "Incomplete Data", "Search"];
+  document.querySelectorAll(".filter-group label").forEach(function(label, index){ label.textContent = filterLabels[index] || label.textContent; });
+  document.querySelectorAll(".status-btn")[0].textContent = "Active";
+  document.querySelectorAll(".status-btn")[1].textContent = "All";
+  document.querySelectorAll(".status-btn")[2].textContent = "Inactive";
+  document.querySelector("#genderFilter option[value='all']").textContent = "All";
+  document.querySelector("#genderFilter option[value='Gent']").textContent = "Gents";
+  document.querySelector("#genderFilter option[value='Lady']").textContent = "Ladies";
+  document.querySelectorAll("thead th").forEach(function(th, index){
+    const headers = ["Sr. No.","Submission Number","Name","Mobile Number","Age","Gender","City","Accommodation","Registered By","Missing Fields","Status"];
+    th.textContent = headers[index] || th.textContent;
+  });
+  document.getElementById("dataEmpty").textContent = "No data for the selected filter.";
+  document.getElementById("downloadBtn").textContent = "Download Excel";
+  document.getElementById("refreshBtn").textContent = "Refresh";
+  document.getElementById("addViaTextBtn").textContent = "Add via Text / Voice";
+  document.getElementById("recordVoiceBtn").textContent = isRecording ? "Stop Recording" : "Start Recording";
+  document.getElementById("parseTextImportBtn").textContent = "Paste and Analyse";
+  document.getElementById("saveTextImportBtn").textContent = "Save With Missing Data";
+  document.getElementById("saveBookingBtn").textContent = "Save Booking";
+  document.getElementById("cancelEditBtn").textContent = "Cancel";
+}
+
+function populateDropdowns(rows){
+  setSelectOptions(cityFilter, "All Cities", uniqueSorted(rows.map(function(row){ return row["City"]; })));
+  setSelectOptions(accommodationFilter, "All Accommodation", ["free", "own"], translateAccommodation);
+  setSelectOptions(dateFilter, "All Dates", uniqueSorted(rows.map(function(row){ return getRegistrationDate(row["Timestamp"]); }).filter(Boolean)));
+  populateSourceFilter();
+  cityFilter.value = filters.city;
+  genderFilter.value = filters.gender;
+  accommodationFilter.value = filters.accommodation;
+  languageFilter.value = filters.formLanguage;
+  sourceFilter.value = filters.source;
+  dateFilter.value = filters.registrationDate;
+  incompleteFilter.value = filters.incomplete;
+  searchFilter.value = filters.search;
+  searchFilter.placeholder = "Search name, city, mobile, booking ID";
+}
+
+function populateSourceFilter(){
+  const values = ["all", "", "Self"].concat(VOLUNTEERS.map(function(name){ return "Volunteer - " + name; }));
+  const previous = filters.source;
+  sourceFilter.innerHTML = "";
+  values.forEach(function(value){
+    const option = document.createElement("option");
+    option.value = value === "all" ? "all" : value;
+    option.textContent = value === "all" ? "All" : value === "" ? "Blank" : translateRegisteredBy(value);
+    sourceFilter.appendChild(option);
+  });
+  sourceFilter.value = values.indexOf(previous) !== -1 ? previous : "all";
+}
+
+function applyCurrentFilters(){
+  displayedRows = rawRows.filter(function(row){
+    if (filters.status !== "all" && normalizeStatus(row["Status"]) !== filters.status) return false;
+    if (filters.city && String(row["City"] || "") !== filters.city) return false;
+    if (filters.gender !== "all" && String(row["Type"] || "") !== filters.gender) return false;
+    if (filters.accommodation && String(row["Accommodation"] || "") !== filters.accommodation) return false;
+    if (filters.formLanguage !== "all" && String(row["Form Language"] || "en") !== filters.formLanguage) return false;
+    if (filters.source !== "all" && normalizeRegisteredBy(row["Registered By"]) !== filters.source) return false;
+    if (filters.registrationDate && getRegistrationDate(row["Timestamp"]) !== filters.registrationDate) return false;
+    const missingFields = getMissingFieldsForRow(row);
+    if (filters.incomplete === "incomplete" && !missingFields.length) return false;
+    if (filters.incomplete === "complete" && missingFields.length) return false;
+    if (filters.search) {
+      const haystack = [
+        row["Submission Number"],
+        row["Name"],
+        row["Mobile Number"],
+        row["Age"],
+        row["City"],
+        row["Registered By"],
+        missingFields.join(", ")
+      ].join(" ").toLowerCase();
+      if (haystack.indexOf(filters.search) === -1) return false;
+    }
+    return true;
+  });
+  renderAnalytics(displayedRows);
+  renderTable(displayedRows);
+}
+
+function renderTable(rows){
+  const body = document.getElementById("dataTableBody");
+  const empty = document.getElementById("dataEmpty");
+  const summary = document.getElementById("tableSummary");
+  body.innerHTML = "";
+  summary.textContent = rows.length + " rows";
+  if (!rows.length) { empty.style.display = "block"; return; }
+  empty.style.display = "none";
+  let previousSubmissionNumber = null;
+  let currentBand = "submission-band-a";
+  rows.forEach(function(row, index){
+    if (row["Submission Number"] !== previousSubmissionNumber) {
+      currentBand = currentBand === "submission-band-a" ? "submission-band-b" : "submission-band-a";
+      previousSubmissionNumber = row["Submission Number"];
+    }
+    const missingFields = getMissingFieldsForRow(row);
+    const tr = document.createElement("tr");
+    tr.className = currentBand;
+    tr.innerHTML =
+      "<td>" + safeCell(index + 1) + "</td>" +
+      "<td>" + safeCell(row["Submission Number"]) + "</td>" +
+      "<td>" + safeCell(displayText(row["Name"])) + "</td>" +
+      "<td>" + safeCell(row["Mobile Number"]) + "</td>" +
+      "<td>" + safeCell(row["Age"] || "-") + "</td>" +
+      "<td>" + safeCell(translateType(row["Type"])) + "</td>" +
+      "<td>" + safeCell(displayText(row["City"]) || "-") + "</td>" +
+      "<td>" + safeCell(translateAccommodation(row["Accommodation"])) + "</td>" +
+      "<td>" + safeCell(translateRegisteredBy(row["Registered By"])) + "</td>" +
+      "<td>" + safeCell(missingFields.length ? missingFields.join(", ") + " (" + missingFields.length + ")" : "-") + "</td>" +
+      "<td>" + safeCell(translateStatus(row["Status"])) + "</td>";
+    tr.addEventListener("click", function(){ openUserModal(row); });
+    body.appendChild(tr);
+  });
+}
+
+function getMissingFieldsForRow(row){
+  const fields = [];
+  if (!String(row["Age"] || "").trim()) fields.push("Age");
+  if (!String(row["Type"] || "").trim()) fields.push("Gender");
+  if (!String(row["Area/Locality"] || "").trim()) fields.push("Area/Locality");
+  if (!String(row["City"] || "").trim()) fields.push("City");
+  if (!String(row["District"] || "").trim()) fields.push("District");
+  if (!String(row["State"] || "").trim()) fields.push("State");
+  if (!String(row["Postcode"] || "").trim()) fields.push("Postcode");
+  if (!String(row["Accommodation"] || "").trim()) fields.push("Accommodation");
+  if (!String(row["Registered By"] || "").trim()) fields.push("Registered By");
+  return fields;
+}
+
+function openUserModal(row){
+  selectedRow = row;
+  document.getElementById("modalName").textContent = displayText(row["Name"]) || "Person Details";
+  document.getElementById("modalGender").textContent = translateType(row["Type"]);
+  document.getElementById("modalAge").textContent = row["Age"] || "-";
+  document.getElementById("modalMobile").textContent = row["Mobile Number"] || "-";
+  document.getElementById("modalCity").textContent = displayText(row["City"]) || "-";
+  document.getElementById("modalPostcode").textContent = row["Postcode"] || "-";
+  document.getElementById("modalAccommodation").textContent = translateAccommodation(row["Accommodation"]);
+  document.getElementById("modalRegisteredBy").textContent = translateRegisteredBy(row["Registered By"]);
+  document.getElementById("modalStatus").textContent = translateStatus(row["Status"]);
+  document.getElementById("modalSubmissionNumber").textContent = row["Submission Number"] || "-";
+  document.getElementById("modalPersonId").textContent = row["Person ID"] || "-";
+  document.getElementById("userModal").classList.add("show");
+}
+
+function openEditFromSelected(){
+  if (!selectedRow) return;
+  const submissionId = String(selectedRow["Submission ID"] || "");
+  const bookingRows = getBookingRows(submissionId);
+  if (!bookingRows.length) return;
+  editingSubmissionId = submissionId;
+  const registeredByDraft = getRegisteredByDraftForRows(bookingRows);
+  document.getElementById("editModalTitle").textContent = "Edit Booking #" + bookingRows[0]["Submission Number"];
+  document.getElementById("editBookingNumber").value = bookingRows[0]["Submission Number"] || "";
+  ensureSelectOption(document.getElementById("editAccommodation"), "", "Leave blank");
+  document.getElementById("editAccommodation").value = bookingRows[0]["Accommodation"] || "";
+  document.getElementById("editAccommodation").dataset.registeredByMode = registeredByDraft.mode;
+  document.getElementById("editAccommodation").dataset.volunteerName = registeredByDraft.volunteerName;
+  document.getElementById("editCity").value = bookingRows[0]["City"] || "";
+  document.getElementById("editState").value = bookingRows[0]["State"] || "";
+  document.getElementById("editArea").value = bookingRows[0]["Area/Locality"] || "";
+  document.getElementById("editPostcode").value = bookingRows[0]["Postcode"] || "";
+  document.getElementById("editError").style.display = "none";
+  renderEditParticipants(bookingRows);
+  document.getElementById("editModal").classList.add("show");
+}
+
+function ensureSelectOption(select, value, text){
+  if (!Array.from(select.options).some(function(option){ return option.value === value; })) {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = text;
+    select.insertBefore(option, select.firstChild);
+  }
+}
+
+function getRegisteredByDraftForRows(rows){
+  const registeredBy = normalizeRegisteredBy(rows[0] && rows[0]["Registered By"] || "");
+  if (registeredBy === "Self") return { mode: "self", volunteerName: "" };
+  if (/^Volunteer - /.test(registeredBy)) {
+    return { mode: "volunteer", volunteerName: registeredBy.replace(/^Volunteer - /, "") };
+  }
+  return { mode: "", volunteerName: "" };
+}
+
+function renderEditParticipants(rows){
+  const container = document.getElementById("editParticipants");
+  container.innerHTML = "";
+  rows.forEach(function(row, index){
+    const block = document.createElement("div");
+    block.className = "booking-participant";
+    block.innerHTML =
+      "<h4>" + safeCell("Participant " + (index + 1)) + "</h4>" +
+      '<div class="participant-edit-grid">' +
+      '<input type="text" class="edit-name" value="' + safeCell(row["Name"] || "") + '" autocomplete="off">' +
+      '<input type="number" class="edit-age" value="' + safeCell(row["Age"] || "") + '" min="1" max="120" placeholder="Age" autocomplete="off">' +
+      '<input type="tel" class="edit-mobile" value="' + safeCell(row["Mobile Number"] || "") + '" autocomplete="off">' +
+      '<select class="edit-gender"><option value="">Leave blank</option><option value="male"' + (row["Type"] === "Gent" ? " selected" : "") + '>Male</option><option value="female"' + (row["Type"] === "Lady" ? " selected" : "") + '>Female</option></select>' +
+      "</div>";
+    container.appendChild(block);
+  });
+}
+
+async function saveBookingEdit(){
+  if (!editingSubmissionId) return;
+  const participants = Array.from(document.querySelectorAll("#editParticipants .booking-participant")).map(function(card){
+    return {
+      name: card.querySelector(".edit-name").value.trim(),
+      age: card.querySelector(".edit-age").value.trim(),
+      mobile: card.querySelector(".edit-mobile").value.trim(),
+      gender: card.querySelector(".edit-gender").value
+    };
+  });
+  const accommodationSelect = document.getElementById("editAccommodation");
+  const payload = {
+    action: "updateBooking",
+    adminKey: ADMIN_KEY,
+    submissionId: editingSubmissionId,
+    accommodation: accommodationSelect.value,
+    registeredByMode: accommodationSelect.dataset.registeredByMode || "",
+    volunteerName: accommodationSelect.dataset.volunteerName || "",
+    location: {
+      area: document.getElementById("editArea").value.trim(),
+      city: document.getElementById("editCity").value.trim(),
+      district: document.getElementById("editCity").value.trim(),
+      state: document.getElementById("editState").value.trim(),
+      postcode: document.getElementById("editPostcode").value.trim()
+    },
+    participants: participants
+  };
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json();
+    if (result.status !== "success") throw new Error(result.message || "Could not save booking");
+    closeEditModal();
+    closeUserModal();
+    await loadData();
+  } catch (error) {
+    const errorBox = document.getElementById("editError");
+    errorBox.textContent = error && error.message ? error.message : "Could not save booking";
+    errorBox.style.display = "block";
+  }
+}
+
+async function toggleVoiceRecording(){
+  if (isRecording && mediaRecorder) {
+    mediaRecorder.stop();
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    recordedChunks = [];
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.addEventListener("dataavailable", function(event){
+      if (event.data && event.data.size) recordedChunks.push(event.data);
+    });
+    mediaRecorder.addEventListener("stop", async function(){
+      isRecording = false;
+      updateRecordingUi();
+      stream.getTracks().forEach(function(track){ track.stop(); });
+      try {
+        const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType || "audio/webm" });
+        const base64Audio = await blobToBase64(blob);
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "transcribeAdminAudio",
+            adminKey: ADMIN_KEY,
+            mimeType: blob.type || "audio/webm",
+            audioBase64: base64Audio
+          })
+        });
+        const payload = await response.json();
+        if (payload.status !== "success") throw new Error(payload.message || "Audio transcription failed.");
+        const transcript = String(payload.data && payload.data.transcript || "").trim();
+        if (transcript) document.getElementById("textImportInput").value = transcript;
+        await parseTextImport();
+      } catch (error) {
+        const errorBox = document.getElementById("textImportError");
+        errorBox.textContent = error && error.message ? error.message : "Audio transcription failed.";
+        errorBox.style.display = "block";
+      }
+    });
+    mediaRecorder.start();
+    isRecording = true;
+    updateRecordingUi();
+  } catch (error) {
+    const errorBox = document.getElementById("textImportError");
+    errorBox.textContent = "Microphone permission was denied or recording is unavailable.";
+    errorBox.style.display = "block";
+  }
+}
+
+function updateRecordingUi(){
+  document.getElementById("recordVoiceBtn").textContent = isRecording ? "Stop Recording" : "Start Recording";
+  document.getElementById("recordingNote").classList.toggle("show", isRecording);
+}
+
+function blobToBase64(blob){
+  return new Promise(function(resolve, reject){
+    const reader = new FileReader();
+    reader.onloadend = function(){
+      const result = String(reader.result || "");
+      resolve(result.split(",").pop() || "");
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function parseTextImport(){
+  resetTextImportErrors();
+  const text = document.getElementById("textImportInput").value.trim();
+  if (!text) {
+    document.getElementById("textImportError").textContent = "Paste or record some booking text first.";
+    document.getElementById("textImportError").style.display = "block";
+    return;
+  }
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "parseAdminTextWithAI", adminKey: ADMIN_KEY, text: text })
+    });
+    const payload = await response.json();
+    if (payload.status !== "success") throw new Error(payload.message || "AI parsing failed.");
+    importedBookingDraft = mapAiParseToDraft(payload.data, text, "");
+  } catch (error) {
+    importedBookingDraft = mapAiParseToDraft(null, text, error && error.message ? error.message : "AI parsing failed.");
+  }
+  await verifyDraftAddress(importedBookingDraft);
+  renderTextImportPreview(importedBookingDraft);
+  closeTextImportModal();
+  document.getElementById("textImportPreviewModal").classList.add("show");
+}
+
+function mapAiParseToDraft(data, rawText, parseError){
+  const source = data || {};
+  const booking = source.booking || {};
+  const participants = Array.isArray(source.participants) && source.participants.length ? source.participants : [{ name: "", mobile: "", age: "", gender: "" }];
+  return {
+    rawText: rawText,
+    parseError: parseError || "",
+    missingFields: Array.isArray(source.missing_fields) ? source.missing_fields.slice() : [],
+    uncertainFields: Array.isArray(source.uncertain_fields) ? source.uncertain_fields.slice() : [],
+    booking: {
+      area: String(booking.area || "").trim(),
+      city: String(booking.city || "").trim(),
+      district: String(booking.district || "").trim(),
+      state: String(booking.state || "").trim(),
+      postcode: String(booking.postcode || "").trim(),
+      accommodation: String(booking.accommodation || "").trim(),
+      registeredByMode: String(booking.registration_type || "").trim(),
+      volunteerName: String(booking.volunteer_name || "").trim()
+    },
+    participants: participants.map(function(person){
+      return {
+        name: String(person.name || "").trim(),
+        mobile: normalizeImportedMobile(person.mobile || ""),
+        age: String(person.age || "").trim(),
+        gender: String(person.gender || "").trim()
+      };
+    })
+  };
+}
+
+async function verifyDraftAddress(draft){
+  pendingAddressMatches = [];
+  const query = [draft.booking.area, draft.booking.city, draft.booking.district, draft.booking.state, draft.booking.postcode].filter(Boolean).join(", ");
+  if (!query) {
+    renderAddressMatchOptions([]);
+    return;
+  }
+  try {
+    const params = new URLSearchParams({
+      q: query,
+      limit: "5",
+      bbox: PHOTON_BBOX.join(","),
+      osm_tag: "place:city,place:town,place:village"
+    });
+    const response = await fetch(PHOTON_URL + "?" + params.toString());
+    const payload = await response.json();
+    pendingAddressMatches = extractPhotonMatches(payload.features || []);
+    if (pendingAddressMatches.length === 1) {
+      applyAddressMatchToDraft(pendingAddressMatches[0]);
+      renderAddressMatchOptions([]);
+      return;
+    }
+    renderAddressMatchOptions(pendingAddressMatches);
+  } catch (error) {
+    renderAddressMatchOptions([]);
+  }
+}
+
+function extractPhotonMatches(features){
+  const seen = {};
+  return (features || []).map(function(feature){
+    const props = feature && feature.properties ? feature.properties : {};
+    const city = firstNonEmpty([props.city, props.town, props.village, props.name]);
+    const state = firstNonEmpty([props.state]);
+    if (!city || !state) return null;
+    const district = firstNonEmpty([props.district, props.county, props.state_district, city]);
+    const postcode = String(props.postcode || "").trim();
+    const label = city + ", " + state + (postcode ? " " + postcode : "");
+    const key = [city, district, state, postcode].join("|").toLowerCase();
+    if (seen[key]) return null;
+    seen[key] = true;
+    return {
+      area: firstNonEmpty([props.suburb, props.hamlet, props.locality, props.name, city]),
+      city: city,
+      district: district,
+      state: state,
+      postcode: postcode,
+      label: label
+    };
+  }).filter(Boolean);
+}
+
+function firstNonEmpty(values){
+  for (let i = 0; i < values.length; i++) {
+    const value = String(values[i] || "").trim();
+    if (value) return value;
+  }
+  return "";
+}
+
+function renderAddressMatchOptions(matches){
+  const wrap = document.getElementById("addressMatchBox");
+  const select = document.getElementById("addressMatchSelect");
+  select.innerHTML = "";
+  if (!matches.length) {
+    wrap.classList.remove("show");
+    return;
+  }
+  wrap.classList.add("show");
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Select a verified address";
+  select.appendChild(placeholder);
+  matches.forEach(function(match, index){
+    const option = document.createElement("option");
+    option.value = String(index);
+    option.textContent = match.label;
+    select.appendChild(option);
+  });
+}
+
+function handleAddressMatchSelection(){
+  const index = document.getElementById("addressMatchSelect").value;
+  if (index === "") return;
+  const match = pendingAddressMatches[Number(index)];
+  if (!match) return;
+  applyAddressMatchToDraft(match);
+  renderTextImportPreview(importedBookingDraft);
+}
+
+function applyAddressMatchToDraft(match){
+  if (!importedBookingDraft || !match) return;
+  importedBookingDraft.booking.area = match.area || importedBookingDraft.booking.area;
+  importedBookingDraft.booking.city = match.city || importedBookingDraft.booking.city;
+  importedBookingDraft.booking.district = match.district || importedBookingDraft.booking.district;
+  importedBookingDraft.booking.state = match.state || importedBookingDraft.booking.state;
+  importedBookingDraft.booking.postcode = match.postcode || importedBookingDraft.booking.postcode;
+}
+
+function renderTextImportPreview(draft){
+  document.getElementById("importArea").value = draft.booking.area || "";
+  document.getElementById("importCity").value = draft.booking.city || "";
+  document.getElementById("importDistrict").value = draft.booking.district || "";
+  document.getElementById("importState").value = draft.booking.state || "";
+  document.getElementById("importPostcode").value = draft.booking.postcode || "";
+  document.getElementById("importAccommodation").value = draft.booking.accommodation || "";
+  document.getElementById("importRegisteredByMode").value = draft.booking.registeredByMode || "";
+  importVolunteerName.value = draft.booking.volunteerName && VOLUNTEERS.indexOf(draft.booking.volunteerName) !== -1 ? draft.booking.volunteerName : VOLUNTEERS[0];
+  syncImportVolunteerVisibility();
+  document.getElementById("textImportPreviewIssue").textContent = draft.parseError || buildPreviewIssueMessage(draft);
+  document.getElementById("previewParticipantCount").textContent = draft.participants.length + " participant" + (draft.participants.length === 1 ? "" : "s");
+  renderTextImportParticipants(draft.participants);
+  refreshPreviewHighlights();
+  resetTextImportErrors();
+}
+
+function buildPreviewIssueMessage(draft){
+  if (draft.uncertainFields.length) return "Some fields are uncertain. Please review the highlighted values before saving.";
+  return "Review the extracted booking, then save when ready.";
+}
+
+function renderTextImportParticipants(participants){
+  const container = document.getElementById("textImportParticipants");
+  container.innerHTML = "";
+  participants.forEach(function(person, index){
+    const block = document.createElement("div");
+    block.className = "import-participant";
+    block.innerHTML =
+      "<div style=\"display:flex;justify-content:space-between;gap:10px;align-items:center;\"><h4>" + safeCell("Participant " + (index + 1)) + "</h4><button type=\"button\" class=\"remove-link\" data-index=\"" + index + "\">Remove participant</button></div>" +
+      '<div class="import-participant-grid">' +
+      '<div><input type="text" class="import-name" value="' + safeCell(person.name || "") + '" placeholder="Name" autocomplete="off"><div class="field-hint"></div></div>' +
+      '<div><select class="import-gender"><option value="">Leave blank</option><option value="male"' + (person.gender === "male" ? " selected" : "") + '>Male</option><option value="female"' + (person.gender === "female" ? " selected" : "") + '>Female</option></select><div class="field-hint"></div></div>' +
+      '<div><input type="tel" class="import-mobile" value="' + safeCell(person.mobile || "") + '" placeholder="Mobile" autocomplete="off"><div class="field-hint"></div></div>' +
+      '<div><input type="number" class="import-age" value="' + safeCell(person.age || "") + '" min="1" max="120" placeholder="Age" autocomplete="off"><div class="field-hint"></div></div>' +
+      "</div>";
+    container.appendChild(block);
+  });
+  container.querySelectorAll(".remove-link").forEach(function(button){
+    button.addEventListener("click", function(){
+      const index = Number(button.dataset.index);
+      importedBookingDraft.participants.splice(index, 1);
+      if (!importedBookingDraft.participants.length) {
+        importedBookingDraft.participants.push({ name: "", mobile: "", age: "", gender: "" });
+      }
+      renderTextImportPreview(importedBookingDraft);
+    });
+  });
+}
+
+function collectTextImportDraft(){
+  const participantCards = Array.from(document.querySelectorAll("#textImportParticipants .import-participant"));
+  const participants = participantCards.map(function(card){
+    return {
+      name: card.querySelector(".import-name").value.trim(),
+      gender: card.querySelector(".import-gender").value,
+      mobile: normalizeImportedMobile(card.querySelector(".import-mobile").value),
+      age: String(card.querySelector(".import-age").value || "").trim()
+    };
+  });
+  return {
+    rawText: importedBookingDraft ? importedBookingDraft.rawText : "",
+    parseError: importedBookingDraft ? importedBookingDraft.parseError : "",
+    missingFields: importedBookingDraft ? importedBookingDraft.missingFields.slice() : [],
+    uncertainFields: importedBookingDraft ? importedBookingDraft.uncertainFields.slice() : [],
+    booking: {
+      area: document.getElementById("importArea").value.trim(),
+      city: document.getElementById("importCity").value.trim(),
+      district: document.getElementById("importDistrict").value.trim(),
+      state: document.getElementById("importState").value.trim(),
+      postcode: document.getElementById("importPostcode").value.trim(),
+      accommodation: document.getElementById("importAccommodation").value,
+      registeredByMode: document.getElementById("importRegisteredByMode").value,
+      volunteerName: importVolunteerName.value
+    },
+    participants: participants
+  };
+}
+
+function getPreviewMissingEntries(draft){
+  const missing = [];
+  draft.participants.forEach(function(person, index){
+    if (!String(person.age || "").trim()) missing.push({ path: "participants[" + index + "].age", label: "Age" });
+    if (!String(person.gender || "").trim()) missing.push({ path: "participants[" + index + "].gender", label: "Gender" });
+  });
+  if (!draft.booking.area) missing.push({ path: "booking.area", label: "Area/Locality" });
+  if (!draft.booking.city) missing.push({ path: "booking.city", label: "City" });
+  if (!draft.booking.district) missing.push({ path: "booking.district", label: "District" });
+  if (!draft.booking.state) missing.push({ path: "booking.state", label: "State" });
+  if (!draft.booking.postcode) missing.push({ path: "booking.postcode", label: "Postcode" });
+  if (!draft.booking.accommodation) missing.push({ path: "booking.accommodation", label: "Accommodation" });
+  if (!draft.booking.registeredByMode) missing.push({ path: "booking.registered_by", label: "Registered By" });
+  return missing;
+}
+
+function refreshPreviewHighlights(){
+  const draft = collectTextImportDraft();
+  importedBookingDraft = draft;
+  const missingEntries = getPreviewMissingEntries(draft);
+  const uncertain = new Set((draft.uncertainFields || []).map(function(value){ return String(value || "").trim(); }));
+  document.getElementById("previewMissingCount").textContent = missingEntries.length + " missing fields";
+  setFieldHighlight(document.getElementById("importArea"), hasPath(missingEntries, "booking.area"), uncertain.has("booking.area"));
+  setFieldHighlight(document.getElementById("importCity"), hasPath(missingEntries, "booking.city"), uncertain.has("booking.city"));
+  setFieldHighlight(document.getElementById("importDistrict"), hasPath(missingEntries, "booking.district"), uncertain.has("booking.district"));
+  setFieldHighlight(document.getElementById("importState"), hasPath(missingEntries, "booking.state"), uncertain.has("booking.state"));
+  setFieldHighlight(document.getElementById("importPostcode"), hasPath(missingEntries, "booking.postcode"), uncertain.has("booking.postcode"));
+  setFieldHighlight(document.getElementById("importAccommodation"), hasPath(missingEntries, "booking.accommodation"), uncertain.has("booking.accommodation"));
+  setFieldHighlight(document.getElementById("importRegisteredByMode"), hasPath(missingEntries, "booking.registered_by"), uncertain.has("booking.registration_type"));
+  Array.from(document.querySelectorAll("#textImportParticipants .import-participant")).forEach(function(card, index){
+    const fields = {
+      name: card.querySelector(".import-name"),
+      gender: card.querySelector(".import-gender"),
+      mobile: card.querySelector(".import-mobile"),
+      age: card.querySelector(".import-age")
+    };
+    setFieldHighlight(fields.age, hasPath(missingEntries, "participants[" + index + "].age"), uncertain.has("participants[" + index + "].age"));
+    setFieldHighlight(fields.gender, hasPath(missingEntries, "participants[" + index + "].gender"), uncertain.has("participants[" + index + "].gender"));
+    setFieldHighlight(fields.name, false, uncertain.has("participants[" + index + "].name"));
+    setFieldHighlight(fields.mobile, false, uncertain.has("participants[" + index + "].mobile"));
+  });
+}
+
+function hasPath(entries, path){
+  return entries.some(function(entry){ return entry.path === path; });
+}
+
+function setFieldHighlight(element, isMissing, isUncertain){
+  if (!element) return;
+  element.classList.toggle("missing-highlight", Boolean(isMissing));
+  element.classList.toggle("uncertain-highlight", Boolean(!isMissing && isUncertain));
+}
+
+function validateTextImportDraft(draft){
+  const issues = [];
+  const cards = Array.from(document.querySelectorAll("#textImportParticipants .import-participant"));
+  cards.forEach(function(card){
+    card.querySelectorAll(".field-hint").forEach(function(node){ node.textContent = ""; });
+  });
+  if (!draft.participants.length) issues.push("At least one participant is required.");
+  draft.participants.forEach(function(person, index){
+    const card = cards[index];
+    if (!person.name) {
+      if (card) card.querySelectorAll(".field-hint")[0].textContent = "Name is required.";
+      issues.push("Participant " + (index + 1) + ": name is required.");
+    }
+    if (!/^\d{10}$/.test(person.mobile)) {
+      if (card) card.querySelectorAll(".field-hint")[2].textContent = "Enter a 10-digit mobile number.";
+      issues.push("Participant " + (index + 1) + ": mobile must be 10 digits.");
+    }
+    if (person.age && !/^(?:1[01]\d|120|[1-9]\d?)$/.test(person.age)) {
+      if (card) card.querySelectorAll(".field-hint")[3].textContent = "Enter age from 1 to 120.";
+      issues.push("Participant " + (index + 1) + ": age must be 1 to 120.");
+    }
+  });
+  if (draft.booking.registeredByMode === "volunteer" && !draft.booking.volunteerName) {
+    issues.push("Select an approved volunteer.");
+  }
+  return issues;
+}
+
+async function saveTextImportBooking(){
+  resetTextImportErrors();
+  const draft = collectTextImportDraft();
+  const issues = validateTextImportDraft(draft);
+  refreshPreviewHighlights();
+  if (issues.length) {
+    const errorBox = document.getElementById("textImportPreviewError");
+    errorBox.textContent = issues[0];
+    errorBox.style.display = "block";
+    return;
+  }
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        action: "saveAdminTextBooking",
+        adminKey: ADMIN_KEY,
+        accommodation: draft.booking.accommodation,
+        registeredByMode: draft.booking.registeredByMode,
+        volunteerName: draft.booking.registeredByMode === "volunteer" ? draft.booking.volunteerName : "",
+        location: {
+          area: draft.booking.area,
+          city: draft.booking.city,
+          district: draft.booking.district,
+          state: draft.booking.state,
+          postcode: draft.booking.postcode
+        },
+        participants: draft.participants
+      })
+    });
+    const result = await response.json();
+    if (result.status !== "success") throw new Error(result.message || "Could not save booking");
+    document.getElementById("textImportInput").value = "";
+    closeTextImportPreviewModal();
+    await loadData();
+  } catch (error) {
+    const errorBox = document.getElementById("textImportPreviewError");
+    errorBox.textContent = error && error.message ? error.message : "Could not save booking";
+    errorBox.style.display = "block";
+  }
+}
+
+function resetTextImportErrors(){
+  document.getElementById("textImportError").style.display = "none";
+  document.getElementById("textImportError").textContent = "";
+  document.getElementById("textImportPreviewError").style.display = "none";
+  document.getElementById("textImportPreviewError").textContent = "";
+}
+
+function closeTextImportPreviewModal(){
+  importedBookingDraft = null;
+  pendingAddressMatches = [];
+  document.getElementById("textImportPreviewModal").classList.remove("show");
+}
+
+function downloadExcel(){
+  if (!displayedRows.length) { alert("No data available for export."); return; }
+  if (typeof XLSX === "undefined") { alert("Excel export library failed to load. Please refresh and try again."); return; }
+  const data = displayedRows.map(function(row, index){
+    return {
+      "Sr. No.": index + 1,
+      "Submission Number": row["Submission Number"],
+      "Name": row["Name"],
+      "Mobile Number": row["Mobile Number"],
+      "Age": row["Age"],
+      "Gender": translateType(row["Type"]),
+      "City": row["City"],
+      "Accommodation": translateAccommodation(row["Accommodation"]),
+      "Registered By": translateRegisteredBy(row["Registered By"]),
+      "Missing Fields": getMissingFieldsForRow(row).join(", "),
+      "Status": translateStatus(row["Status"])
+    };
+  });
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Registrations");
+  XLSX.writeFile(workbook, "parayan-registrations-" + filters.status + "-" + new Date().toISOString().slice(0, 10) + ".xlsx");
+}
+
+applyUiLanguage();
 </script>
 </body>
 </html>
-
