@@ -68,8 +68,7 @@
   .multi-select-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .multi-select-menu{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:30;display:none;padding:10px;border:1px solid var(--border);border-radius:12px;background:#fff;box-shadow:0 16px 36px rgba(0,0,0,.16);}
   .multi-select-menu.show{display:block;}
-  .multi-select-actions{display:flex;justify-content:space-between;gap:8px;margin-bottom:8px;}
-  .mini-btn{padding:7px 10px;border-radius:8px;background:#f4e7d5;color:var(--maroon);font-size:12px;font-weight:600;}
+  .multi-select-actions{margin-bottom:8px;}
   .multi-select-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
   .multi-select-option{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:#fffaf3;font-size:13px;cursor:pointer;}
   .multi-select-option input{width:16px;min-width:16px;height:16px;margin:0;appearance:none;-webkit-appearance:none;border:1.8px solid var(--muted);border-radius:50%;background:#fff;position:relative;flex-shrink:0;}
@@ -219,21 +218,23 @@
           <div class="filter-group"><label>Registration Date</label><select id="dateFilter"></select></div>
           <div class="filter-group"><label>Incomplete Data</label><select id="incompleteFilter"><option value="all">All</option><option value="incomplete">Incomplete Only</option><option value="complete">Complete Only</option></select></div>
           <div class="filter-group wide">
-            <label>Duplicate Check</label>
+            <label>Check duplicate by</label>
             <div id="duplicateFilter" class="multi-select-wrap">
               <button type="button" id="duplicateFilterButton" class="multi-select-trigger" aria-expanded="false">
                 <span id="duplicateFilterLabel" class="multi-select-label">Select Fields</span>
               </button>
               <div id="duplicateFilterMenu" class="multi-select-menu">
                 <div class="multi-select-actions">
-                  <button type="button" id="duplicateSelectAllBtn" class="mini-btn">Select All</button>
-                  <button type="button" id="duplicateClearBtn" class="mini-btn">Clear</button>
+                  <label class="multi-select-option"><input type="checkbox" value="select_all"><span>Select All</span></label>
                 </div>
                 <div class="multi-select-options">
-                  <label class="multi-select-option"><input type="checkbox" value="name"><span>Name</span></label>
+                  <label class="multi-select-option"><input type="checkbox" value="name"><span>Participant Name</span></label>
                   <label class="multi-select-option"><input type="checkbox" value="age"><span>Age</span></label>
                   <label class="multi-select-option"><input type="checkbox" value="mobile"><span>Mobile Number</span></label>
+                  <label class="multi-select-option"><input type="checkbox" value="gender"><span>Gender</span></label>
                   <label class="multi-select-option"><input type="checkbox" value="city"><span>City</span></label>
+                  <label class="multi-select-option"><input type="checkbox" value="accommodation"><span>Accommodation</span></label>
+                  <label class="multi-select-option"><input type="checkbox" value="registered_by"><span>Registered By</span></label>
                 </div>
               </div>
             </div>
@@ -566,8 +567,6 @@ const duplicateFilter = document.getElementById("duplicateFilter");
 const duplicateFilterButton = document.getElementById("duplicateFilterButton");
 const duplicateFilterLabel = document.getElementById("duplicateFilterLabel");
 const duplicateFilterMenu = document.getElementById("duplicateFilterMenu");
-const duplicateSelectAllBtn = document.getElementById("duplicateSelectAllBtn");
-const duplicateClearBtn = document.getElementById("duplicateClearBtn");
 const searchFilter = document.getElementById("searchFilter");
 const importVolunteerName = document.getElementById("importVolunteerName");
 
@@ -626,21 +625,14 @@ duplicateFilterButton.addEventListener("click", function(event){
   duplicateFilterButton.classList.toggle("open", isOpen);
   duplicateFilterButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
 });
-duplicateSelectAllBtn.addEventListener("click", function(event){
-  event.preventDefault();
-  filters.duplicates = ["name", "age", "mobile", "city"];
-  syncDuplicateFilterUi();
-  applyCurrentFilters();
-});
-duplicateClearBtn.addEventListener("click", function(event){
-  event.preventDefault();
-  filters.duplicates = [];
-  syncDuplicateFilterUi();
-  applyCurrentFilters();
-});
 Array.from(duplicateFilter.querySelectorAll('input[type="checkbox"]')).forEach(function(input){
   input.addEventListener("change", function(){
-    filters.duplicates = Array.from(duplicateFilter.querySelectorAll('input[type="checkbox"]:checked')).map(function(node){ return node.value; });
+    const selectedValues = Array.from(duplicateFilter.querySelectorAll('input[type="checkbox"]:checked')).map(function(node){ return node.value; });
+    if (input.value === "select_all") {
+      filters.duplicates = input.checked ? ["name", "age", "mobile", "gender", "city", "accommodation", "registered_by"] : [];
+    } else {
+      filters.duplicates = selectedValues.filter(function(value){ return value !== "select_all"; });
+    }
     syncDuplicateFilterUi();
     applyCurrentFilters();
   });
@@ -662,15 +654,24 @@ function closeDuplicateFilterMenu(){
 
 function syncDuplicateFilterUi(){
   const labels = filters.duplicates.map(function(value){
-    if (value === "name") return "Name";
+    if (value === "name") return "Participant Name";
     if (value === "age") return "Age";
     if (value === "mobile") return "Mobile Number";
+    if (value === "gender") return "Gender";
     if (value === "city") return "City";
+    if (value === "accommodation") return "Accommodation";
+    if (value === "registered_by") return "Registered By";
     return value;
   });
   duplicateFilterLabel.textContent = labels.length ? labels.join(", ") : "Select Fields";
   Array.from(duplicateFilter.querySelectorAll('input[type="checkbox"]')).forEach(function(input){
-    input.checked = filters.duplicates.indexOf(input.value) !== -1;
+    if (input.value === "select_all") {
+      input.checked = ["name", "age", "mobile", "gender", "city", "accommodation", "registered_by"].every(function(value){
+        return filters.duplicates.indexOf(value) !== -1;
+      });
+    } else {
+      input.checked = filters.duplicates.indexOf(input.value) !== -1;
+    }
   });
 }
 
@@ -1546,7 +1547,10 @@ function getDuplicateComparableValue(row, field){
   if (field === "name") return String(row["Name"] || "").trim().replace(/\s+/g, " ").toLowerCase();
   if (field === "age") return String(row["Age"] || "").trim();
   if (field === "mobile") return normalizeMobile(row["Mobile Number"]);
+  if (field === "gender") return String(row["Type"] || "").trim().toLowerCase();
   if (field === "city") return String(row["City"] || "").trim().replace(/\s+/g, " ").toLowerCase();
+  if (field === "accommodation") return String(row["Accommodation"] || "").trim().toLowerCase();
+  if (field === "registered_by") return normalizeRegisteredBy(row["Registered By"]).trim().toLowerCase();
   return "";
 }
 
@@ -1893,17 +1897,21 @@ function applyUiLanguage(){
   document.querySelectorAll("#analyticsTab .panel h2")[1].textContent = "City Breakdown";
   document.querySelectorAll("#analyticsTab .panel h2")[2].textContent = "Age Distribution";
   document.querySelector("#dataTab .panel h2").textContent = "Submitted People";
-  const filterLabels = ["Status", "City", "Gender", "Age", "Accommodation", "Language", "Registered By", "Registration Date", "Incomplete Data", "Duplicate Check", "Search"];
+  const filterLabels = ["Status", "City", "Gender", "Age", "Accommodation", "Language", "Registered By", "Registration Date", "Incomplete Data", "Check duplicate by", "Search"];
   document.querySelectorAll(".filter-group label").forEach(function(label, index){ label.textContent = filterLabels[index] || label.textContent; });
   document.getElementById("duplicateHelp").textContent = "Open the dropdown and select one or more fields.";
   Array.from(duplicateFilter.querySelectorAll(".multi-select-option")).forEach(function(label){
     const input = label.querySelector('input[type="checkbox"]');
     const span = label.querySelector("span");
     if (!input || !span) return;
-    if (input.value === "name") span.textContent = "Name";
+    if (input.value === "select_all") span.textContent = "Select All";
+    if (input.value === "name") span.textContent = "Participant Name";
     if (input.value === "age") span.textContent = "Age";
     if (input.value === "mobile") span.textContent = "Mobile Number";
+    if (input.value === "gender") span.textContent = "Gender";
     if (input.value === "city") span.textContent = "City";
+    if (input.value === "accommodation") span.textContent = "Accommodation";
+    if (input.value === "registered_by") span.textContent = "Registered By";
   });
   document.querySelectorAll(".status-btn")[0].textContent = "Active";
   document.querySelectorAll(".status-btn")[1].textContent = "All";
