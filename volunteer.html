@@ -212,6 +212,7 @@
                 <th id="bookingsHeadGender"></th>
                 <th id="bookingsHeadCity"></th>
                 <th id="bookingsHeadAccommodation"></th>
+                <th id="bookingsHeadMissing"></th>
                 <th id="bookingsHeadStatus"></th>
               </tr>
             </thead>
@@ -537,6 +538,7 @@ function applyLanguage(){
   document.getElementById("bookingsHeadGender").textContent = currentLanguage === "mr" ? "लिंग" : "Gender";
   document.getElementById("bookingsHeadCity").textContent = currentLanguage === "mr" ? "शहर" : "City";
   document.getElementById("bookingsHeadAccommodation").textContent = currentLanguage === "mr" ? "निवास" : "Accommodation";
+  document.getElementById("bookingsHeadMissing").textContent = currentLanguage === "mr" ? "उणी माहिती" : "Missing Fields";
   document.getElementById("bookingsHeadStatus").textContent = currentLanguage === "mr" ? "स्थिती" : "Status";
   document.getElementById("bookingsSearch").placeholder = currentLanguage === "mr" ? "नाव, शहर, मोबाईल, बुकिंग शोधा" : "Search name, city, mobile, booking ID";
   document.getElementById("downloadBookingsBtn").textContent = currentLanguage === "mr" ? "डाउनलोड डेटा" : "Download Data";
@@ -957,6 +959,20 @@ async function loadVolunteerBookings(){
   renderVolunteerBookings();
 }
 
+function getVolunteerMissingFields(row){
+  const missing = [];
+  if (!String(row["Age"] || "").trim()) missing.push(currentLanguage === "mr" ? "वय" : "Age");
+  if (!String(row["Type"] || "").trim()) missing.push(currentLanguage === "mr" ? "लिंग" : "Gender");
+  if (!String(row["City"] || "").trim()) missing.push(currentLanguage === "mr" ? "शहर" : "City");
+  if (!String(row["Accommodation"] || "").trim()) missing.push(currentLanguage === "mr" ? "निवास" : "Accommodation");
+  return missing;
+}
+
+function getVolunteerMissingFieldsSummary(row){
+  const missing = getVolunteerMissingFields(row);
+  return missing.length ? missing.join(", ") : "";
+}
+
 function renderVolunteerBookings(){
   const body = document.getElementById("bookingsTableBody");
   const empty = document.getElementById("bookingsEmpty");
@@ -971,6 +987,7 @@ function renderVolunteerBookings(){
       row["Age"],
       row["City"],
       row["Accommodation"],
+      getVolunteerMissingFieldsSummary(row),
       row["Status"]
     ].join(" ").toLowerCase();
     return haystack.indexOf(query) !== -1;
@@ -984,6 +1001,8 @@ function renderVolunteerBookings(){
   filteredRows.slice().sort(function(a, b){
     return Number(b["Submission Number"] || 0) - Number(a["Submission Number"] || 0);
   }).forEach(function(row){
+    const missingFields = getVolunteerMissingFields(row);
+    const missingSummary = missingFields.length ? missingFields.join(", ") + " (" + missingFields.length + ")" : "-";
     const tr = document.createElement("tr");
     tr.innerHTML =
       "<td>" + escapeHtml(row["Submission Number"]) + "</td>" +
@@ -993,6 +1012,7 @@ function renderVolunteerBookings(){
       "<td>" + escapeHtml(translateGenderValue(row["Type"])) + "</td>" +
       "<td>" + escapeHtml(row["City"]) + "</td>" +
       "<td>" + escapeHtml(translateAccommodationValue(row["Accommodation"])) + "</td>" +
+      "<td>" + escapeHtml(missingSummary) + "</td>" +
       "<td>" + escapeHtml(translateStatusValue(row["Status"])) + "</td>";
     tr.addEventListener("click", function(){ openBookingEditor(row["Submission ID"]); });
     body.appendChild(tr);
@@ -1004,13 +1024,14 @@ function downloadVolunteerBookings(){
   const query = String(document.getElementById("bookingsSearch").value || "").trim().toLowerCase();
   const rows = volunteerBookings.filter(function(row){
     if (!query) return true;
-    const haystack = [row["Submission Number"], row["Name"], row["Mobile Number"], row["Age"], row["City"], row["Accommodation"], row["Status"]].join(" ").toLowerCase();
+    const haystack = [row["Submission Number"], row["Name"], row["Mobile Number"], row["Age"], row["City"], row["Accommodation"], getVolunteerMissingFieldsSummary(row), row["Status"]].join(" ").toLowerCase();
     return haystack.indexOf(query) !== -1;
   });
   const labels = currentLanguage === "mr"
-    ? ["बुकिंग आयडी","नाव","मोबाईल","वय","लिंग","शहर","निवास","स्थिती"]
-    : ["Booking ID","Name","Mobile","Age","Gender","City","Accommodation","Status"];
+    ? ["बुकिंग आयडी","नाव","मोबाईल","वय","लिंग","शहर","निवास","उणी माहिती","उणी संख्या","स्थिती"]
+    : ["Booking ID","Name","Mobile","Age","Gender","City","Accommodation","Missing Fields","Missing Count","Status"];
   const data = rows.map(function(row){
+    const missingFields = getVolunteerMissingFields(row);
     const item = {};
     item[labels[0]] = row["Submission Number"];
     item[labels[1]] = row["Name"];
@@ -1019,7 +1040,9 @@ function downloadVolunteerBookings(){
     item[labels[4]] = translateGenderValue(row["Type"]);
     item[labels[5]] = row["City"];
     item[labels[6]] = translateAccommodationValue(row["Accommodation"]);
-    item[labels[7]] = translateStatusValue(row["Status"]);
+    item[labels[7]] = missingFields.join(", ");
+    item[labels[8]] = missingFields.length;
+    item[labels[9]] = translateStatusValue(row["Status"]);
     return item;
   });
   const worksheet = XLSX.utils.json_to_sheet(data);
