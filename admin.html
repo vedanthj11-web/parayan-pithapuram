@@ -2389,6 +2389,9 @@ function validateTextImportDraft(draft){
       issues.push("Participant " + (index + 1) + ": age must be 1 to 120.");
     }
   });
+  if (!draft.booking.city) {
+    issues.push("City is required.");
+  }
   if (draft.booking.registeredByMode === "volunteer" && !draft.booking.volunteerName) {
     issues.push("Select an approved volunteer.");
   }
@@ -2455,6 +2458,7 @@ function downloadExcel(){
   if (!displayedRows.length) { alert("No data available for export."); return; }
   if (typeof XLSX === "undefined") { alert("Excel export library failed to load. Please refresh and try again."); return; }
   const data = displayedRows.map(function(row, index){
+    const missingFields = getMissingFieldsForRow(row);
     return {
       "Sr. No.": index + 1,
       "Submission Number": row["Submission Number"],
@@ -2465,7 +2469,8 @@ function downloadExcel(){
       "City": row["City"],
       "Accommodation": translateAccommodation(row["Accommodation"]),
       "Registered By": translateRegisteredBy(row["Registered By"]),
-      "Missing Fields": getMissingFieldsForRow(row).join(", "),
+      "Missing Fields": missingFields.join(", "),
+      "Missing Count": missingFields.length,
       "Status": translateStatus(row["Status"])
     };
   });
