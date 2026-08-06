@@ -71,15 +71,14 @@
   .multi-select-actions{margin-bottom:8px;}
   .multi-select-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
   .multi-select-option{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:#fffaf3;font-size:13px;cursor:pointer;}
-  .multi-select-option input{width:16px;min-width:16px;height:16px;margin:0;appearance:none;-webkit-appearance:none;border:1.8px solid var(--muted);border-radius:4px;background:#fff;position:relative;flex-shrink:0;}
-  .multi-select-option input:checked{border-color:var(--saffron-dark);}
-  .multi-select-option input:checked::after{content:"";position:absolute;left:4px;top:1px;width:4px;height:8px;border:solid var(--saffron-dark);border-width:0 2px 2px 0;transform:rotate(45deg);}
+  .multi-select-option input{width:16px;min-width:16px;height:16px;margin:0;appearance:auto;-webkit-appearance:checkbox;accent-color:var(--saffron-dark);flex-shrink:0;}
   .filter-help{margin-top:6px;font-size:12px;color:var(--muted);line-height:1.4;}
   .status-switch{display:flex;gap:8px;flex-wrap:wrap;}
   .status-btn{background:#fff8ee;border:1px solid var(--border);color:var(--maroon);padding:10px 12px;}
   .status-btn.active{background:var(--saffron);border-color:var(--saffron);color:#fff;}
   .meta-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
   .meta-info{font-size:13px;color:var(--muted);}
+  .meta-actions{display:flex;gap:10px;flex-wrap:wrap;}
   .table-wrap{overflow:auto;border:1px solid var(--border);border-radius:12px;}
   table{width:100%;min-width:1480px;border-collapse:collapse;background:#fff;}
   th,td{padding:11px 12px;border-bottom:1px solid var(--border);font-size:13.5px;text-align:left;vertical-align:top;}
@@ -100,10 +99,15 @@
   .detail-value{font-size:14px;color:var(--ink);word-break:break-word;}
   .modal-actions{display:flex;gap:10px;flex-wrap:wrap;}
   .edit-modal-card{width:min(100%,880px);max-height:min(88vh,900px);overflow:auto;background:#fff;border-radius:16px;padding:20px;box-shadow:0 18px 46px rgba(0,0,0,.24);}
+  .bulk-edit-modal-card{width:min(100%,1040px);max-height:min(88vh,920px);overflow:auto;background:#fff;border-radius:16px;padding:20px;box-shadow:0 18px 46px rgba(0,0,0,.24);}
   .edit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:16px;}
   .booking-participant{border:1px solid var(--border);border-radius:12px;padding:14px;background:#fffaf3;margin-bottom:12px;}
   .booking-participant h4{margin:0 0 10px;color:var(--maroon);}
   .participant-edit-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
+  .bulk-card{border:1px solid var(--border);border-radius:12px;padding:14px;background:#fffaf3;margin-bottom:12px;}
+  .bulk-card-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
+  .bulk-meta{font-size:12px;color:var(--muted);}
+  .row-check{width:16px;min-width:16px;height:16px;}
   .import-modal-card{width:min(100%,760px);max-height:min(90vh,920px);overflow:auto;background:#fff;border-radius:16px;padding:20px;box-shadow:0 18px 46px rgba(0,0,0,.24);}
   .import-textarea{width:100%;min-height:260px;padding:14px;border:1.5px solid var(--border);border-radius:12px;resize:vertical;background:#fffdf9;color:var(--ink);}
   .import-help{margin:0 0 12px;color:var(--muted);font-size:13px;}
@@ -197,7 +201,10 @@
       <div class="panel">
         <div class="meta-row">
           <h2 style="margin:0;">Submitted People</h2>
-          <div class="meta-info" id="tableSummary">0 rows</div>
+          <div class="meta-actions">
+            <div class="meta-info" id="tableSummary">0 rows</div>
+            <button type="button" class="action-btn secondary" id="bulkEditInactiveBtn">Bulk Edit Inactive</button>
+          </div>
         </div>
 
         <div class="toolbar">
@@ -247,6 +254,7 @@
           <table>
             <thead>
               <tr>
+                <th>Select</th>
                 <th>Sr. No.</th>
                 <th>Submission Number</th>
                 <th>Name</th>
@@ -289,6 +297,19 @@
       <button type="button" class="action-btn" id="activateBtn">Mark Active</button>
       <button type="button" class="action-btn danger" id="deactivateBtn">Mark Inactive</button>
       <button type="button" class="action-btn secondary" id="closeModalBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="bulkEditModal" class="modal-backdrop" role="dialog" aria-modal="true">
+  <div class="bulk-edit-modal-card">
+    <h3 class="modal-title" id="bulkEditTitle">Bulk Edit Inactive Participants</h3>
+    <p class="import-help" id="bulkEditHelp">Select inactive participants from the table, edit their fields here, then save all changes together.</p>
+    <div id="bulkEditError" class="capacity-note" style="display:none;color:#b33a30;margin-bottom:12px;"></div>
+    <div id="bulkEditParticipants"></div>
+    <div class="modal-actions">
+      <button type="button" class="action-btn" id="saveBulkEditBtn">Save All Changes</button>
+      <button type="button" class="action-btn secondary" id="cancelBulkEditBtn">Cancel</button>
     </div>
   </div>
 </div>
@@ -553,6 +574,7 @@ let mediaRecorder = null;
 let recordedChunks = [];
 let isRecording = false;
 let pendingAddressMatches = [];
+let selectedInactivePersonIds = [];
 
 const adminKeyInput = document.getElementById("adminKey");
 const cityFilter = document.getElementById("cityFilter");
@@ -581,6 +603,9 @@ document.getElementById("closeModalBtn").addEventListener("click", closeUserModa
 document.getElementById("editBookingBtn").addEventListener("click", openEditFromSelected);
 document.getElementById("saveBookingBtn").addEventListener("click", saveBookingEdit);
 document.getElementById("cancelEditBtn").addEventListener("click", closeEditModal);
+document.getElementById("bulkEditInactiveBtn").addEventListener("click", openBulkEditInactiveModal);
+document.getElementById("saveBulkEditBtn").addEventListener("click", saveBulkEditInactive);
+document.getElementById("cancelBulkEditBtn").addEventListener("click", closeBulkEditInactiveModal);
 document.getElementById("recordVoiceBtn").addEventListener("click", toggleVoiceRecording);
 document.getElementById("parseTextImportBtn").addEventListener("click", parseTextImport);
 document.getElementById("cancelTextImportBtn").addEventListener("click", closeTextImportModal);
@@ -591,6 +616,7 @@ document.getElementById("importRegisteredByMode").addEventListener("change", syn
 document.getElementById("addressMatchSelect").addEventListener("change", handleAddressMatchSelection);
 document.getElementById("userModal").addEventListener("click", function(event){ if (event.target.id === "userModal") closeUserModal(); });
 document.getElementById("editModal").addEventListener("click", function(event){ if (event.target.id === "editModal") closeEditModal(); });
+document.getElementById("bulkEditModal").addEventListener("click", function(event){ if (event.target.id === "bulkEditModal") closeBulkEditInactiveModal(); });
 document.getElementById("textImportModal").addEventListener("click", function(event){ if (event.target.id === "textImportModal") closeTextImportModal(); });
 document.getElementById("textImportPreviewModal").addEventListener("click", function(event){ if (event.target.id === "textImportPreviewModal") closeTextImportPreviewModal(); });
 populateVolunteerOptions();
@@ -995,6 +1021,131 @@ function openEditFromSelected(){
 function closeEditModal(){
   editingSubmissionId = "";
   document.getElementById("editModal").classList.remove("show");
+}
+
+function openBulkEditInactiveModal(){
+  const rows = displayedRows.filter(function(row){
+    return normalizeStatus(row["Status"]) === "inactive" && selectedInactivePersonIds.indexOf(String(row["Person ID"] || "")) !== -1;
+  });
+  if (!rows.length) {
+    alert("Select at least one inactive participant first.");
+    return;
+  }
+  const container = document.getElementById("bulkEditParticipants");
+  container.innerHTML = "";
+  rows.forEach(function(row){
+    const registeredBy = normalizeRegisteredBy(row["Registered By"] || "");
+    const mode = registeredBy === "Self" ? "self" : /^Volunteer - /.test(registeredBy) ? "volunteer" : "";
+    const volunteerName = mode === "volunteer" ? registeredBy.replace(/^Volunteer - /, "") : "";
+    const volunteerOptions = ['<option value="">Volunteer Name</option>'].concat(VOLUNTEERS.map(function(name){
+      return '<option value="' + safeCell(name) + '"' + (volunteerName === name ? ' selected' : '') + '>' + safeCell(name) + '</option>';
+    })).join("");
+    const card = document.createElement("div");
+    card.className = "bulk-card";
+    card.dataset.personId = String(row["Person ID"] || "");
+    card.dataset.submissionId = String(row["Submission ID"] || "");
+    card.innerHTML =
+      '<div class="bulk-card-head"><strong>' + safeCell(displayText(row["Name"]) || "Participant") + '</strong><div class="bulk-meta">Booking ' + safeCell(row["Submission Number"] || "-") + ' • Person ID ' + safeCell(row["Person ID"] || "-") + '</div></div>' +
+      '<div class="participant-edit-grid">' +
+      '<input type="text" class="bulk-name" value="' + safeCell(row["Name"] || "") + '" autocomplete="off">' +
+      '<input type="number" class="bulk-age" value="' + safeCell(row["Age"] || "") + '" min="1" max="120" placeholder="Age" autocomplete="off">' +
+      '<input type="tel" class="bulk-mobile" value="' + safeCell(row["Mobile Number"] || "") + '" autocomplete="off">' +
+      '<select class="bulk-gender"><option value="">Leave blank</option><option value="male"' + (row["Type"] === "Gent" ? " selected" : "") + '>Male</option><option value="female"' + (row["Type"] === "Lady" ? " selected" : "") + '>Female</option></select>' +
+      '<input type="text" class="bulk-city" value="' + safeCell(row["City"] || "") + '" placeholder="City" autocomplete="off">' +
+      '<select class="bulk-accommodation"><option value="">Leave blank</option><option value="free"' + (row["Accommodation"] === "free" ? " selected" : "") + '>Free</option><option value="own"' + (row["Accommodation"] === "own" ? " selected" : "") + '>Own/Paid</option></select>' +
+      '<select class="bulk-registered-by"><option value="">Leave blank</option><option value="self"' + (mode === "self" ? " selected" : "") + '>Self</option><option value="volunteer"' + (mode === "volunteer" ? " selected" : "") + '>Volunteer</option></select>' +
+      '<div class="bulk-volunteer-wrap' + (mode === "volunteer" ? '' : ' hidden') + '"><select class="bulk-volunteer">' + volunteerOptions + '</select></div>' +
+      "</div>";
+    container.appendChild(card);
+  });
+  container.querySelectorAll(".bulk-registered-by").forEach(function(select){
+    select.addEventListener("change", function(){
+      const wrap = select.closest(".participant-edit-grid").querySelector(".bulk-volunteer-wrap");
+      wrap.classList.toggle("hidden", select.value !== "volunteer");
+    });
+  });
+  document.getElementById("bulkEditError").style.display = "none";
+  document.getElementById("bulkEditModal").classList.add("show");
+}
+
+function closeBulkEditInactiveModal(){
+  document.getElementById("bulkEditModal").classList.remove("show");
+}
+
+async function saveBulkEditInactive(){
+  const cards = Array.from(document.querySelectorAll("#bulkEditParticipants .bulk-card"));
+  if (!cards.length) return;
+  const updatesBySubmission = {};
+  cards.forEach(function(card){
+    const submissionId = card.dataset.submissionId;
+    const personId = card.dataset.personId;
+    if (!updatesBySubmission[submissionId]) updatesBySubmission[submissionId] = {};
+    updatesBySubmission[submissionId][personId] = {
+      name: card.querySelector(".bulk-name").value.trim(),
+      age: card.querySelector(".bulk-age").value.trim(),
+      mobile: card.querySelector(".bulk-mobile").value.trim(),
+      gender: card.querySelector(".bulk-gender").value,
+      city: card.querySelector(".bulk-city").value.trim(),
+      accommodation: card.querySelector(".bulk-accommodation").value,
+      registeredByMode: card.querySelector(".bulk-registered-by").value,
+      volunteerName: card.querySelector(".bulk-volunteer").value
+    };
+  });
+  try {
+    const submissionIds = Object.keys(updatesBySubmission);
+    for (let i = 0; i < submissionIds.length; i++) {
+      const submissionId = submissionIds[i];
+      const bookingRows = getBookingRows(submissionId);
+      if (!bookingRows.length) continue;
+      const participants = bookingRows.map(function(row){
+        const personId = String(row["Person ID"] || "");
+        const edited = updatesBySubmission[submissionId][personId];
+        if (!edited) {
+          const registeredBy = normalizeRegisteredBy(row["Registered By"] || "");
+          return {
+            name: String(row["Name"] || "").trim(),
+            age: String(row["Age"] || "").trim(),
+            mobile: String(row["Mobile Number"] || "").trim(),
+            gender: row["Type"] === "Lady" ? "female" : row["Type"] === "Gent" ? "male" : "",
+            city: String(row["City"] || "").trim(),
+            accommodation: String(row["Accommodation"] || "").trim(),
+            registeredByMode: registeredBy === "Self" ? "self" : /^Volunteer - /.test(registeredBy) ? "volunteer" : "",
+            volunteerName: /^Volunteer - /.test(registeredBy) ? registeredBy.replace(/^Volunteer - /, "") : ""
+          };
+        }
+        return edited;
+      });
+      const response = await fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "updateBooking",
+          adminKey: ADMIN_KEY,
+          submissionId: submissionId,
+          accommodation: "",
+          registeredByMode: "",
+          volunteerName: "",
+          location: {
+            area: String(bookingRows[0]["Area/Locality"] || "").trim(),
+            city: "",
+            district: "",
+            state: String(bookingRows[0]["State"] || "").trim(),
+            postcode: String(bookingRows[0]["Postcode"] || "").trim()
+          },
+          participants: participants
+        })
+      });
+      const result = await response.json();
+      if (result.status !== "success") throw new Error(result.message || "Could not save bulk changes");
+    }
+    selectedInactivePersonIds = [];
+    closeBulkEditInactiveModal();
+    await loadData();
+  } catch (error) {
+    const errorBox = document.getElementById("bulkEditError");
+    errorBox.textContent = error && error.message ? error.message : "Could not save bulk changes";
+    errorBox.style.display = "block";
+  }
 }
 
 function populateVolunteerOptions(){
@@ -1920,13 +2071,15 @@ function applyUiLanguage(){
   document.querySelector("#genderFilter option[value='Gent']").textContent = "Gents";
   document.querySelector("#genderFilter option[value='Lady']").textContent = "Ladies";
   document.querySelectorAll("thead th").forEach(function(th, index){
-    const headers = ["Sr. No.","Submission Number","Name","Mobile Number","Age","Gender","City","Accommodation","Registered By","Missing Fields","Status"];
+    const headers = ["Select","Sr. No.","Submission Number","Name","Mobile Number","Age","Gender","City","Accommodation","Registered By","Missing Fields","Status"];
     th.textContent = headers[index] || th.textContent;
   });
   document.getElementById("dataEmpty").textContent = "No data for the selected filter.";
   document.getElementById("downloadBtn").textContent = "Download Excel";
   document.getElementById("refreshBtn").textContent = "Refresh";
   document.getElementById("addViaTextBtn").textContent = "Add via Text / Voice";
+  document.getElementById("bulkEditInactiveBtn").textContent = selectedInactivePersonIds.length ? "Bulk Edit Inactive (" + selectedInactivePersonIds.length + ")" : "Bulk Edit Inactive";
+  document.getElementById("bulkEditTitle").textContent = "Bulk Edit Inactive Participants";
   document.getElementById("recordVoiceBtn").textContent = isRecording ? "Stop Recording" : "Start Recording";
   document.getElementById("parseTextImportBtn").textContent = "Paste and Analyse";
   document.getElementById("saveTextImportBtn").textContent = "Save With Missing Data";
@@ -2005,6 +2158,7 @@ function renderTable(rows){
   const body = document.getElementById("dataTableBody");
   const empty = document.getElementById("dataEmpty");
   const summary = document.getElementById("tableSummary");
+  const bulkBtn = document.getElementById("bulkEditInactiveBtn");
   body.innerHTML = "";
   const duplicateSummary = filters.duplicates.length ? " • duplicate check: " + filters.duplicates.map(function(value){
     if (value === "name") return "Name";
@@ -2014,6 +2168,10 @@ function renderTable(rows){
     return value;
   }).join(" + ") : "";
   summary.textContent = rows.length + " rows" + duplicateSummary;
+  const selectedCount = rows.filter(function(row){
+    return normalizeStatus(row["Status"]) === "inactive" && selectedInactivePersonIds.indexOf(String(row["Person ID"] || "")) !== -1;
+  }).length;
+  bulkBtn.textContent = selectedCount ? "Bulk Edit Inactive (" + selectedCount + ")" : "Bulk Edit Inactive";
   if (!rows.length) { empty.style.display = "block"; return; }
   empty.style.display = "none";
   let previousSubmissionNumber = null;
@@ -2024,9 +2182,12 @@ function renderTable(rows){
       previousSubmissionNumber = row["Submission Number"];
     }
     const missingFields = getMissingFieldsForRow(row);
+    const personId = String(row["Person ID"] || "");
+    const isInactive = normalizeStatus(row["Status"]) === "inactive";
     const tr = document.createElement("tr");
     tr.className = currentBand;
     tr.innerHTML =
+      '<td><input type="checkbox" class="row-check"' + (isInactive ? '' : ' disabled') + (isInactive && selectedInactivePersonIds.indexOf(personId) !== -1 ? ' checked' : '') + '></td>' +
       "<td>" + safeCell(index + 1) + "</td>" +
       "<td>" + safeCell(row["Submission Number"]) + "</td>" +
       "<td>" + safeCell(displayText(row["Name"])) + "</td>" +
@@ -2038,9 +2199,27 @@ function renderTable(rows){
       "<td>" + safeCell(translateRegisteredBy(row["Registered By"])) + "</td>" +
       "<td>" + safeCell(missingFields.length ? missingFields.join(", ") + " (" + missingFields.length + ")" : "-") + "</td>" +
       "<td>" + safeCell(translateStatus(row["Status"])) + "</td>";
+    const checkbox = tr.querySelector(".row-check");
+    if (checkbox && isInactive) {
+      checkbox.addEventListener("click", function(event){
+        event.stopPropagation();
+      });
+      checkbox.addEventListener("change", function(event){
+        event.stopPropagation();
+        toggleInactiveSelection(personId, checkbox.checked);
+      });
+    }
     tr.addEventListener("click", function(){ openUserModal(row); });
     body.appendChild(tr);
   });
+}
+
+function toggleInactiveSelection(personId, isSelected){
+  const id = String(personId || "");
+  if (!id) return;
+  selectedInactivePersonIds = selectedInactivePersonIds.filter(function(value){ return value !== id; });
+  if (isSelected) selectedInactivePersonIds.push(id);
+  renderTable(displayedRows);
 }
 
 function getMissingFieldsForRow(row){
