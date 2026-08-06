@@ -226,7 +226,7 @@
           <div class="filter-group"><label>Incomplete Data</label><select id="incompleteFilter"><option value="all">All</option><option value="incomplete">Incomplete Only</option><option value="complete">Complete Only</option></select></div>
           <div class="filter-group">
             <label>Check duplicate by</label>
-            <select id="duplicateFilter">
+            <select id="duplicateModeFilter" style="cursor:pointer;">
               <option value="">No Duplicate Check</option>
               <option value="name">Participant Name</option>
               <option value="age">Age</option>
@@ -575,7 +575,7 @@ const languageFilter = document.getElementById("languageFilter");
 const sourceFilter = document.getElementById("sourceFilter");
 const dateFilter = document.getElementById("dateFilter");
 const incompleteFilter = document.getElementById("incompleteFilter");
-const duplicateFilter = document.getElementById("duplicateFilter");
+const duplicateModeFilter = document.getElementById("duplicateModeFilter");
 const searchFilter = document.getElementById("searchFilter");
 const importVolunteerName = document.getElementById("importVolunteerName");
 
@@ -632,8 +632,8 @@ languageFilter.addEventListener("change", function(){ filters.formLanguage = lan
 sourceFilter.addEventListener("change", function(){ filters.source = sourceFilter.value; applyCurrentFilters(); });
 dateFilter.addEventListener("change", function(){ filters.registrationDate = dateFilter.value; applyCurrentFilters(); });
 incompleteFilter.addEventListener("change", function(){ filters.incomplete = incompleteFilter.value; applyCurrentFilters(); });
-duplicateFilter.addEventListener("change", function(){
-  filters.duplicates = duplicateFilter.value ? [duplicateFilter.value] : [];
+duplicateModeFilter.addEventListener("change", function(){
+  filters.duplicates = duplicateModeFilter.value ? [duplicateModeFilter.value] : [];
   applyCurrentFilters();
 });
 searchFilter.addEventListener("input", function(){ filters.search = searchFilter.value.trim().toLowerCase(); applyCurrentFilters(); });
@@ -712,7 +712,7 @@ function applyUiLanguage(){
   document.querySelector("#languageFilter option[value='all']").textContent = t().languageOptions.all;
   document.querySelector("#languageFilter option[value='en']").textContent = t().languageOptions.en;
   document.querySelector("#languageFilter option[value='mr']").textContent = t().languageOptions.mr;
-  Array.from(duplicateFilter.options).forEach(function(option){
+  Array.from(duplicateModeFilter.options).forEach(function(option){
     if (option.value === "") option.textContent = "No Duplicate Check";
     if (option.value === "name") option.textContent = "Participant Name";
     if (option.value === "age") option.textContent = "Age";
@@ -750,7 +750,7 @@ function populateDropdowns(rows){
   populateSourceFilter();
   cityFilter.value = filters.city;
   genderFilter.value = filters.gender;
-  duplicateFilter.value = filters.duplicates[0] || "";
+  duplicateModeFilter.value = filters.duplicates[0] || "";
   accommodationFilter.value = filters.accommodation;
   languageFilter.value = filters.formLanguage;
   sourceFilter.value = filters.source;
@@ -1988,7 +1988,7 @@ function applyUiLanguage(){
   document.querySelector("#dataTab .panel h2").textContent = "Submitted People";
   const filterLabels = ["Status", "City", "Gender", "Age", "Accommodation", "Language", "Registered By", "Registration Date", "Incomplete Data", "Check duplicate by", "Search"];
   document.querySelectorAll(".filter-group label").forEach(function(label, index){ label.textContent = filterLabels[index] || label.textContent; });
-  Array.from(duplicateFilter.options).forEach(function(option){
+  Array.from(duplicateModeFilter.options).forEach(function(option){
     if (option.value === "") option.textContent = "No Duplicate Check";
     if (option.value === "name") option.textContent = "Participant Name";
     if (option.value === "age") option.textContent = "Age";
@@ -2035,7 +2035,7 @@ function populateDropdowns(rows){
   sourceFilter.value = filters.source;
   dateFilter.value = filters.registrationDate;
   incompleteFilter.value = filters.incomplete;
-  duplicateFilter.value = filters.duplicates[0] || "";
+  duplicateModeFilter.value = filters.duplicates[0] || "";
   searchFilter.value = filters.search;
   searchFilter.placeholder = "Search name, city, mobile, booking ID";
 }
@@ -2805,4 +2805,5 @@ applyUiLanguage();
 </script>
 </body>
 </html>
+
 
