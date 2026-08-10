@@ -72,6 +72,8 @@
   th{background:#fffaf3;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;font-size:11.5px;}
   tr.submission-band-a td{background:#fffaf3;}
   tr.submission-band-b td{background:#fdecd8;}
+  tr.mobile-group-a td{background:#fffaf3;}
+  tr.mobile-group-b td{background:#fdecd8;}
   tbody tr:hover td{background:#fff1df;}
   tbody tr{cursor:pointer;}
   .empty-note{font-size:13px;color:var(--muted);margin:0;}
@@ -649,6 +651,11 @@ incompleteFilter.addEventListener("change", function(){ filters.incomplete = inc
 duplicateModeFilter.addEventListener("change", function(){
   filters.duplicateField = duplicateModeFilter.value || "";
   filters.duplicateValue = "";
+  if (filters.duplicateField === "mobile") {
+    if (filters.status !== "all") duplicateStatusBeforeReview = filters.status;
+    filters.status = "all";
+    syncStatusButtons();
+  }
   updateDuplicateValueControls();
   applyCurrentFilters();
 });
@@ -1687,6 +1694,42 @@ function buildDuplicateValueOptions(rows, field){
     });
 }
 
+function getDuplicateCountStatusScope(){
+  if (!filters.duplicateField) return filters.status;
+  if (filters.status === "all") return duplicateStatusBeforeReview || "active";
+  return filters.status;
+}
+
+function getBaseFilteredRows(statusOverride){
+  const effectiveStatus = statusOverride || filters.status;
+  return rawRows.filter(function(row){
+    if (effectiveStatus !== "all" && normalizeStatus(row["Status"]) !== effectiveStatus) return false;
+    if (filters.city && String(row["City"] || "") !== filters.city) return false;
+    if (filters.gender !== "all" && String(row["Type"] || "") !== filters.gender) return false;
+    if (filters.ageRange && getAgeRangeKey(row["Age"]) !== filters.ageRange) return false;
+    if (filters.accommodation && String(row["Accommodation"] || "") !== filters.accommodation) return false;
+    if (filters.formLanguage !== "all" && String(row["Form Language"] || "en") !== filters.formLanguage) return false;
+    if (filters.source !== "all" && normalizeRegisteredBy(row["Registered By"]) !== filters.source) return false;
+    if (filters.registrationDate && getRegistrationDate(row["Timestamp"]) !== filters.registrationDate) return false;
+    const missingFields = getMissingFieldsForRow(row);
+    if (filters.incomplete === "incomplete" && !missingFields.length) return false;
+    if (filters.incomplete === "complete" && missingFields.length) return false;
+    if (filters.search) {
+      const haystack = [
+        row["Submission Number"],
+        row["Name"],
+        row["Mobile Number"],
+        row["Age"],
+        row["City"],
+        row["Registered By"],
+        missingFields.join(", ")
+      ].join(" ").toLowerCase();
+      if (haystack.indexOf(filters.search) === -1) return false;
+    }
+    return true;
+  });
+}
+
 function populateDuplicateValueFilter(options){
   duplicateValueFilter.innerHTML = "";
   const placeholderOption = document.createElement("option");
@@ -1704,8 +1747,8 @@ function populateDuplicateValueFilter(options){
 }
 
 function updateDuplicateValueControls(){
-  duplicateOptionsCache = buildDuplicateValueOptions(rawRows, filters.duplicateField);
-  duplicateValueGroup.classList.toggle("hidden", !filters.duplicateField);
+  duplicateOptionsCache = buildDuplicateValueOptions(getBaseFilteredRows(getDuplicateCountStatusScope()), filters.duplicateField);
+  duplicateValueGroup.classList.toggle("hidden", !filters.duplicateField || filters.duplicateField === "mobile");
   duplicateValueLabel.textContent = filters.duplicateField ? getDuplicateSelectLabel(filters.duplicateField) : "Select Duplicate Value";
   if (!duplicateOptionsCache.some(function(option){ return option.value === filters.duplicateValue; })) {
     filters.duplicateValue = "";
@@ -1716,6 +1759,30 @@ function updateDuplicateValueControls(){
 function getSelectedDuplicateOption(){
   if (!filters.duplicateField || !filters.duplicateValue) return null;
   return duplicateOptionsCache.find(function(option){ return option.value === filters.duplicateValue; }) || null;
+}
+
+function getDuplicateCountMap(options){
+  const counts = {};
+  options.forEach(function(option){
+    counts[option.value] = option.count;
+  });
+  return counts;
+}
+
+function sortRowsForMobileDuplicateReview(rows){
+  const countMap = getDuplicateCountMap(duplicateOptionsCache);
+  return rows.slice().sort(function(a, b){
+    const mobileA = getDuplicateComparableValue(a, "mobile");
+    const mobileB = getDuplicateComparableValue(b, "mobile");
+    const countA = countMap[mobileA] || 0;
+    const countB = countMap[mobileB] || 0;
+    if (countB !== countA) return countB - countA;
+    if (mobileA !== mobileB) return mobileA.localeCompare(mobileB, "en", { numeric: true });
+    const submissionA = String(a["Submission Number"] || "");
+    const submissionB = String(b["Submission Number"] || "");
+    if (submissionA !== submissionB) return submissionA.localeCompare(submissionB, "en", { numeric: true });
+    return String(a["Person ID"] || "").localeCompare(String(b["Person ID"] || ""), "en", { numeric: true });
+  });
 }
 
 function buildDuplicateKey(row, mode){
@@ -2153,36 +2220,20 @@ function populateSourceFilter(){
 
 function applyCurrentFilters(){
   const selectedDuplicate = getSelectedDuplicateOption();
-  const baseRows = rawRows.filter(function(row){
-    if (filters.status !== "all" && normalizeStatus(row["Status"]) !== filters.status) return false;
-    if (filters.city && String(row["City"] || "") !== filters.city) return false;
-    if (filters.gender !== "all" && String(row["Type"] || "") !== filters.gender) return false;
-    if (filters.ageRange && getAgeRangeKey(row["Age"]) !== filters.ageRange) return false;
-    if (filters.accommodation && String(row["Accommodation"] || "") !== filters.accommodation) return false;
-    if (filters.formLanguage !== "all" && String(row["Form Language"] || "en") !== filters.formLanguage) return false;
-    if (filters.source !== "all" && normalizeRegisteredBy(row["Registered By"]) !== filters.source) return false;
-    if (filters.registrationDate && getRegistrationDate(row["Timestamp"]) !== filters.registrationDate) return false;
-    const missingFields = getMissingFieldsForRow(row);
-    if (filters.incomplete === "incomplete" && !missingFields.length) return false;
-    if (filters.incomplete === "complete" && missingFields.length) return false;
-    if (filters.search) {
-      const haystack = [
-        row["Submission Number"],
-        row["Name"],
-        row["Mobile Number"],
-        row["Age"],
-        row["City"],
-        row["Registered By"],
-        missingFields.join(", ")
-      ].join(" ").toLowerCase();
-      if (haystack.indexOf(filters.search) === -1) return false;
-    }
-    return true;
-  });
+  const mobileDuplicateValues = filters.duplicateField === "mobile"
+    ? new Set(duplicateOptionsCache.map(function(option){ return option.value; }))
+    : null;
+  const baseRows = getBaseFilteredRows(filters.status);
   displayedRows = baseRows.filter(function(row){
+    if (filters.duplicateField === "mobile") {
+      return mobileDuplicateValues.has(getDuplicateComparableValue(row, "mobile"));
+    }
     if (!selectedDuplicate) return true;
     return getDuplicateComparableValue(row, filters.duplicateField) === selectedDuplicate.value;
   });
+  if (filters.duplicateField === "mobile") {
+    displayedRows = sortRowsForMobileDuplicateReview(displayedRows);
+  }
   renderAnalytics(baseRows);
   renderTable(displayedRows);
 }
@@ -2196,6 +2247,8 @@ function renderTable(rows){
   const selectedDuplicate = getSelectedDuplicateOption();
   if (filters.duplicateField && !duplicateOptionsCache.length) {
     summary.textContent = "No duplicate values found.";
+  } else if (filters.duplicateField === "mobile") {
+    summary.textContent = "Showing " + rows.length + " registrations for duplicate Mobile Number groups, sorted from highest repeats to 2 times.";
   } else if (selectedDuplicate) {
     summary.textContent = "Showing " + rows.length + " registrations for duplicate " + getDuplicateFieldLabel(filters.duplicateField) + ": " + selectedDuplicate.label + " (" + selectedDuplicate.count + " times)";
   } else {
@@ -2209,10 +2262,21 @@ function renderTable(rows){
   empty.style.display = "none";
   let previousSubmissionNumber = null;
   let currentBand = "submission-band-a";
+  let previousMobileGroup = null;
+  let currentMobileBand = "mobile-group-a";
   rows.forEach(function(row, index){
-    if (row["Submission Number"] !== previousSubmissionNumber) {
-      currentBand = currentBand === "submission-band-a" ? "submission-band-b" : "submission-band-a";
-      previousSubmissionNumber = row["Submission Number"];
+    if (filters.duplicateField === "mobile") {
+      const currentMobileGroupValue = getDuplicateComparableValue(row, "mobile");
+      if (currentMobileGroupValue !== previousMobileGroup) {
+        currentMobileBand = currentMobileBand === "mobile-group-a" ? "mobile-group-b" : "mobile-group-a";
+        previousMobileGroup = currentMobileGroupValue;
+      }
+      currentBand = currentMobileBand;
+    } else {
+      if (row["Submission Number"] !== previousSubmissionNumber) {
+        currentBand = currentBand === "submission-band-a" ? "submission-band-b" : "submission-band-a";
+        previousSubmissionNumber = row["Submission Number"];
+      }
     }
     const missingFields = getMissingFieldsForRow(row);
     const personId = String(row["Person ID"] || "");
@@ -2904,3 +2968,4 @@ applyUiLanguage();
 </script>
 </body>
 </html>
+
