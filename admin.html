@@ -1545,6 +1545,7 @@ async function updateSelectedStatus(nextStatus){
     });
     selectedRow["Status"] = nextStatus;
     document.getElementById("modalStatus").textContent = translateStatus(nextStatus);
+    syncModalStatusActions(nextStatus);
     applyCurrentFilters();
   } catch (error) {
     console.error("Status update failed:", error);
@@ -2334,6 +2335,12 @@ function getMissingFieldsForRow(row){
   return fields;
 }
 
+function syncModalStatusActions(statusValue){
+  const isInactive = normalizeStatus(statusValue) === "inactive";
+  document.getElementById("activateBtn").style.display = isInactive ? "" : "none";
+  document.getElementById("deactivateBtn").style.display = isInactive ? "none" : "";
+}
+
 function openUserModal(row){
   selectedRow = row;
   document.getElementById("modalName").textContent = displayText(row["Name"]) || "Person Details";
@@ -2345,6 +2352,7 @@ function openUserModal(row){
   document.getElementById("modalAccommodation").textContent = translateAccommodation(row["Accommodation"]);
   document.getElementById("modalRegisteredBy").textContent = translateRegisteredBy(row["Registered By"]);
   document.getElementById("modalStatus").textContent = translateStatus(row["Status"]);
+  syncModalStatusActions(row["Status"]);
   document.getElementById("modalSubmissionNumber").textContent = row["Submission Number"] || "-";
   document.getElementById("modalPersonId").textContent = row["Person ID"] || "-";
   document.getElementById("userModal").classList.add("show");
@@ -2973,3 +2981,4 @@ applyUiLanguage();
 </script>
 </body>
 </html>
+
