@@ -210,17 +210,27 @@
           <div class="filter-group"><label>Registration Date</label><select id="dateFilter"></select></div>
           <div class="filter-group"><label>Incomplete Data</label><select id="incompleteFilter"><option value="all">All</option><option value="incomplete">Incomplete Only</option><option value="complete">Complete Only</option></select></div>
           <div class="filter-group">
-            <label>Check duplicate by</label>
+            <label>Duplicate Data By</label>
             <select id="duplicateModeFilter" style="cursor:pointer;">
-              <option value="">No Duplicate Check</option>
-              <option value="name">Participant Name</option>
-              <option value="age">Age</option>
+              <option value="">Select</option>
               <option value="mobile">Mobile Number</option>
+              <option value="name">Name</option>
+              <option value="age">Age</option>
               <option value="gender">Gender</option>
               <option value="city">City</option>
               <option value="accommodation">Accommodation</option>
               <option value="registered_by">Registered By</option>
             </select>
+          </div>
+          <div class="filter-group hidden" id="duplicateValueGroup">
+            <label id="duplicateValueLabel">Select Duplicate Value</label>
+            <select id="duplicateValueFilter" style="cursor:pointer;">
+              <option value="">Select</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>&nbsp;</label>
+            <button type="button" class="action-btn secondary" id="clearDuplicateFilterBtn">Clear Duplicate Filter</button>
           </div>
           <div class="filter-group"><label>Search</label><input id="searchFilter" type="text" placeholder="Search table" autocomplete="off"></div>
         </div>
@@ -426,7 +436,20 @@ const VOLUNTEERS = [
   "Rupali Joshi",
   "B.D. Wani"
 ];
-const filters = { status: "active", city: "", gender: "all", ageRange: "", accommodation: "", formLanguage: "all", source: "all", registrationDate: "", incomplete: "all", duplicates: [], search: "" };
+const filters = {
+  status: "active",
+  city: "",
+  gender: "all",
+  ageRange: "",
+  accommodation: "",
+  formLanguage: "all",
+  source: "all",
+  registrationDate: "",
+  incomplete: "all",
+  duplicateField: "",
+  duplicateValue: "",
+  search: ""
+};
 const UI_TEXTS = {
   original: {
     pageTitle: "Admin Dashboard - Parayan Registrations",
@@ -561,8 +584,14 @@ const sourceFilter = document.getElementById("sourceFilter");
 const dateFilter = document.getElementById("dateFilter");
 const incompleteFilter = document.getElementById("incompleteFilter");
 const duplicateModeFilter = document.getElementById("duplicateModeFilter");
+const duplicateValueGroup = document.getElementById("duplicateValueGroup");
+const duplicateValueLabel = document.getElementById("duplicateValueLabel");
+const duplicateValueFilter = document.getElementById("duplicateValueFilter");
+const clearDuplicateFilterBtn = document.getElementById("clearDuplicateFilterBtn");
 const searchFilter = document.getElementById("searchFilter");
 const importVolunteerName = document.getElementById("importVolunteerName");
+let duplicateOptionsCache = [];
+let duplicateStatusBeforeReview = "active";
 
 document.getElementById("loginBtn").addEventListener("click", tryUnlock);
 adminKeyInput.addEventListener("keydown", function(event){ if (event.key === "Enter") { event.preventDefault(); tryUnlock(); } });
@@ -586,6 +615,7 @@ document.getElementById("backTextImportBtn").addEventListener("click", backToTex
 document.getElementById("closeTextImportPreviewBtn").addEventListener("click", closeTextImportPreviewModal);
 document.getElementById("importRegisteredByMode").addEventListener("change", syncImportVolunteerVisibility);
 document.getElementById("addressMatchSelect").addEventListener("change", handleAddressMatchSelection);
+clearDuplicateFilterBtn.addEventListener("click", clearDuplicateFilter);
 document.getElementById("userModal").addEventListener("click", function(event){ if (event.target.id === "userModal") closeUserModal(); });
 document.getElementById("editModal").addEventListener("click", function(event){ if (event.target.id === "editModal") closeEditModal(); });
 document.getElementById("bulkEditModal").addEventListener("click", function(event){ if (event.target.id === "bulkEditModal") closeBulkEditInactiveModal(); });
@@ -604,8 +634,7 @@ document.querySelectorAll(".tab-btn").forEach(function(button){
 document.querySelectorAll(".status-btn").forEach(function(button){
   button.addEventListener("click", function(){
     filters.status = button.dataset.status;
-    document.querySelectorAll(".status-btn").forEach(function(item){ item.classList.remove("active"); });
-    button.classList.add("active");
+    syncStatusButtons();
     applyCurrentFilters();
   });
 });
@@ -618,7 +647,18 @@ sourceFilter.addEventListener("change", function(){ filters.source = sourceFilte
 dateFilter.addEventListener("change", function(){ filters.registrationDate = dateFilter.value; applyCurrentFilters(); });
 incompleteFilter.addEventListener("change", function(){ filters.incomplete = incompleteFilter.value; applyCurrentFilters(); });
 duplicateModeFilter.addEventListener("change", function(){
-  filters.duplicates = duplicateModeFilter.value ? [duplicateModeFilter.value] : [];
+  filters.duplicateField = duplicateModeFilter.value || "";
+  filters.duplicateValue = "";
+  updateDuplicateValueControls();
+  applyCurrentFilters();
+});
+duplicateValueFilter.addEventListener("change", function(){
+  filters.duplicateValue = duplicateValueFilter.value || "";
+  if (filters.duplicateField && filters.duplicateValue) {
+    if (filters.status !== "all") duplicateStatusBeforeReview = filters.status;
+    filters.status = "all";
+    syncStatusButtons();
+  }
   applyCurrentFilters();
 });
 searchFilter.addEventListener("input", function(){ filters.search = searchFilter.value.trim().toLowerCase(); applyCurrentFilters(); });
@@ -698,14 +738,7 @@ function applyUiLanguage(){
   document.querySelector("#languageFilter option[value='en']").textContent = t().languageOptions.en;
   document.querySelector("#languageFilter option[value='mr']").textContent = t().languageOptions.mr;
   Array.from(duplicateModeFilter.options).forEach(function(option){
-    if (option.value === "") option.textContent = "No Duplicate Check";
-    if (option.value === "name") option.textContent = "Participant Name";
-    if (option.value === "age") option.textContent = "Age";
-    if (option.value === "mobile") option.textContent = "Mobile Number";
-    if (option.value === "gender") option.textContent = "Gender";
-    if (option.value === "city") option.textContent = "City";
-    if (option.value === "accommodation") option.textContent = "Accommodation";
-    if (option.value === "registered_by") option.textContent = "Registered By";
+    option.textContent = option.value ? getDuplicateFieldLabel(option.value) : "Select";
   });
   document.querySelectorAll("thead th").forEach(function(th, index){ th.textContent = t().tableHeaders[index]; });
   document.getElementById("dataEmpty").textContent = t().empty;
@@ -735,7 +768,7 @@ function populateDropdowns(rows){
   populateSourceFilter();
   cityFilter.value = filters.city;
   genderFilter.value = filters.gender;
-  duplicateModeFilter.value = filters.duplicates[0] || "";
+  duplicateModeFilter.value = filters.duplicateField || "";
   accommodationFilter.value = filters.accommodation;
   languageFilter.value = filters.formLanguage;
   sourceFilter.value = filters.source;
@@ -773,34 +806,6 @@ function setSelectOptions(select, placeholder, values, formatter){
     select.appendChild(option);
   });
   if (Array.from(select.options).some(function(option){ return option.value === previous; })) select.value = previous;
-}
-
-function applyCurrentFilters(){
-  const duplicateSet = buildDuplicateSet(rawRows, filters.duplicates);
-  displayedRows = rawRows.filter(function(row){
-    if (filters.status !== "all" && normalizeStatus(row["Status"]) !== filters.status) return false;
-    if (filters.city && String(row["City"] || "") !== filters.city) return false;
-    if (filters.gender !== "all" && String(row["Type"] || "") !== filters.gender) return false;
-    if (filters.accommodation && String(row["Accommodation"] || "") !== filters.accommodation) return false;
-    if (filters.formLanguage !== "all" && String(row["Form Language"] || "en") !== filters.formLanguage) return false;
-    if (filters.source !== "all" && normalizeRegisteredBy(row["Registered By"]) !== filters.source) return false;
-    if (filters.registrationDate && getRegistrationDate(row["Timestamp"]) !== filters.registrationDate) return false;
-    if (filters.duplicates.length && !duplicateSet.has(buildDuplicateKey(row, filters.duplicates))) return false;
-    if (filters.search) {
-      const haystack = [
-        row["Submission Number"],
-        row["Name"],
-        row["Mobile Number"],
-        row["Age"],
-        row["City"],
-        row["Registered By"]
-      ].join(" ").toLowerCase();
-      if (haystack.indexOf(filters.search) === -1) return false;
-    }
-    return true;
-  });
-  renderAnalytics(baseRows);
-  renderTable(displayedRows);
 }
 
 function renderAnalytics(rows){
@@ -1606,7 +1611,9 @@ function getRegistrationDate(value){
 }
 
 function normalizeMobile(value){
-  return String(value || "").replace(/\D/g, "").replace(/^91/, "").slice(-10);
+  const digits = String(value || "").replace(/\D/g, "");
+  const finalDigits = digits.slice(-10);
+  return finalDigits.length === 10 ? finalDigits : "";
 }
 
 function getAgeRangeKey(value){
@@ -1626,6 +1633,89 @@ function getDuplicateComparableValue(row, field){
   if (field === "accommodation") return String(row["Accommodation"] || "").trim().toLowerCase();
   if (field === "registered_by") return normalizeRegisteredBy(row["Registered By"]).trim().toLowerCase();
   return "";
+}
+
+function getDuplicateFieldLabel(field){
+  if (field === "mobile") return "Mobile Number";
+  if (field === "name") return "Name";
+  if (field === "age") return "Age";
+  if (field === "gender") return "Gender";
+  if (field === "city") return "City";
+  if (field === "accommodation") return "Accommodation";
+  if (field === "registered_by") return "Registered By";
+  return "Value";
+}
+
+function getDuplicateSelectLabel(field){
+  return field === "mobile" ? "Select Duplicate Mobile Number" : "Select Duplicate " + getDuplicateFieldLabel(field);
+}
+
+function getDuplicateDisplayValue(row, field, normalizedValue){
+  if (field === "mobile") return normalizedValue;
+  if (field === "name") return String(row["Name"] || "").trim().replace(/\s+/g, " ");
+  if (field === "age") return String(row["Age"] || "").trim();
+  if (field === "gender") return translateType(row["Type"]);
+  if (field === "city") return String(row["City"] || "").trim().replace(/\s+/g, " ");
+  if (field === "accommodation") return translateAccommodation(row["Accommodation"]);
+  if (field === "registered_by") return translateRegisteredBy(row["Registered By"]);
+  return normalizedValue;
+}
+
+function buildDuplicateValueOptions(rows, field){
+  if (!field) return [];
+  const counts = {};
+  const labels = {};
+  rows.forEach(function(row){
+    const normalizedValue = getDuplicateComparableValue(row, field);
+    if (!normalizedValue) return;
+    counts[normalizedValue] = (counts[normalizedValue] || 0) + 1;
+    if (!labels[normalizedValue]) labels[normalizedValue] = getDuplicateDisplayValue(row, field, normalizedValue);
+  });
+  return Object.keys(counts)
+    .filter(function(value){ return counts[value] > 1; })
+    .map(function(value){
+      return {
+        value: value,
+        count: counts[value],
+        label: labels[value] || value
+      };
+    })
+    .sort(function(a, b){
+      if (b.count !== a.count) return b.count - a.count;
+      if (field === "mobile") return a.value.localeCompare(b.value, "en", { numeric: true });
+      return a.label.localeCompare(b.label, "en", { sensitivity: "base", numeric: true });
+    });
+}
+
+function populateDuplicateValueFilter(options){
+  duplicateValueFilter.innerHTML = "";
+  const placeholderOption = document.createElement("option");
+  placeholderOption.value = "";
+  placeholderOption.textContent = options.length ? "Select" : "No duplicate values found.";
+  duplicateValueFilter.appendChild(placeholderOption);
+  options.forEach(function(optionData){
+    const option = document.createElement("option");
+    option.value = optionData.value;
+    option.textContent = optionData.label + " (" + optionData.count + " times)";
+    duplicateValueFilter.appendChild(option);
+  });
+  duplicateValueFilter.disabled = !options.length;
+  duplicateValueFilter.value = options.some(function(option){ return option.value === filters.duplicateValue; }) ? filters.duplicateValue : "";
+}
+
+function updateDuplicateValueControls(){
+  duplicateOptionsCache = buildDuplicateValueOptions(rawRows, filters.duplicateField);
+  duplicateValueGroup.classList.toggle("hidden", !filters.duplicateField);
+  duplicateValueLabel.textContent = filters.duplicateField ? getDuplicateSelectLabel(filters.duplicateField) : "Select Duplicate Value";
+  if (!duplicateOptionsCache.some(function(option){ return option.value === filters.duplicateValue; })) {
+    filters.duplicateValue = "";
+  }
+  populateDuplicateValueFilter(duplicateOptionsCache);
+}
+
+function getSelectedDuplicateOption(){
+  if (!filters.duplicateField || !filters.duplicateValue) return null;
+  return duplicateOptionsCache.find(function(option){ return option.value === filters.duplicateValue; }) || null;
 }
 
 function buildDuplicateKey(row, mode){
@@ -1955,6 +2045,25 @@ function translateRegisteredBy(value){
   return normalized || "-";
 }
 
+function syncStatusButtons(){
+  document.querySelectorAll(".status-btn").forEach(function(button){
+    button.classList.toggle("active", button.dataset.status === filters.status);
+  });
+}
+
+function clearDuplicateFilter(){
+  const hadDuplicateReview = !!filters.duplicateField;
+  filters.duplicateField = "";
+  filters.duplicateValue = "";
+  if (hadDuplicateReview) {
+    filters.status = duplicateStatusBeforeReview || "active";
+    syncStatusButtons();
+  }
+  duplicateModeFilter.value = "";
+  updateDuplicateValueControls();
+  applyCurrentFilters();
+}
+
 function applyUiLanguage(){
   document.title = "Admin Dashboard - Parayan Registrations";
   document.querySelector("#dashboard > h1").textContent = "Registration Dashboard";
@@ -1971,11 +2080,11 @@ function applyUiLanguage(){
   document.querySelectorAll("#analyticsTab .panel h2")[1].textContent = "City Breakdown";
   document.querySelectorAll("#analyticsTab .panel h2")[2].textContent = "Age Distribution";
   document.querySelector("#dataTab .panel h2").textContent = "Submitted People";
-  const filterLabels = ["Status", "City", "Gender", "Age", "Accommodation", "Language", "Registered By", "Registration Date", "Incomplete Data", "Check duplicate by", "Search"];
+  const filterLabels = ["Status", "City", "Gender", "Age", "Accommodation", "Language", "Registered By", "Registration Date", "Incomplete Data", "Duplicate Data By", "Select Duplicate Value", "", "Search"];
   document.querySelectorAll(".filter-group label").forEach(function(label, index){ label.textContent = filterLabels[index] || label.textContent; });
   Array.from(duplicateModeFilter.options).forEach(function(option){
-    if (option.value === "") option.textContent = "No Duplicate Check";
-    if (option.value === "name") option.textContent = "Participant Name";
+    if (option.value === "") option.textContent = "Select";
+    if (option.value === "name") option.textContent = "Name";
     if (option.value === "age") option.textContent = "Age";
     if (option.value === "mobile") option.textContent = "Mobile Number";
     if (option.value === "gender") option.textContent = "Gender";
@@ -2004,6 +2113,8 @@ function applyUiLanguage(){
   document.getElementById("saveTextImportBtn").textContent = "Save With Missing Data";
   document.getElementById("saveBookingBtn").textContent = "Save Booking";
   document.getElementById("cancelEditBtn").textContent = "Cancel";
+  clearDuplicateFilterBtn.textContent = "Clear Duplicate Filter";
+  duplicateValueLabel.textContent = filters.duplicateField ? getDuplicateSelectLabel(filters.duplicateField) : "Select Duplicate Value";
 }
 
 function populateDropdowns(rows){
@@ -2020,9 +2131,11 @@ function populateDropdowns(rows){
   sourceFilter.value = filters.source;
   dateFilter.value = filters.registrationDate;
   incompleteFilter.value = filters.incomplete;
-  duplicateModeFilter.value = filters.duplicates[0] || "";
+  duplicateModeFilter.value = filters.duplicateField || "";
   searchFilter.value = filters.search;
   searchFilter.placeholder = "Search name, city, mobile, booking ID";
+  syncStatusButtons();
+  updateDuplicateValueControls();
 }
 
 function populateSourceFilter(){
@@ -2039,6 +2152,7 @@ function populateSourceFilter(){
 }
 
 function applyCurrentFilters(){
+  const selectedDuplicate = getSelectedDuplicateOption();
   const baseRows = rawRows.filter(function(row){
     if (filters.status !== "all" && normalizeStatus(row["Status"]) !== filters.status) return false;
     if (filters.city && String(row["City"] || "") !== filters.city) return false;
@@ -2065,9 +2179,9 @@ function applyCurrentFilters(){
     }
     return true;
   });
-  const duplicateSet = buildDuplicateSet(baseRows, filters.duplicates);
   displayedRows = baseRows.filter(function(row){
-    return !filters.duplicates.length || duplicateSet.has(buildDuplicateKey(row, filters.duplicates));
+    if (!selectedDuplicate) return true;
+    return getDuplicateComparableValue(row, filters.duplicateField) === selectedDuplicate.value;
   });
   renderAnalytics(baseRows);
   renderTable(displayedRows);
@@ -2079,14 +2193,14 @@ function renderTable(rows){
   const summary = document.getElementById("tableSummary");
   const bulkBtn = document.getElementById("bulkEditInactiveBtn");
   body.innerHTML = "";
-  const duplicateSummary = filters.duplicates.length ? " • duplicate check: " + filters.duplicates.map(function(value){
-    if (value === "name") return "Name";
-    if (value === "age") return "Age";
-    if (value === "mobile") return "Mobile";
-    if (value === "city") return "City";
-    return value;
-  }).join(" + ") : "";
-  summary.textContent = rows.length + " rows" + duplicateSummary;
+  const selectedDuplicate = getSelectedDuplicateOption();
+  if (filters.duplicateField && !duplicateOptionsCache.length) {
+    summary.textContent = "No duplicate values found.";
+  } else if (selectedDuplicate) {
+    summary.textContent = "Showing " + rows.length + " registrations for duplicate " + getDuplicateFieldLabel(filters.duplicateField) + ": " + selectedDuplicate.label + " (" + selectedDuplicate.count + " times)";
+  } else {
+    summary.textContent = rows.length + " rows";
+  }
   const selectedCount = rows.filter(function(row){
     return normalizeStatus(row["Status"]) === "inactive" && selectedInactivePersonIds.indexOf(String(row["Person ID"] || "")) !== -1;
   }).length;
