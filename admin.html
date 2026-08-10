@@ -1532,15 +1532,20 @@ async function saveBookingEdit(){
 async function updateSelectedStatus(nextStatus){
   if (!selectedRow) return;
   try {
+    const personId = String(selectedRow["Person ID"] || "");
     const response = await fetch(SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action:"updateStatus", adminKey: ADMIN_KEY, personId:selectedRow["Person ID"], nextStatus:nextStatus })
+      body: JSON.stringify({ action:"updateStatus", adminKey: ADMIN_KEY, personId:personId, nextStatus:nextStatus })
     });
     const payload = await response.json();
     if (payload.status !== "success") throw new Error(payload.message || "Status update failed");
-    closeUserModal();
-    await loadData();
+    rawRows.forEach(function(row){
+      if (String(row["Person ID"] || "") === personId) row["Status"] = nextStatus;
+    });
+    selectedRow["Status"] = nextStatus;
+    document.getElementById("modalStatus").textContent = translateStatus(nextStatus);
+    applyCurrentFilters();
   } catch (error) {
     console.error("Status update failed:", error);
     alert(error && error.message ? error.message : "Could not update status. Please try again.");
@@ -2968,4 +2973,3 @@ applyUiLanguage();
 </script>
 </body>
 </html>
-
