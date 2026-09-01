@@ -566,19 +566,8 @@ function hardenAutofill(){
   });
 }
 
-async function selectLanguage(language){
+function selectLanguage(language){
   currentLanguage = language;
-  try {
-    const response = await fetch(SCRIPT_URL + "?action=getAvailability&eventId=parayan3&_=" + Date.now());
-    const payload = await response.json();
-    const total = payload && payload.status === "success" && payload.data && payload.data.total;
-    if (total && total.isFull) {
-      alert(t("eventFull"));
-      return;
-    }
-  } catch (error) {
-    // The server rechecks capacity when the registration is submitted.
-  }
   document.getElementById("languageScreen").style.display = "none";
   // Parayan 3 is the active public registration slot.
   selectEvent("parayan3");
@@ -795,6 +784,12 @@ async function loadAvailability(){
     const payload = await response.json();
     if (payload.status !== "success") throw new Error(payload.message || "Availability failed");
     availabilityData = payload.data || null;
+    if (availabilityData && availabilityData.total && availabilityData.total.isFull) {
+      document.getElementById("app").style.display = "none";
+      document.getElementById("languageScreen").style.display = "flex";
+      alert(t("eventFull"));
+      return;
+    }
     renderAccommodationOptions();
     renderAvailability();
   } catch (error) {
