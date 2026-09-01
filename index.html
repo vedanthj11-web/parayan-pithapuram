@@ -566,11 +566,22 @@ function hardenAutofill(){
   });
 }
 
-function selectLanguage(language){
+async function selectLanguage(language){
   currentLanguage = language;
+  try {
+    const response = await fetch(SCRIPT_URL + "?action=getAvailability&eventId=parayan3&_=" + Date.now());
+    const payload = await response.json();
+    const total = payload && payload.status === "success" && payload.data && payload.data.total;
+    if (total && total.isFull) {
+      alert(t("eventFull"));
+      return;
+    }
+  } catch (error) {
+    // The server rechecks capacity when the registration is submitted.
+  }
   document.getElementById("languageScreen").style.display = "none";
-  document.getElementById("eventScreen").style.display = "flex";
-  renderEventChooser();
+  // Parayan 3 is the active public registration slot.
+  selectEvent("parayan3");
 }
 
 function t(key){
