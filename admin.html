@@ -190,7 +190,7 @@
           <h2 style="margin:0;">Submitted People</h2>
           <div class="meta-actions">
             <div class="meta-info" id="tableSummary">0 rows</div>
-            <button type="button" class="action-btn secondary" id="bulkEditInactiveBtn">Bulk Edit Inactive</button>
+            <button type="button" class="action-btn secondary" id="bulkEditInactiveBtn">Bulk Edit Selected</button>
           </div>
         </div>
 
@@ -290,8 +290,8 @@
 
 <div id="bulkEditModal" class="modal-backdrop" role="dialog" aria-modal="true">
   <div class="bulk-edit-modal-card">
-    <h3 class="modal-title" id="bulkEditTitle">Bulk Edit Inactive Participants</h3>
-    <p class="import-help" id="bulkEditHelp">Select inactive participants from the table, edit their fields here, then save all changes together.</p>
+    <h3 class="modal-title" id="bulkEditTitle">Bulk Edit Selected Participants</h3>
+    <p class="import-help" id="bulkEditHelp">Select any participants from the table, edit their fields and status here, then save all changes together.</p>
     <div id="bulkEditError" class="capacity-note" style="display:none;color:#b33a30;margin-bottom:12px;"></div>
     <div id="bulkEditParticipants"></div>
     <div class="modal-actions">
@@ -428,7 +428,6 @@
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTkXBHASxYiSdqjy1eyYQASuqgDY-qvABIwISYEyOaKg8Bvg8H1WsVAOT7CWo78dat/exec";
-const ADMIN_KEY = "Admin@1";
 const VOLUNTEERS = [
   "Prasad Bhivre",
   "Priyanka Tai Patil",
@@ -575,6 +574,9 @@ let recordedChunks = [];
 let isRecording = false;
 let pendingAddressMatches = [];
 let selectedInactivePersonIds = [];
+let currentAdminToken = "";
+let currentAdminEventId = "";
+let currentAdminEventTitle = "";
 
 const adminKeyInput = document.getElementById("adminKey");
 const cityFilter = document.getElementById("cityFilter");
@@ -676,11 +678,27 @@ function t(){
   return UI_TEXTS[displayMode] || UI_TEXTS.original;
 }
 
-function tryUnlock(){
-  if (adminKeyInput.value !== ADMIN_KEY) { alert("Incorrect key."); return; }
-  document.getElementById("lockScreen").style.display = "none";
-  document.getElementById("dashboard").style.display = "block";
-  loadData();
+async function tryUnlock(){
+  const adminKey = adminKeyInput.value;
+  if (!adminKey) { alert("Enter the admin key."); return; }
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "authenticateAdmin", adminKey: adminKey })
+    });
+    const payload = await response.json();
+    if (payload.status !== "success") throw new Error(payload.message || "Incorrect key.");
+    currentAdminToken = payload.data.adminToken;
+    currentAdminEventId = payload.data.eventId;
+    currentAdminEventTitle = payload.data.eventTitle;
+    adminKeyInput.value = "";
+    document.getElementById("lockScreen").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+    loadData();
+  } catch (error) {
+    alert(error && error.message ? error.message : "Incorrect key.");
+  }
 }
 
 async function loadData(){
@@ -688,7 +706,7 @@ async function loadData(){
   const requestId = currentRequestId;
   setLoadingState(true);
   try {
-    const response = await fetch(SCRIPT_URL + "?action=getAllData&adminKey=" + encodeURIComponent(ADMIN_KEY) + "&_=" + Date.now());
+    const response = await fetch(SCRIPT_URL + "?action=getAllData&adminToken=" + encodeURIComponent(currentAdminToken) + "&_=" + Date.now());
     const payload = await response.json();
     if (payload.status !== "success") throw new Error(payload.message || "Could not load rows");
     if (requestId !== currentRequestId) return;
@@ -721,7 +739,7 @@ function setLoadingState(isLoading){
 function applyUiLanguage(){
   document.title = t().pageTitle;
   document.querySelector("#dashboard > h1").textContent = t().dashboardTitle;
-  document.querySelector("#dashboard > .sub").textContent = t().dashboardSub;
+  document.querySelector("#dashboard > .sub").textContent = currentAdminEventTitle || t().dashboardSub;
   document.querySelectorAll(".tab-btn")[0].textContent = t().tabs[0];
   document.querySelectorAll(".tab-btn")[1].textContent = t().tabs[1];
   document.querySelectorAll(".stat-card .lbl")[0].textContent = t().statLabels[0];
@@ -959,11 +977,11 @@ function closeEditModal(){
 }
 
 function openBulkEditInactiveModal(){
-  const rows = displayedRows.filter(function(row){
-    return normalizeStatus(row["Status"]) === "inactive" && selectedInactivePersonIds.indexOf(String(row["Person ID"] || "")) !== -1;
+  const rows = rawRows.filter(function(row){
+    return selectedInactivePersonIds.indexOf(String(row["Person ID"] || "")) !== -1;
   });
   if (!rows.length) {
-    alert("Select at least one inactive participant first.");
+    alert("Select at least one participant first.");
     return;
   }
   const container = document.getElementById("bulkEditParticipants");
@@ -987,6 +1005,7 @@ function openBulkEditInactiveModal(){
       '<input type="tel" class="bulk-mobile" value="' + safeCell(row["Mobile Number"] || "") + '" autocomplete="off">' +
       '<select class="bulk-gender"><option value="">Leave blank</option><option value="male"' + (row["Type"] === "Gent" ? " selected" : "") + '>Male</option><option value="female"' + (row["Type"] === "Lady" ? " selected" : "") + '>Female</option></select>' +
       '<input type="text" class="bulk-city" value="' + safeCell(row["City"] || "") + '" placeholder="City" autocomplete="off">' +
+      '<select class="bulk-status"><option value="active"' + (normalizeStatus(row["Status"]) === "active" ? " selected" : "") + '>Active</option><option value="inactive"' + (normalizeStatus(row["Status"]) === "inactive" ? " selected" : "") + '>Inactive</option></select>' +
       '<select class="bulk-accommodation"><option value="">Leave blank</option><option value="free"' + (row["Accommodation"] === "free" ? " selected" : "") + '>Free</option><option value="own"' + (row["Accommodation"] === "own" ? " selected" : "") + '>Own/Paid</option></select>' +
       '<select class="bulk-registered-by"><option value="">Leave blank</option><option value="self"' + (mode === "self" ? " selected" : "") + '>Self</option><option value="volunteer"' + (mode === "volunteer" ? " selected" : "") + '>Volunteer</option></select>' +
       '<div class="bulk-volunteer-wrap' + (mode === "volunteer" ? '' : ' hidden') + '"><select class="bulk-volunteer">' + volunteerOptions + '</select></div>' +
@@ -1021,6 +1040,7 @@ async function saveBulkEditInactive(){
       mobile: card.querySelector(".bulk-mobile").value.trim(),
       gender: card.querySelector(".bulk-gender").value,
       city: card.querySelector(".bulk-city").value.trim(),
+      status: card.querySelector(".bulk-status").value,
       accommodation: card.querySelector(".bulk-accommodation").value,
       registeredByMode: card.querySelector(".bulk-registered-by").value,
       volunteerName: card.querySelector(".bulk-volunteer").value
@@ -1043,6 +1063,7 @@ async function saveBulkEditInactive(){
             mobile: String(row["Mobile Number"] || "").trim(),
             gender: row["Type"] === "Lady" ? "female" : row["Type"] === "Gent" ? "male" : "",
             city: String(row["City"] || "").trim(),
+            status: normalizeStatus(row["Status"]),
             accommodation: String(row["Accommodation"] || "").trim(),
             registeredByMode: registeredBy === "Self" ? "self" : /^Volunteer - /.test(registeredBy) ? "volunteer" : "",
             volunteerName: /^Volunteer - /.test(registeredBy) ? registeredBy.replace(/^Volunteer - /, "") : ""
@@ -1055,7 +1076,7 @@ async function saveBulkEditInactive(){
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
           action: "updateBooking",
-          adminKey: ADMIN_KEY,
+          adminToken: currentAdminToken,
           submissionId: submissionId,
           accommodation: "",
           registeredByMode: "",
@@ -1072,6 +1093,22 @@ async function saveBulkEditInactive(){
       });
       const result = await response.json();
       if (result.status !== "success") throw new Error(result.message || "Could not save bulk changes");
+      for (let j = 0; j < bookingRows.length; j++) {
+        const row = bookingRows[j];
+        const personId = String(row["Person ID"] || "");
+        const edited = updatesBySubmission[submissionId][personId];
+        if (!edited) continue;
+        const nextStatus = normalizeStatus(edited.status);
+        const currentStatus = normalizeStatus(row["Status"]);
+        if (nextStatus === currentStatus) continue;
+        const statusResponse = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action:"updateStatus", adminToken: currentAdminToken, personId: personId, nextStatus: nextStatus })
+        });
+        const statusResult = await statusResponse.json();
+        if (statusResult.status !== "success") throw new Error(statusResult.message || "Could not update bulk status");
+      }
     }
     selectedInactivePersonIds = [];
     closeBulkEditInactiveModal();
@@ -1443,7 +1480,7 @@ async function saveTextImportBooking(){
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({
         action: "saveAdminTextBooking",
-        adminKey: ADMIN_KEY,
+        adminToken: currentAdminToken,
         accommodation: draft.booking.accommodation,
         registeredByMode: draft.booking.registeredByMode,
         volunteerName: draft.booking.registeredByMode === "volunteer" ? draft.booking.volunteerName : "",
@@ -1499,7 +1536,7 @@ async function saveBookingEdit(){
   });
   const payload = {
     action: "updateBooking",
-    adminKey: ADMIN_KEY,
+    adminToken: currentAdminToken,
     submissionId: editingSubmissionId,
     accommodation: document.getElementById("editAccommodation").value,
     location: {
@@ -1536,7 +1573,7 @@ async function updateSelectedStatus(nextStatus){
     const response = await fetch(SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action:"updateStatus", adminKey: ADMIN_KEY, personId:personId, nextStatus:nextStatus })
+      body: JSON.stringify({ action:"updateStatus", adminToken: currentAdminToken, personId:personId, nextStatus:nextStatus })
     });
     const payload = await response.json();
     if (payload.status !== "success") throw new Error(payload.message || "Status update failed");
@@ -2141,6 +2178,7 @@ function applyUiLanguage(){
   document.title = "Admin Dashboard - Parayan Registrations";
   document.querySelector("#dashboard > h1").textContent = "Registration Dashboard";
   document.querySelector("#dashboard > .sub").textContent = "Shripad Shrivallabh Charitamrut Samohik Parayan · Pithapuram";
+  document.querySelector("#dashboard > .sub").textContent = currentAdminEventTitle || document.querySelector("#dashboard > .sub").textContent;
   document.querySelectorAll(".tab-btn")[0].textContent = "Analytics";
   document.querySelectorAll(".tab-btn")[1].textContent = "All Submissions";
   document.querySelectorAll(".stat-card .lbl")[0].textContent = "People";
@@ -2179,8 +2217,8 @@ function applyUiLanguage(){
   document.getElementById("downloadBtn").textContent = "Download Excel";
   document.getElementById("refreshBtn").textContent = "Refresh";
   document.getElementById("addViaTextBtn").textContent = "Add via Text / Voice";
-  document.getElementById("bulkEditInactiveBtn").textContent = selectedInactivePersonIds.length ? "Bulk Edit Inactive (" + selectedInactivePersonIds.length + ")" : "Bulk Edit Inactive";
-  document.getElementById("bulkEditTitle").textContent = "Bulk Edit Inactive Participants";
+  document.getElementById("bulkEditInactiveBtn").textContent = selectedInactivePersonIds.length ? "Bulk Edit Selected (" + selectedInactivePersonIds.length + ")" : "Bulk Edit Selected";
+  document.getElementById("bulkEditTitle").textContent = "Bulk Edit Selected Participants";
   document.getElementById("recordVoiceBtn").textContent = isRecording ? "Stop Recording" : "Start Recording";
   document.getElementById("parseTextImportBtn").textContent = "Paste and Analyse";
   document.getElementById("saveTextImportBtn").textContent = "Save With Missing Data";
@@ -2261,9 +2299,9 @@ function renderTable(rows){
     summary.textContent = rows.length + " rows";
   }
   const selectedCount = rows.filter(function(row){
-    return normalizeStatus(row["Status"]) === "inactive" && selectedInactivePersonIds.indexOf(String(row["Person ID"] || "")) !== -1;
+    return selectedInactivePersonIds.indexOf(String(row["Person ID"] || "")) !== -1;
   }).length;
-  bulkBtn.textContent = selectedCount ? "Bulk Edit Inactive (" + selectedCount + ")" : "Bulk Edit Inactive";
+  bulkBtn.textContent = selectedInactivePersonIds.length ? "Bulk Edit Selected (" + selectedInactivePersonIds.length + ")" : "Bulk Edit Selected";
   if (!rows.length) { empty.style.display = "block"; return; }
   empty.style.display = "none";
   let previousSubmissionNumber = null;
@@ -2286,11 +2324,11 @@ function renderTable(rows){
     }
     const missingFields = getMissingFieldsForRow(row);
     const personId = String(row["Person ID"] || "");
-    const isInactive = normalizeStatus(row["Status"]) === "inactive";
+    const isSelected = selectedInactivePersonIds.indexOf(personId) !== -1;
     const tr = document.createElement("tr");
     tr.className = currentBand;
     tr.innerHTML =
-      '<td><input type="checkbox" class="row-check"' + (isInactive ? '' : ' disabled') + (isInactive && selectedInactivePersonIds.indexOf(personId) !== -1 ? ' checked' : '') + '></td>' +
+      '<td><input type="checkbox" class="row-check"' + (isSelected ? ' checked' : '') + '></td>' +
       "<td>" + safeCell(index + 1) + "</td>" +
       "<td>" + safeCell(row["Submission Number"]) + "</td>" +
       "<td>" + safeCell(displayText(row["Name"])) + "</td>" +
@@ -2303,7 +2341,7 @@ function renderTable(rows){
       "<td>" + safeCell(missingFields.length ? missingFields.join(", ") + " (" + missingFields.length + ")" : "-") + "</td>" +
       "<td>" + safeCell(translateStatus(row["Status"])) + "</td>";
     const checkbox = tr.querySelector(".row-check");
-    if (checkbox && isInactive) {
+    if (checkbox) {
       checkbox.addEventListener("click", function(event){
         event.stopPropagation();
       });
@@ -2450,7 +2488,7 @@ async function saveBookingEdit(){
   });
   const payload = {
     action: "updateBooking",
-    adminKey: ADMIN_KEY,
+    adminToken: currentAdminToken,
     submissionId: editingSubmissionId,
     accommodation: "",
     registeredByMode: "",
@@ -2506,7 +2544,7 @@ async function toggleVoiceRecording(){
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({
             action: "transcribeAdminAudio",
-            adminKey: ADMIN_KEY,
+            adminToken: currentAdminToken,
             mimeType: blob.type || "audio/webm",
             audioBase64: base64Audio
           })
@@ -2561,7 +2599,7 @@ async function parseTextImport(){
     const response = await fetch(SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "parseAdminTextWithAI", adminKey: ADMIN_KEY, text: text })
+      body: JSON.stringify({ action: "parseAdminTextWithAI", adminToken: currentAdminToken, text: text })
     });
     const payload = await response.json();
     if (payload.status !== "success") throw new Error(payload.message || "AI parsing failed.");
@@ -2902,7 +2940,7 @@ async function saveTextImportBooking(){
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({
         action: "saveAdminTextBooking",
-        adminKey: ADMIN_KEY,
+        adminToken: currentAdminToken,
         location: {
           area: draft.booking.area,
           city: "",
@@ -2981,4 +3019,3 @@ applyUiLanguage();
 </script>
 </body>
 </html>
-

@@ -123,6 +123,15 @@
     </div>
     <h1 id="gateTitle"></h1>
     <p class="sub" id="gateSubtitle"></p>
+    <div class="field" id="field-event">
+      <label for="volunteerEvent">Parayan Slot</label>
+      <select id="volunteerEvent" required>
+        <option value="">Choose a Parayan slot</option>
+        <option value="parayan2">Shripad Shrivallabh Charitamrut Samohik Parayan- 2 November 21, 22, 23 2026</option>
+        <option value="parayan3">Shripad Shrivallabh Charitamrut Samohik Parayan- 3 February 5, 6, 7 2027</option>
+      </select>
+      <div class="error-text" id="volunteerEventError"></div>
+    </div>
     <div class="field" id="field-agent-mobile">
       <label id="agentMobileLabel" for="agentMobile"></label>
       <input type="tel" id="agentMobile" inputmode="numeric" maxlength="10" autocomplete="off">
@@ -301,6 +310,7 @@ const CONTACTS = {
   ]
 };
 let currentLanguage = "en";
+let currentEventId = "";
 let participantCount = 1;
 let availabilityData = null;
 let selectedLocation = null;
@@ -480,6 +490,12 @@ document.getElementById("manualLocationBtn").addEventListener("click", function(
 });
 document.getElementById("locationSearch").addEventListener("input", handleLocationInput);
 document.getElementById("locationSearch").addEventListener("keydown", handleLocationKeydown);
+document.getElementById("volunteerEvent").addEventListener("change", function(){
+  currentEventId = this.value;
+  document.getElementById("field-event").classList.remove("invalid");
+  document.getElementById("volunteerEventError").style.display = "none";
+  if (validatedAgent && currentEventId) loadAvailability();
+});
 document.addEventListener("click", function(event){
   if (!document.getElementById("field-location").contains(event.target)) hideSuggestions();
 });
@@ -590,8 +606,19 @@ async function verifyAgent(){
   const field = document.getElementById("field-agent-mobile");
   const error = document.getElementById("agentMobileError");
   const mobile = document.getElementById("agentMobile").value.trim();
+  const eventField = document.getElementById("field-event");
+  const eventError = document.getElementById("volunteerEventError");
   field.classList.remove("invalid");
   error.style.display = "none";
+  eventField.classList.remove("invalid");
+  eventError.style.display = "none";
+  currentEventId = document.getElementById("volunteerEvent").value;
+  if (!currentEventId) {
+    eventField.classList.add("invalid");
+    eventError.textContent = "Choose a Parayan slot.";
+    eventError.style.display = "block";
+    return;
+  }
   if (!MOBILE_REGEX.test(mobile)) {
     field.classList.add("invalid");
     error.textContent = t("agentMobileError");
@@ -615,6 +642,14 @@ async function verifyAgent(){
   document.getElementById("refreshBookingsBtn").style.display = "inline-block";
   window.scrollTo({ top: 0, behavior: "smooth" });
   await loadAvailability();
+  if (availabilityData && availabilityData.total && availabilityData.total.isFull) {
+    document.getElementById("panel").style.display = "none";
+    document.getElementById("gate").style.display = "block";
+    eventField.classList.add("invalid");
+    eventError.textContent = "This Parayan slot is full.";
+    eventError.style.display = "block";
+    return;
+  }
   await loadVolunteerBookings();
 }
 
@@ -712,7 +747,7 @@ function renderAccommodationOption(value, selected){
 
 async function loadAvailability(){
   try {
-    const response = await fetch(SCRIPT_URL + "?action=getAvailability&_=" + Date.now());
+    const response = await fetch(SCRIPT_URL + "?action=getAvailability&eventId=" + encodeURIComponent(currentEventId) + "&_=" + Date.now());
     const payload = await response.json();
     if (payload.status !== "success") throw new Error(payload.message || "Availability failed");
     availabilityData = payload.data || null;
@@ -1189,6 +1224,7 @@ async function handleSubmit(event){
     accommodation: document.querySelector('input[name="accom"]:checked').value,
     timestamp: new Date().toISOString(),
     submissionId: submissionId,
+    eventId: currentEventId,
     formLanguage: currentLanguage,
     location: getResolvedLocation(),
     isAgentRegistration: true,
