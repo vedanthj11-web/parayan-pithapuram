@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shripad Shrivallabh Charitamrut Samohik Parayan- 2</title>
+<title>Shripad Shrivallabh Charitamrut Samohik Parayan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Serif:wght@600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -272,6 +272,7 @@
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTkXBHASxYiSdqjy1eyYQASuqgDY-qvABIwISYEyOaKg8Bvg8H1WsVAOT7CWo78dat/exec";
+const SITE_TITLE = "Shripad Shrivallabh Charitamrut Samohik Parayan";
 const REQUEST_TIMEOUT_MS = 8000;
 const MOBILE_REGEX = /^\d{10}$/;
 const AGE_REGEX = /^(?:1[01]\d|120|[1-9]\d?)$/;
@@ -342,7 +343,7 @@ const TEXTS = {
     eventSeatsLine: "Total bookings left: {remaining} out of {capacity}",
     eventFull: "This slot is full",
     eventLoading: "Loading live booking count...",
-    pageTitle: "Shripad Shrivallabh Charitamrut Samohik Parayan- 2",
+    pageTitle: "Shripad Shrivallabh Charitamrut Samohik Parayan",
     headerTitle: "Shripad Shrivallabh Charitamrut Samohik Parayan- 2",
     headerSubtitle: "Pithapuram Registration Form",
     headerDates: "21 - 22 - 23 November",
@@ -525,7 +526,7 @@ renderLanguageChooser();
 hardenAutofill();
 
 function renderLanguageChooser(){
-  document.title = TEXTS.en.pageTitle;
+  document.title = SITE_TITLE;
   document.getElementById("languageTitle").textContent = TEXTS.en.languageTitle;
   document.getElementById("languageSubtitle").textContent = TEXTS.en.languageSubtitle;
   document.getElementById("languageMarathiTitle").textContent = TEXTS.en.languageMarathiTitle;
@@ -578,7 +579,7 @@ function t(key){
 
 function applyLanguage(){
   document.documentElement.lang = currentLanguage === "mr" ? "mr" : "en";
-  document.title = currentEventTitle || t("pageTitle");
+  document.title = SITE_TITLE;
   document.getElementById("headerTitle").textContent = currentEventTitle || t("headerTitle");
   document.getElementById("headerSubtitle").textContent = t("headerSubtitle");
   document.getElementById("headerDates").textContent = getEventDatesText();
@@ -802,11 +803,25 @@ async function loadEventAvailability(){
       eventAvailability[eventItem.id] = null;
     }
   }));
-  if (document.getElementById("eventScreen").style.display !== "none") {
-    const grid = document.getElementById("eventGrid");
-    if (grid.children.length) {
-      renderEventChooserLoadedState();
-    }
+  if (document.getElementById("eventScreen").style.display === "none") return;
+
+  const allSlotsLoaded = PARAYAN_EVENTS.every(function(eventItem){
+    return Boolean(eventAvailability[eventItem.id] && eventAvailability[eventItem.id].total);
+  });
+  const availableEvents = PARAYAN_EVENTS.filter(function(eventItem){
+    const total = eventAvailability[eventItem.id] && eventAvailability[eventItem.id].total;
+    return total && !total.isFull;
+  });
+
+  // When only one slot remains, take the registrant directly to it.
+  if (allSlotsLoaded && availableEvents.length === 1) {
+    selectEvent(availableEvents[0].id);
+    return;
+  }
+
+  const grid = document.getElementById("eventGrid");
+  if (grid.children.length) {
+    renderEventChooserLoadedState();
   }
 }
 
